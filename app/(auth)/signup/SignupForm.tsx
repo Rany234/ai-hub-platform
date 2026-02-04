@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { signUpAction } from "@/features/auth/actions";
@@ -79,20 +80,58 @@ export function SignupForm() {
 
   const isCheckEmailVisible = state?.success === true && state.requireVerification === true;
 
+  const emailDomain = useMemo(() => {
+    if (!email) return "";
+    const parts = email.toLowerCase().split("@");
+    return parts.length > 1 ? parts[1] : "";
+  }, [email]);
+
+  const mailProvider = useMemo(() => {
+    if (!emailDomain) return null;
+    if (emailDomain.includes("gmail.com")) return { name: "Gmail", url: "https://mail.google.com" };
+    if (emailDomain.includes("outlook.com") || emailDomain.includes("hotmail.com"))
+      return { name: "Outlook", url: "https://outlook.live.com" };
+    return null;
+  }, [emailDomain]);
+
   if (isCheckEmailVisible) {
     return (
-      <div className="mt-6 border rounded-lg p-8">
-        <div className="text-5xl">📧</div>
-        <h2 className="mt-4 text-xl font-semibold">验证邮件已发送</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          我们已向您的邮箱发送了一封确认邮件，请点击邮件中的链接激活账号。
-        </p>
-        <a
-          className="inline-flex mt-6 items-center justify-center rounded-md bg-black text-white px-4 py-2 text-sm"
-          href="/login"
-        >
-          返回登录页
-        </a>
+      <div className="mt-6 border rounded-xl p-8 text-center space-y-6">
+        <div className="text-6xl">📩</div>
+
+        <div>
+          <h2 className="text-xl font-semibold">只差最后一步了！</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            请点击邮件中的链接激活账号。
+          </p>
+        </div>
+
+        {mailProvider ? (
+          <a
+            href={mailProvider.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-md bg-black text-white px-6 py-3 text-base font-medium hover:bg-gray-800 transition-colors"
+          >
+            打开 {mailProvider.name}
+          </a>
+        ) : (
+          <a
+            href={`https://${emailDomain}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-md bg-black text-white px-6 py-3 text-base font-medium hover:bg-gray-800 transition-colors"
+          >
+            打开邮箱
+          </a>
+        )}
+
+        <div className="text-sm text-muted-foreground">
+          已在其他窗口完成验证？
+          <Link href="/login" className="ml-1 underline hover:text-foreground">
+            立即登录
+          </Link>
+        </div>
       </div>
     );
   }
