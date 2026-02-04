@@ -1,11 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
-import { useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { loginAction } from "@/features/auth/actions";
-import { AuthSubmitButton } from "@/features/auth/components/AuthSubmitButton";
+import { toastError } from "@/lib/toast";
+
+function toastSuccess(message: string) {
+  if (typeof window !== "undefined") {
+    window.alert(message);
+  }
+}
 
 type State =
   | { success?: undefined; error?: undefined }
@@ -14,22 +19,33 @@ type State =
 
 export default function LoginForm() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [state, formAction] = useActionState<State, FormData>(
-    loginAction,
-    {}
-  );
+  const [state, formAction] = useActionState<State, FormData>(loginAction, {});
 
   useEffect(() => {
-    if (state && state.success) {
-      router.push(state.redirectTo ?? "/dashboard");
+    if (!state || state.success === undefined) return;
+
+    if (state.success) {
+      toastSuccess("登录成功，正在跳转...");
       router.refresh();
+      router.push(state.redirectTo ?? "/");
+      return;
     }
+
+    toastError(state.error);
+    setIsLoading(false);
   }, [state, router]);
 
   return (
     <div>
-      <form action={formAction} className="mt-6 space-y-4">
+      <form
+        action={async (formData) => {
+          setIsLoading(true);
+          await formAction(formData);
+        }}
+        className="mt-6 space-y-4"
+      >
         <div className="space-y-1">
           <label className="text-sm" htmlFor="email">
             邮箱
@@ -41,6 +57,7 @@ export default function LoginForm() {
             required
             className="w-full border rounded-md px-3 py-2"
             autoComplete="email"
+            disabled={isLoading}
           />
         </div>
 
@@ -55,10 +72,17 @@ export default function LoginForm() {
             required
             className="w-full border rounded-md px-3 py-2"
             autoComplete="current-password"
+            disabled={isLoading}
           />
         </div>
 
-        <AuthSubmitButton pendingText="登录中..." idleText="登录" />
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60"
+        >
+          {isLoading ? "登录中..." : "登录"}
+        </button>
 
         {state && state.success === false ? (
           <p className="text-sm text-red-600">{state.error}</p>
