@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
@@ -18,7 +17,7 @@ export async function updateUserRole(role: UserRole) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    throw new Error("Unauthorized");
   }
 
   const { error } = await supabase
@@ -31,5 +30,5 @@ export async function updateUserRole(role: UserRole) {
   }
 
   revalidatePath("/dashboard", "layout");
-  redirect("/dashboard");
+  return { success: true } as const;
 }
