@@ -1,7 +1,7 @@
 import { Briefcase, Code2 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { updateUserRole, UserRole } from "@/actions/profile";
+import { updateUserRole, UserRole } from "@/app/actions/profile";
 
 export default function OnboardingRolePage() {
   async function handleSelectRole(role: UserRole) {
