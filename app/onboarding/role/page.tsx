@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Briefcase, Code2, Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +9,6 @@ import { updateUserRole } from "@/app/actions/profile";
 type Role = "client" | "freelancer";
 
 export default function OnboardingRolePage() {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
@@ -24,8 +22,7 @@ export default function OnboardingRolePage() {
         const result = await updateUserRole(role);
 
         if (result && result.success) {
-          router.push("/dashboard");
-          router.refresh();
+          window.location.href = "/dashboard";
         }
       } catch (e) {
         console.error("Failed to update role:", e);
