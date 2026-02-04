@@ -16,7 +16,6 @@ export default function LoginForm() {
   const router = useRouter();
 
   const [state, formAction] = useActionState<State, FormData>(
-    
     loginAction,
     {}
   );

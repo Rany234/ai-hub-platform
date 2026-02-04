@@ -123,7 +123,7 @@ export default async function ListingDetailPage({
         </div>
         <aside className="border rounded-lg p-4">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-semibold">卖家信息</div>
+          <div className="text-sm font-semibold">卖家信息</div>
             <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
           </div>
           <div className="mt-4 flex items-start gap-3">
