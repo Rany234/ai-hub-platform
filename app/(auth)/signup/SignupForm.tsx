@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { signUpAction } from "@/features/auth/actions";
-import { AuthSubmitButton } from "@/features/auth/components/AuthSubmitButton";
+import { toastError } from "@/lib/toast";
 
 type SignUpInputs = {
   email?: string;
@@ -43,11 +44,38 @@ function normalizeError(raw: string): string {
 }
 
 export function SignupForm() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+
   const [state, formAction] = useActionState<State, FormData>(
     // @ts-expect-error - Next will provide the correct types at runtime
     signUpAction,
     {}
   );
+
+  useEffect(() => {
+    if (!state || state.success === undefined) return;
+
+    if (state.success) {
+      setIsSuccess(true);
+
+      if (state.redirectTo) {
+        router.refresh();
+        router.push(state.redirectTo);
+      }
+
+      return;
+    }
+
+    toastError(normalizeError(state.error));
+    setIsLoading(false);
+  }, [state, router]);
 
   const isCheckEmailVisible = state?.success === true && state.requireVerification === true;
 
@@ -71,7 +99,13 @@ export function SignupForm() {
 
   return (
     <div>
-      <form action={formAction} className="mt-6 space-y-4">
+      <form
+        action={async (formData) => {
+          setIsLoading(true);
+          await formAction(formData);
+        }}
+        className="mt-6 space-y-4"
+      >
         <div className="space-y-1">
           <label className="text-sm" htmlFor="email">
             邮箱
@@ -81,9 +115,11 @@ export function SignupForm() {
             name="email"
             type="email"
             required
-            defaultValue={state.inputs?.email ?? ""}
             className="w-full border rounded-md px-3 py-2"
             autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading || isSuccess}
           />
         </div>
 
@@ -98,6 +134,9 @@ export function SignupForm() {
             required
             className="w-full border rounded-md px-3 py-2"
             autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading || isSuccess}
           />
         </div>
 
@@ -109,9 +148,11 @@ export function SignupForm() {
             id="username"
             name="username"
             type="text"
-            defaultValue={state.inputs?.username ?? ""}
             className="w-full border rounded-md px-3 py-2"
             autoComplete="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            disabled={isLoading || isSuccess}
           />
         </div>
 
@@ -123,12 +164,26 @@ export function SignupForm() {
             id="fullName"
             name="fullName"
             type="text"
-            defaultValue={state.inputs?.fullName ?? ""}
             className="w-full border rounded-md px-3 py-2"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            disabled={isLoading || isSuccess}
           />
         </div>
 
-        <AuthSubmitButton pendingText="注册中..." idleText="注册" />
+        <button
+          type="submit"
+          disabled={isLoading || isSuccess}
+          className={`w-full rounded-md py-2 text-white disabled:opacity-60 ${
+            isSuccess ? "bg-green-600" : "bg-black"
+          }`}
+        >
+          {isSuccess
+            ? "注册成功，请查收邮件验证"
+            : isLoading
+              ? "注册中..."
+              : "注册"}
+        </button>
 
         {state && state.success === false ? (
           <p className="text-sm text-red-600">{normalizeError(state.error)}</p>

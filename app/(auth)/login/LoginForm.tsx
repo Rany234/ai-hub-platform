@@ -6,12 +6,6 @@ import { useRouter } from "next/navigation";
 import { loginAction } from "@/features/auth/actions";
 import { toastError } from "@/lib/toast";
 
-function toastSuccess(message: string) {
-  if (typeof window !== "undefined") {
-    window.alert(message);
-  }
-}
-
 type State =
   | { success?: undefined; error?: undefined }
   | { success: true; data: null; redirectTo?: string }
@@ -20,6 +14,10 @@ type State =
 export default function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [state, formAction] = useActionState<State, FormData>(loginAction, {});
 
@@ -27,7 +25,7 @@ export default function LoginForm() {
     if (!state || state.success === undefined) return;
 
     if (state.success) {
-      toastSuccess("登录成功，正在跳转...");
+      setIsSuccess(true);
       router.refresh();
       router.push(state.redirectTo ?? "/");
       return;
@@ -57,7 +55,9 @@ export default function LoginForm() {
             required
             className="w-full border rounded-md px-3 py-2"
             autoComplete="email"
-            disabled={isLoading}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading || isSuccess}
           />
         </div>
 
@@ -72,16 +72,20 @@ export default function LoginForm() {
             required
             className="w-full border rounded-md px-3 py-2"
             autoComplete="current-password"
-            disabled={isLoading}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading || isSuccess}
           />
         </div>
 
         <button
           type="submit"
-          disabled={isLoading}
-          className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60"
+          disabled={isLoading || isSuccess}
+          className={`w-full rounded-md py-2 text-white disabled:opacity-60 ${
+            isSuccess ? "bg-green-600" : "bg-black"
+          }`}
         >
-          {isLoading ? "登录中..." : "登录"}
+          {isSuccess ? "登录成功，正在跳转..." : isLoading ? "登录中..." : "登录"}
         </button>
 
         {state && state.success === false ? (
