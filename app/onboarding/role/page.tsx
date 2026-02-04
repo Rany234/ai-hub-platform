@@ -21,7 +21,12 @@ export default function OnboardingRolePage() {
       try {
         await updateUserRole(role);
       } catch (e) {
-        console.error(e);
+        const err = e as any;
+        if (err?.message === "NEXT_REDIRECT" || typeof err?.digest === "string" && err.digest.startsWith("NEXT_REDIRECT")) {
+          throw e;
+        }
+
+        console.error("更新角色失败:", e);
         setSelectedRole(null);
       }
     });
