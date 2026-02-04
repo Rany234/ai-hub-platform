@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "./supabase/server";
@@ -112,13 +113,16 @@ export async function signUpAction(
 
     const supabase = await createSupabaseServerClient();
 
-    const origin = (formData.get("origin") as string | null) ?? "";
+    const origin = (await headers()).get("origin");
+    const callbackUrl = origin
+      ? `${origin}/auth/callback`
+      : "https://ai-hub-platform.vercel.app/auth/callback";
 
     const { data, error } = await supabase.auth.signUp({
       email: input.email,
       password: input.password,
       options: {
-        emailRedirectTo: origin ? `${origin}/auth/callback` : undefined,
+        emailRedirectTo: callbackUrl,
       },
     });
 
