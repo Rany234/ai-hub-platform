@@ -55,7 +55,6 @@ export function SignupForm() {
   const [fullName, setFullName] = useState("");
 
   const [state, formAction] = useActionState<State, FormData>(
-    // @ts-expect-error - Next will provide the correct types at runtime
     signUpAction,
     {}
   );
@@ -141,6 +140,7 @@ export function SignupForm() {
       <form
         action={async (formData) => {
           setIsLoading(true);
+          formData.set("origin", window.location.origin);
           await formAction(formData);
         }}
         className="mt-6 space-y-4"

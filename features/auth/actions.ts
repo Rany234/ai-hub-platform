@@ -112,9 +112,14 @@ export async function signUpAction(
 
     const supabase = await createSupabaseServerClient();
 
+    const origin = (formData.get("origin") as string | null) ?? "";
+
     const { data, error } = await supabase.auth.signUp({
       email: input.email,
       password: input.password,
+      options: {
+        emailRedirectTo: origin ? `${origin}/auth/callback` : undefined,
+      },
     });
 
     if (error) {
