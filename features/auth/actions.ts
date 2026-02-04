@@ -113,10 +113,11 @@ export async function signUpAction(
 
     const supabase = await createSupabaseServerClient();
 
-    const origin = (await headers()).get("origin");
-    const callbackUrl = origin
-      ? `${origin}/auth/callback`
-      : "https://ai-hub-platform.vercel.app/auth/callback";
+    const callbackUrl = process.env.NODE_ENV === 'production'
+      ? 'https://ai-hub-platform.vercel.app/auth/callback'  // 生产环境：强制指向你的 Vercel 域名
+      : 'http://localhost:3000/auth/callback';              // 本地开发：指向 localhost
+
+    console.log("正在注册，重定向地址为：", callbackUrl); // 加个日志，方便调试
 
     const { data, error } = await supabase.auth.signUp({
       email: input.email,
