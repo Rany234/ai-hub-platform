@@ -30,7 +30,7 @@ export default async function DashboardHomePage() {
   }
 
   if (profile?.role === "client") {
-    return <ClientView />;
+    return <ClientView userId={user.id} />;
   }
 
   if (profile?.role === "freelancer") {
