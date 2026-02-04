@@ -39,6 +39,7 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthRoute = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/signup");
+  const isOnboardingRoute = req.nextUrl.pathname.startsWith("/onboarding");
 
   // If user is not logged in, protect /app routes (you can expand this list).
   const isProtected = req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/account");
@@ -49,6 +50,19 @@ export async function middleware(req: NextRequest) {
 
   if (user && isAuthRoute) {
     return NextResponse.redirect(getRedirectUrl(req, "/"));
+  }
+
+  // Role onboarding guard: logged in but no role -> redirect to role selection
+  if (user && !isOnboardingRoute && (isProtected || req.nextUrl.pathname === "/")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.role) {
+      return NextResponse.redirect(getRedirectUrl(req, "/onboarding/role"));
+    }
   }
 
   return res;
