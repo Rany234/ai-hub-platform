@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { JobCard } from "@/components/jobs/JobCard";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
 type ClientViewProps = {
@@ -13,7 +14,7 @@ export async function ClientView({ userId }: ClientViewProps) {
 
   const { data: jobs, error } = await supabase
     .from("jobs")
-    .select("id, title, budget, status, created_at")
+    .select("id, creator_id, title, description, budget, status, created_at")
     .eq("creator_id", userId)
     .order("created_at", { ascending: false });
 
@@ -56,26 +57,7 @@ export async function ClientView({ userId }: ClientViewProps) {
         {hasJobs ? (
           <div className="space-y-3">
             {jobs.map((job) => (
-              <div
-                key={job.id}
-                className="border rounded-lg p-4 space-y-2 hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex justify-between items-start">
-                  <Link
-                    href={`/jobs/${job.id}`}
-                    className="text-base font-medium hover:underline"
-                  >
-                    {job.title}
-                  </Link>
-                  <span className="text-sm font-semibold text-green-600">
-                    ¥{Number(job.budget).toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-sm text-muted-foreground">
-                  <span>状态: {job.status === "open" ? "开放" : job.status === "in_progress" ? "进行中" : "已完成"}</span>
-                  <span>{new Date(job.created_at).toLocaleDateString("zh-CN")}</span>
-                </div>
-              </div>
+              <JobCard key={job.id} job={job} isOwner />
             ))}
           </div>
         ) : (
