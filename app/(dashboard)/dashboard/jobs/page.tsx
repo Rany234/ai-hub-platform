@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Ghost } from "lucide-react";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { EmptyState } from "@/components/ui/empty-state";
 import { JobsClient } from "./JobsClient";
 
 export default async function MyJobsPage() {
@@ -32,16 +34,13 @@ export default async function MyJobsPage() {
       {error ? <p className="mt-4 text-sm text-red-600">{error.message}</p> : null}
 
       {!jobs || jobs.length === 0 ? (
-        <div className="mt-10 border rounded-lg p-8 text-center">
-          <h2 className="text-lg font-semibold">暂无内容</h2>
-          <p className="mt-2 text-sm text-muted-foreground">你还没有发布任何任务。</p>
-          <Link
-            className="inline-flex mt-4 items-center justify-center rounded-md bg-black text-white px-4 py-2 text-sm"
-            href="/jobs/create"
-          >
-            去发布
-          </Link>
-        </div>
+        <EmptyState
+          title="暂时没有任务"
+          description="目前还没有发布任何 AI 需求，快去发布第一个任务吧！"
+          icon={Ghost}
+          actionLabel="发布任务"
+          href="/jobs/create"
+        />
       ) : (
         <JobsClient jobs={(jobs as any) ?? []} />
       )}
