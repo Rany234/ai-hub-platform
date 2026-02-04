@@ -16,7 +16,7 @@ export default function LoginForm() {
   const router = useRouter();
 
   const [state, formAction] = useActionState<State, FormData>(
-    // @ts-expect-error - Next will provide the correct types at runtime
+    
     loginAction,
     {}
   );
