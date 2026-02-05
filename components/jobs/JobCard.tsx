@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Clock } from "lucide-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { deleteJob } from "@/app/actions/job";
 
 type JobLike = {
   id?: string;
@@ -48,6 +50,23 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
 
   const createdAt = j.created_at ? new Date(j.created_at) : null;
   const createdAtText = createdAt ? format(createdAt, "yyyy-MM-dd HH:mm") : "";
+
+  const handleDelete = async () => {
+    if (!j.id) return;
+    
+    const confirmed = confirm("确定要删除这个任务吗？");
+    if (!confirmed) return;
+
+    const toastId = toast.loading("正在删除...");
+    
+    try {
+      await deleteJob(j.id);
+      toast.success("任务已删除", { id: toastId });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "删除失败，请稍后重试";
+      toast.error(message, { id: toastId });
+    }
+  };
 
   return (
     <Card>
@@ -95,7 +114,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
               <Button variant="outline" size="sm" asChild>
                 <Link href={j.id ? `/dashboard/jobs/${j.id}/edit` : "/dashboard/jobs"}>编辑</Link>
               </Button>
-              <Button variant="destructive" size="sm">删除</Button>
+              <Button variant="destructive" size="sm" onClick={handleDelete}>删除</Button>
             </>
           ) : (
             <Button size="sm" onClick={() => j.id && router.push(`/dashboard/jobs/${j.id}`)}>

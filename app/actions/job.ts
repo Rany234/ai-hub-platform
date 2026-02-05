@@ -36,6 +36,44 @@ export async function getJobById(id: string) {
   return data;
 }
 
+export async function deleteJob(id: string) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!id?.trim()) {
+    throw new Error("Invalid job id");
+  }
+
+  // 验证任务是否属于当前用户
+  const { data: job } = await supabase
+    .from("jobs")
+    .select("creator_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!job) {
+    throw new Error("任务不存在");
+  }
+
+  if (job.creator_id !== user.id) {
+    throw new Error("无权删除此任务");
+  }
+
+  const { error } = await supabase.from("jobs").delete().eq("id", id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/dashboard");
+}
+
 export async function createJob(input: CreateJobInput) {
   const supabase = await createSupabaseServerClient();
   const {
