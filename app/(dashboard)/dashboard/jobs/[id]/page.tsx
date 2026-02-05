@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, BadgeCheck, CalendarClock, Coins, Hammer } from "lucide-react";
+
+import FormattedDate from "@/components/jobs/FormattedDate";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -63,12 +64,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const budget = job?.budget ? Number(job?.budget) : 0;
   const description = job?.description || "暂无详细描述";
 
-  const createdAtRaw = job?.created_at ?? null;
-  const createdAtDate = createdAtRaw ? new Date(createdAtRaw) : null;
-  const createdAtText =
-    createdAtDate && !Number.isNaN(createdAtDate.getTime())
-      ? format(createdAtDate, "yyyy-MM-dd HH:mm")
-      : "";
+  const createdAt = job?.created_at ?? null;
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -106,7 +102,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           </div>
 
           <div className="bg-white/50 p-8 rounded-3xl border border-slate-100">
-            <div className="prose prose-blue prose-lg max-w-none dark:prose-invert">
+            <div className="prose prose-blue prose-lg max-w-none prose-headings:mt-8 prose-p:leading-relaxed dark:prose-invert">
               <ReactMarkdown>
                 {description?.trim() ? description : "暂无描述"}
               </ReactMarkdown>
@@ -122,10 +118,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 <div className="mt-2 text-3xl font-extrabold tracking-tight font-mono">
                   ${budget ? budget : "-"}
                 </div>
-                {createdAtText ? (
+                {createdAt ? (
                   <div className="mt-4 inline-flex items-center gap-2 text-sm/6 opacity-90">
                     <CalendarClock className="h-4 w-4" />
-                    <span>{createdAtText}</span>
+                    <span>
+                      <FormattedDate date={createdAt} />
+                    </span>
                   </div>
                 ) : null}
               </div>
@@ -154,7 +152,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
             <Button
               size="lg"
-              className="w-full rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
+              className="w-full rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] shadow-blue-500/50 transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
             >
               <Hammer className="mr-2 h-5 w-5" />
               立即投标
