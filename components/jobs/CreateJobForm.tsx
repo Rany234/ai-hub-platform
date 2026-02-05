@@ -21,8 +21,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { createJob, type CreateJobInput } from "@/app/actions/job";
 
 const formSchema = z.object({
-  title: z.string().min(5, "标题至少 5 个字"),
-  description: z.string().min(20, "描述至少 20 个字"),
+  title: z.string().min(5, "标题至少需要 5 个字"),
+  description: z.string().min(2, "描述太短啦，再多写几个字吧"),
   budget: z.coerce.number().gt(0, "预算必须大于 0"),
 });
 
@@ -42,9 +42,12 @@ export function CreateJobForm() {
   });
 
   const onSubmit = async (values: FormData) => {
+    console.log("表单提交中...", values);
     setIsSubmitting(true);
     try {
       await createJob(values as CreateJobInput);
+      alert("发布成功，正在跳转...");
+      router.push("/dashboard");
     } catch (e) {
       console.error(e);
       setIsSubmitting(false);
@@ -67,7 +70,7 @@ export function CreateJobForm() {
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500 font-medium mt-1" />
             </FormItem>
           )}
         />
@@ -86,7 +89,7 @@ export function CreateJobForm() {
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500 font-medium mt-1" />
             </FormItem>
           )}
         />
@@ -105,7 +108,7 @@ export function CreateJobForm() {
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500 font-medium mt-1" />
             </FormItem>
           )}
         />
