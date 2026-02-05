@@ -1,11 +1,104 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AcceptBidModal } from "@/components/bids/AcceptBidModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+function ContactDeveloperDialog({ developerName }: { developerName: string }) {
+  const [open, setOpen] = useState(false);
+
+  const mockEmail = `${developerName.replace(/\s+/g, "").toLowerCase()}@example.com`;
+  const mockWechat = `wx_${developerName.replace(/\s+/g, "").toLowerCase()}`;
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      // toast.success("已复制到剪贴板");
+    } catch {
+      // fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        // toast.success("已复制到剪贴板");
+      } finally {
+        document.body.removeChild(textArea);
+      }
+    }
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline" className="rounded-xl">
+          💬 联系 TA
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>联系开发者</AlertDialogTitle>
+          <AlertDialogDescription>
+            以下是该开发者的联系方式，点击即可复制。
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <div className="space-y-4">
+          <div className="rounded-xl border border-slate-100 bg-white p-4">
+            <div className="text-sm font-medium text-slate-700 mb-2">邮箱</div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-sm text-blue-600">{mockEmail}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void copyToClipboard(mockEmail)}
+                className="shrink-0"
+              >
+                复制
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-white p-4">
+            <div className="text-sm font-medium text-slate-700 mb-2">微信</div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-sm text-green-600">{mockWechat}</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void copyToClipboard(mockWechat)}
+                className="shrink-0"
+              >
+                复制
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <AlertDialogFooter>
+          <AlertDialogAction>关闭</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 function formatDeliveryTime(value?: string | null) {
   if (!value) return "-";
@@ -47,7 +140,17 @@ type BidWithProfile = {
       }>;
 };
 
-export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmployer: boolean }) {
+export function BidList({
+  bids,
+  isEmployer,
+  jobStatus,
+  selectedBidId,
+}: {
+  bids: BidWithProfile[];
+  isEmployer: boolean;
+  jobStatus?: string | null;
+  selectedBidId?: string | null;
+}) {
   const router = useRouter();
 
   if (!isEmployer) {
@@ -66,8 +169,10 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
     );
   }
 
-  const acceptedBidId = bids.find((b) => b?.status === "accepted")?.id;
-  const hasAccepted = Boolean(acceptedBidId);
+  const isJobOpen = jobStatus === "open";
+  const hasSelectedBid = Boolean(selectedBidId);
+
+  const hiredBidId = selectedBidId ?? null;
 
   return (
     <div>
@@ -78,8 +183,9 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
         const amountNum = bid?.amount !== null && bid?.amount !== undefined ? Number(bid.amount) : NaN;
         const amountLabel = Number.isFinite(amountNum) ? `￥${amountNum}` : "-";
 
-        const isAccepted = bid?.status === "accepted";
-        const isDimmed = hasAccepted && !isAccepted;
+        const isHired = Boolean(hiredBidId && bid?.id === hiredBidId);
+        const isNotSelected = Boolean(hasSelectedBid && !isHired);
+        const isDimmed = isNotSelected;
 
         const developerName = profile?.full_name ?? "匿名用户";
 
@@ -97,8 +203,10 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="font-medium truncate">{developerName}</div>
-                    {isAccepted ? (
-                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Accepted</Badge>
+                    {isHired ? (
+                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">🏆 已中标 (Hired)</Badge>
+                    ) : isNotSelected ? (
+                      <Badge variant="secondary">未选中</Badge>
                     ) : null}
                   </div>
                   <div className="text-xs text-muted-foreground">{formatDateTime(bid.created_at)}</div>
@@ -119,8 +227,8 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
               <div className="mt-4 text-sm text-muted-foreground">（未填写方案）</div>
             )}
 
-            {!hasAccepted && !isAccepted ? (
-              <div className="mt-5 flex justify-end">
+            {isJobOpen ? (
+              <div className="mt-5 flex justify-end gap-2">
                 <AcceptBidModal
                   bidId={bid.id}
                   developerName={developerName}
@@ -130,6 +238,10 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
                     <Button className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">采纳</Button>
                   }
                 />
+              </div>
+            ) : isHired ? (
+              <div className="mt-5 flex justify-end gap-2">
+                <ContactDeveloperDialog developerName={developerName} />
               </div>
             ) : null}
           </div>

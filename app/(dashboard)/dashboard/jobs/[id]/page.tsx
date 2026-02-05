@@ -152,7 +152,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             <div className="mb-4 text-lg font-semibold text-slate-900">
               收到的投标 ({bids?.length ?? 0})
             </div>
-            <BidList bids={(bids as any) ?? []} isEmployer={isOwner} />
+            <BidList
+              bids={(bids as any) ?? []}
+              isEmployer={isOwner}
+              jobStatus={job?.status}
+              selectedBidId={(job as any)?.selected_bid_id}
+            />
           </div>
         </div>
 

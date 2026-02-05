@@ -123,7 +123,7 @@ export function BidButtonWithDrawer({
     );
   }
 
-  // 4) Under review + owner -> review drawer
+  // 4) Under review + owner -> review drawer (red highlight)
   if (jobStatus === "under_review" && isOwner) {
     return (
       <ReviewDrawer
@@ -134,13 +134,23 @@ export function BidButtonWithDrawer({
         trigger={
           <Button
             size="lg"
-            className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all hover:scale-105"
+            className="w-full rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.25)] transition-all hover:scale-105"
           >
             <ShieldCheck className="mr-2 h-5 w-5" />
             审核交付成果
           </Button>
         }
       />
+    );
+  }
+
+  // 4b) In progress + owner -> disabled waiting state (prevent accidental complete)
+  if (jobStatus === "in_progress" && isOwner) {
+    return (
+      <Button size="lg" disabled className="w-full rounded-2xl bg-slate-300 text-slate-600">
+        <ShieldCheck className="mr-2 h-5 w-5" />
+        等待开发者交付...
+      </Button>
     );
   }
 
