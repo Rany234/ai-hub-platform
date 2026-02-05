@@ -83,7 +83,19 @@ export default function LoginForm() {
       <form
         action={async (formData) => {
           setIsLoading(true);
-          await formAction(formData);
+          try {
+            await formAction(formData);
+          } catch (error) {
+            // 放行 NEXT_REDIRECT，避免跳转被当成错误
+            if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+              throw error;
+            }
+            // 其他错误交给 useActionState 的 state.error 处理
+            console.error('Login form error:', error);
+          } finally {
+            // 强制清理 loading 状态，防止卡死
+            setIsLoading(false);
+          }
         }}
         className="mt-6 space-y-4"
       >
@@ -125,7 +137,7 @@ export default function LoginForm() {
           type="submit"
           disabled={isLoading}
           className={`w-full rounded-md py-2 text-white disabled:opacity-60 ${
-            isSuccess ? "bg-green-600" : "bg-black"
+            state && state.success ? "bg-green-600" : "bg-black"
           }`}
         >
           {isLoading ? "登录中..." : "登录"}
