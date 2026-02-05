@@ -90,11 +90,19 @@ export function BidDrawer({
       const res = await createBid(payload);
 
       if (!res.success) {
-        toast.error(res.error, { id: loadingId, duration: 5000 });
+        toast.error(res.error || "投标失败，请重试", {
+          id: loadingId,
+          duration: 6000,
+        });
         return;
       }
 
-      toast.success("投标成功！等待雇主联系。", { id: loadingId });
+      toast.success("投标成功！等待雇主联系。", {
+        id: loadingId,
+        duration: 4000,
+      });
+
+      await new Promise((r) => setTimeout(r, 500));
       setOpen(false);
       form.reset();
     } catch (error: unknown) {
