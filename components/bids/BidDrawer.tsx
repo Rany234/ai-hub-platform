@@ -87,7 +87,12 @@ export function BidDrawer({
         proposal: values.proposal,
       };
 
-      await createBid(payload);
+      const res = await createBid(payload);
+
+      if (!res.success) {
+        toast.error(res.error, { id: loadingId });
+        return;
+      }
 
       toast.success("投标成功！等待雇主联系。", { id: loadingId });
       setOpen(false);
