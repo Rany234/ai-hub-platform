@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +37,7 @@ function getStatusLabel(status?: string | null) {
 }
 
 export function JobCard({ job, isOwner, userId }: JobCardProps) {
+  const router = useRouter();
   const j = job as JobLike;
 
   const ownerByProp = typeof isOwner === "boolean" ? isOwner : undefined;
@@ -50,9 +53,13 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             {j.id ? (
-              <Link href={`/jobs/${j.id}`} className="block truncate text-lg font-semibold hover:underline">
+              <button
+                type="button"
+                onClick={() => j.id && router.push(`/jobs/${j.id}`)}
+                className="block truncate text-left text-lg font-semibold hover:underline"
+              >
                 {j.title ?? "未命名任务"}
-              </Link>
+              </button>
             ) : (
               <div className="truncate text-lg font-semibold">{j.title ?? "未命名任务"}</div>
             )}
@@ -84,8 +91,8 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
               <Button variant="destructive" size="sm">删除</Button>
             </>
           ) : (
-            <Button size="sm" asChild>
-              <Link href={j.id ? `/jobs/${j.id}` : "/jobs"}>查看详情</Link>
+            <Button size="sm" onClick={() => j.id && router.push(`/jobs/${j.id}`)}>
+              查看详情
             </Button>
           )}
         </div>

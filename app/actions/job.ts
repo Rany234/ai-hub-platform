@@ -14,6 +14,28 @@ const createJobSchema = z.object({
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 
+export async function getJobById(id: string) {
+  const supabase = await createSupabaseServerClient();
+
+  if (!id?.trim()) {
+    throw new Error("Invalid job id");
+  }
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .select(
+      "id,title,description,budget,status,created_at,creator_id,profiles:creator_id(id,full_name,avatar_url,role)"
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export async function createJob(input: CreateJobInput) {
   const supabase = await createSupabaseServerClient();
   const {
