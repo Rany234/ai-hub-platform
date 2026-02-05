@@ -74,7 +74,7 @@ export function JobsClient({ jobs }: { jobs: JobRow[] }) {
             </div>
 
             <div className="flex flex-col items-end gap-2">
-              <Link className="text-sm underline text-muted-foreground" href={`/jobs/${job.id}`}>
+              <Link className="text-sm underline text-muted-foreground" href={`/dashboard/jobs/${job.id}`}>
                 查看投标
               </Link>
 

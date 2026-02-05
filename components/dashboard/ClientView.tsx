@@ -28,7 +28,7 @@ export async function ClientView({ userId }: ClientViewProps) {
 
         <div className="flex justify-center">
           <Button asChild size="lg">
-            <Link href="/jobs/new">发布新任务</Link>
+            <Link href="/dashboard/jobs/new">发布新任务</Link>
           </Button>
         </div>
 
@@ -48,7 +48,7 @@ export async function ClientView({ userId }: ClientViewProps) {
 
       <div className="flex justify-center">
         <Button asChild size="lg">
-          <Link href="/jobs/new">发布新任务</Link>
+          <Link href="/dashboard/jobs/new">发布新任务</Link>
         </Button>
       </div>
 
@@ -65,7 +65,7 @@ export async function ClientView({ userId }: ClientViewProps) {
             title="还没有发布任务"
             description="发布你的第一个任务，让开发者来帮你完成项目。"
             actionLabel="发布第一个任务"
-            href="/jobs/new"
+            href="/dashboard/jobs/new"
           />
         )}
       </div>

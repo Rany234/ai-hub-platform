@@ -26,7 +26,7 @@ export default async function MyJobsPage() {
     <div className="p-6 max-w-4xl">
       <div className="flex items-baseline justify-between gap-4">
         <h1 className="text-2xl font-semibold">📢 我发布的任务</h1>
-        <Link className="rounded-md bg-black text-white px-4 py-2 text-sm" href="/jobs/create">
+        <Link className="rounded-md bg-black text-white px-4 py-2 text-sm" href="/dashboard/jobs/new">
           去发布
         </Link>
       </div>
@@ -39,7 +39,7 @@ export default async function MyJobsPage() {
           description="目前还没有发布任何 AI 需求，快去发布第一个任务吧！"
           icon={Ghost}
           actionLabel="发布任务"
-          href="/jobs/create"
+          href="/dashboard/jobs/new"
         />
       ) : (
         <JobsClient jobs={(jobs as any) ?? []} />

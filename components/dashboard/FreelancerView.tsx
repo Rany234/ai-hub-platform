@@ -24,7 +24,7 @@ export async function FreelancerView() {
 
         <div className="flex justify-center">
           <Button asChild size="lg">
-            <Link href="/jobs">浏览任务广场</Link>
+            <Link href="/dashboard/jobs">浏览任务广场</Link>
           </Button>
         </div>
 
@@ -44,7 +44,7 @@ export async function FreelancerView() {
 
       <div className="flex justify-center">
         <Button asChild size="lg">
-          <Link href="/jobs">浏览任务广场</Link>
+          <Link href="/dashboard/jobs">浏览任务广场</Link>
         </Button>
       </div>
 
@@ -75,7 +75,7 @@ export async function FreelancerView() {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">最新任务广场</h2>
           <Button asChild variant="outline">
-            <Link href="/jobs">查看全部</Link>
+            <Link href="/dashboard/jobs">查看全部</Link>
           </Button>
         </div>
 

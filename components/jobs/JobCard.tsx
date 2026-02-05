@@ -55,7 +55,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
             {j.id ? (
               <button
                 type="button"
-                onClick={() => j.id && router.push(`/jobs/${j.id}`)}
+                onClick={() => j.id && router.push(`/dashboard/jobs/${j.id}`)}
                 className="block truncate text-left text-lg font-semibold hover:underline"
               >
                 {j.title ?? "未命名任务"}
@@ -91,7 +91,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
               <Button variant="destructive" size="sm">删除</Button>
             </>
           ) : (
-            <Button size="sm" onClick={() => j.id && router.push(`/jobs/${j.id}`)}>
+            <Button size="sm" onClick={() => j.id && router.push(`/dashboard/jobs/${j.id}`)}>
               查看详情
             </Button>
           )}

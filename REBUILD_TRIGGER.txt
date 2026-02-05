@@ -1,0 +1,7 @@
+2026-02-05
+
+Trigger fresh Vercel deployment.
+
+Changes:
+- Global cleanup of legacy /jobs references; consolidate to /dashboard/jobs routes.
+- Updated links and redirects to avoid removed app/jobs routes.

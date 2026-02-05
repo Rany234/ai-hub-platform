@@ -15,6 +15,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authErrorDescription = searchParams.get("error_description");
+  const authError = searchParams.get("error");
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -39,6 +40,12 @@ export default function LoginForm() {
     toastError(state.error);
     setIsLoading(false);
   }, [state, router]);
+
+  useEffect(() => {
+    if (authError === "not_found") {
+      toastError("重定向路径配置中，请尝试重新刷新页面或联系管理员");
+    }
+  }, [authError]);
 
   const showExpired = !!authErrorDescription;
 

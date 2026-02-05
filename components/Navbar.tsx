@@ -29,7 +29,7 @@ export async function Navbar() {
             <Link className="underline-offset-4 hover:underline" href="/">
               市场
             </Link>
-            <Link className="underline-offset-4 hover:underline" href="/jobs">
+            <Link className="underline-offset-4 hover:underline" href="/dashboard/jobs">
               任务大厅
             </Link>
             <Link className="underline-offset-4 hover:underline" href="/dashboard">

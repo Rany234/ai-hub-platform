@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         },
       ],
       success_url: `${baseUrl}/dashboard/orders/${order.id}?success=true`,
-      cancel_url: `${baseUrl}/jobs/${jobId}?canceled=true`,
+      cancel_url: `${baseUrl}/dashboard/jobs/${jobId}?canceled=true`,
       metadata: {
         orderId: order.id,
       },
