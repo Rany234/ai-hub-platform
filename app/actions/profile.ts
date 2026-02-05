@@ -22,11 +22,15 @@ export async function updateUserRole(role: UserRole) {
 
   const { error } = await supabase
     .from("profiles")
-    .update({ role })
-    .eq("id", user.id);
+    .upsert({
+      id: user.id,
+      role,
+    })
+    .select();
 
   if (error) {
-    throw new Error(error.message);
+    console.error("Update role failed:", error);
+    throw new Error("Failed to update role");
   }
 
   revalidatePath("/dashboard", "layout");
