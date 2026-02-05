@@ -85,21 +85,20 @@ export function CreateJobForm() {
   );
 
   const onSubmit = async (values: FormData) => {
-    toast.dismiss();
-
     setIsSubmitting(true);
-    toast.loading("正在发布您的 AI 需求...");
+
+    const loadingToastId = toast.loading("正在发布您的 AI 需求...");
 
     try {
       await createJob(values as CreateJobInput);
 
-      toast.success("🚀 发布成功，正在进入控制台...");
-
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 150);
+      toast.success("🚀 需求已入库，正在为你跳转控制台...", {
+        id: loadingToastId,
+      });
     } catch (error: unknown) {
       const err = error as { message?: string; digest?: string } | null | undefined;
+
+      // 核心：如果是重定向指令，直接 return，不要弹错误提示
       if (
         err?.message === "NEXT_REDIRECT" ||
         err?.digest?.includes("NEXT_REDIRECT")
@@ -107,10 +106,11 @@ export function CreateJobForm() {
         return;
       }
 
-      toast.dismiss();
-      toast.error("发布失败：" + (err?.message || "未知错误"));
+      toast.error(err?.message || "发布失败", { id: loadingToastId });
     } finally {
+      // 无论成败，必须重置提交状态并关闭 loading 提示
       setIsSubmitting(false);
+      toast.dismiss(loadingToastId);
     }
   };
 
