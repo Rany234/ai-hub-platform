@@ -23,8 +23,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { createJob, type CreateJobInput } from "@/app/actions/job";
 
 const formSchema = z.object({
-  title: z.string().min(5, "标题至少需要 5 个字"),
-  description: z.string().min(2, "描述太短啦，再多写几个字吧"),
+  title: z.string().min(1, "标题至少需要 1 个字"),
+  description: z.string().min(1, "描述至少需要 1 个字"),
   budget: z.coerce.number().gt(0, "预算必须大于 0"),
 });
 
@@ -37,6 +37,7 @@ export function CreateJobForm() {
   const form = useForm<FormData>({
     mode: "onChange",
     resolver: zodResolver(formSchema),
+    shouldFocusError: false,
     defaultValues: {
       title: "",
       description: "",
@@ -63,7 +64,13 @@ export function CreateJobForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(
+          onSubmit,
+          () => console.error("校验未通过", form.getValues())
+        )}
+        className="space-y-6"
+      >
         <FormField
           control={form.control}
           name="title"
