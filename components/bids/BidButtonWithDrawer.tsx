@@ -4,11 +4,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ExternalLink, Hammer, PackageCheck, ShieldCheck } from "lucide-react";
 
-import { completeJob } from "@/app/actions/job";
-
 import { Button } from "@/components/ui/button";
 import { BidDrawer } from "@/components/bids/BidDrawer";
 import { DeliveryDrawer } from "@/components/delivery/DeliveryDrawer";
+import { ReviewDrawer } from "@/components/delivery/ReviewDrawer";
 
 export function BidButtonWithDrawer({
   jobId,
@@ -18,6 +17,7 @@ export function BidButtonWithDrawer({
   userRole,
   deliveryUrl,
   deliveryNote,
+  rejectionReason,
 }: {
   jobId: string;
   jobStatus?: string | null;
@@ -26,6 +26,7 @@ export function BidButtonWithDrawer({
   userRole: string | null;
   deliveryUrl?: string | null;
   deliveryNote?: string | null;
+  rejectionReason?: string | null;
 }) {
   const router = useRouter();
 
@@ -58,6 +59,7 @@ export function BidButtonWithDrawer({
         jobId={jobId}
         defaultUrl={deliveryUrl ?? null}
         defaultNote={deliveryNote ?? null}
+        rejectionReason={rejectionReason ?? null}
         onSubmitted={() => router.refresh()}
         trigger={
           <Button
@@ -69,6 +71,16 @@ export function BidButtonWithDrawer({
           </Button>
         }
       />
+    );
+  }
+
+  // 2b) Under review + winner -> show waiting state
+  if (jobStatus === "under_review" && isWinner) {
+    return (
+      <Button size="lg" disabled className="w-full rounded-2xl bg-amber-500 text-white">
+        <PackageCheck className="mr-2 h-5 w-5" />
+        等待雇主审核
+      </Button>
     );
   }
 
@@ -111,42 +123,24 @@ export function BidButtonWithDrawer({
     );
   }
 
-  // 4) In progress + owner -> acceptance
-  if (jobStatus === "in_progress" && isOwner) {
-    const handleComplete = async () => {
-      const loadingId = toast.loading("正在验收并完成任务...");
-      try {
-        const res = await completeJob(jobId);
-        if (!res.success) {
-          toast.error(res.error || "验收失败，请重试", { id: loadingId, duration: 6000 });
-          return;
-        }
-
-        toast.success("任务圆满完成！", {
-          id: loadingId,
-          duration: 5000,
-        });
-
-        router.refresh();
-      } catch (error: unknown) {
-        if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
-
-        const message = error instanceof Error ? error.message : "验收失败";
-        toast.error(message, { id: loadingId });
-      } finally {
-        toast.dismiss();
-      }
-    };
-
+  // 4) Under review + owner -> review drawer
+  if (jobStatus === "under_review" && isOwner) {
     return (
-      <Button
-        size="lg"
-        onClick={() => void handleComplete()}
-        className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all hover:scale-105"
-      >
-        <ShieldCheck className="mr-2 h-5 w-5" />
-        验收成果
-      </Button>
+      <ReviewDrawer
+        jobId={jobId}
+        deliveryUrl={deliveryUrl ?? null}
+        deliveryNote={deliveryNote ?? null}
+        onReviewed={() => router.refresh()}
+        trigger={
+          <Button
+            size="lg"
+            className="w-full rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-700 text-white shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all hover:scale-105"
+          >
+            <ShieldCheck className="mr-2 h-5 w-5" />
+            审核交付成果
+          </Button>
+        }
+      />
     );
   }
 

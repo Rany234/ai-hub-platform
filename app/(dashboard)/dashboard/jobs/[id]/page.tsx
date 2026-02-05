@@ -202,6 +202,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               userRole={userRole}
               deliveryUrl={(job as any)?.delivery_url}
               deliveryNote={(job as any)?.delivery_note}
+              rejectionReason={(job as any)?.rejection_reason}
             />
           </div>
         </div>

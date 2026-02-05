@@ -35,12 +35,14 @@ export function DeliveryDrawer({
   trigger,
   defaultUrl,
   defaultNote,
+  rejectionReason,
   onSubmitted,
 }: {
   jobId: string;
   trigger: React.ReactNode;
   defaultUrl?: string | null;
   defaultNote?: string | null;
+  rejectionReason?: string | null;
   onSubmitted?: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -102,6 +104,13 @@ export function DeliveryDrawer({
           <SheetTitle className="text-2xl font-bold">提交交付成果{titleSuffix}</SheetTitle>
           <SheetDescription>提交代码仓库 / 演示地址，并说明已完成的功能与交付内容。</SheetDescription>
         </SheetHeader>
+
+        {rejectionReason?.trim() ? (
+          <div className="mx-4 mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
+            <div className="text-sm font-semibold text-red-700">雇主驳回了你的上一次交付</div>
+            <div className="mt-2 text-sm text-red-700 whitespace-pre-wrap break-words">{rejectionReason.trim()}</div>
+          </div>
+        ) : null}
 
         <form className="px-4 pb-4 space-y-5" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">

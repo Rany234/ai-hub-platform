@@ -25,7 +25,7 @@ export async function getJobById(id: string) {
     const { data, error } = await supabase
       .from("jobs")
       .select(
-        "id,title,description,budget,status,created_at,creator_id,delivery_url,delivery_note,selected_bid_id,profiles:creator_id(id,full_name,avatar_url,role)"
+        "id,title,description,budget,status,rejection_reason,created_at,creator_id,delivery_url,delivery_note,selected_bid_id,profiles:creator_id(id,full_name,avatar_url,role)"
       )
       .eq("id", id)
       .maybeSingle();
@@ -257,15 +257,151 @@ export async function submitDelivery({
       }
     }
 
+    if (!deliveryUrl?.trim()) {
+      return { success: false, error: "Delivery URL is required" };
+    }
+
+    if (!deliveryNote?.trim()) {
+      return { success: false, error: "Delivery note is required" };
+    }
+
     // 3) Update delivery fields on job
     const updatePayload: Record<string, any> = {
-      delivery_url: deliveryUrl,
-      delivery_note: deliveryNote,
+      delivery_url: deliveryUrl.trim(),
+      delivery_note: deliveryNote.trim(),
+      status: "under_review",
+      rejection_reason: null,
     };
 
     const { error: updateError } = await supabase
       .from("jobs")
       .update(updatePayload)
+      .eq("id", jobId);
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
+
+    const message = error instanceof Error ? error.message : "未知错误";
+    return { success: false, error: message };
+  }
+}
+
+export async function approveDelivery(jobId: string): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (!jobId?.trim()) {
+      return { success: false, error: "Invalid job id" };
+    }
+
+    // Verify job exists and belongs to current user
+    const { data: job, error: jobError } = await supabase
+      .from("jobs")
+      .select("id,status,creator_id")
+      .eq("id", jobId)
+      .maybeSingle();
+
+    if (jobError) {
+      return { success: false, error: jobError.message };
+    }
+
+    if (!job) {
+      return { success: false, error: "Job not found" };
+    }
+
+    if (job.creator_id !== user.id) {
+      return { success: false, error: "Forbidden" };
+    }
+
+    if (job.status !== "under_review") {
+      return { success: false, error: "Job is not under review" };
+    }
+
+    // Update job status to completed and clear rejection_reason
+    const { error: updateError } = await supabase
+      .from("jobs")
+      .update({ status: "completed", rejection_reason: null })
+      .eq("id", jobId);
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
+
+    const message = error instanceof Error ? error.message : "未知错误";
+    return { success: false, error: message };
+  }
+}
+
+export async function rejectDelivery({
+  jobId,
+  reason,
+}: {
+  jobId: string;
+  reason: string;
+}): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (!jobId?.trim()) {
+      return { success: false, error: "Invalid job id" };
+    }
+
+    if (!reason?.trim()) {
+      return { success: false, error: "Rejection reason is required" };
+    }
+
+    // Verify job exists and belongs to current user
+    const { data: job, error: jobError } = await supabase
+      .from("jobs")
+      .select("id,status,creator_id")
+      .eq("id", jobId)
+      .maybeSingle();
+
+    if (jobError) {
+      return { success: false, error: jobError.message };
+    }
+
+    if (!job) {
+      return { success: false, error: "Job not found" };
+    }
+
+    if (job.creator_id !== user.id) {
+      return { success: false, error: "Forbidden" };
+    }
+
+    if (job.status !== "under_review") {
+      return { success: false, error: "Job is not under review" };
+    }
+
+    // Update job status back to in_progress and record rejection reason
+    const { error: updateError } = await supabase
+      .from("jobs")
+      .update({ status: "in_progress", rejection_reason: reason.trim() })
       .eq("id", jobId);
 
     if (updateError) {
