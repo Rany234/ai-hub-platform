@@ -1,0 +1,8 @@
+2026-02-05T10:31:30.056Z
+
+Force Vercel rebuild due to /dashboard/jobs/new 404.
+
+Changes:
+- Verified app/(dashboard)/jobs/new/page.tsx exists.
+- Verified components/ui/* all present.
+- Re-trigger build to ensure route resolution.
