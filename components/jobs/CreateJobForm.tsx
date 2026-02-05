@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,15 +26,16 @@ import { createJob, type CreateJobInput } from "@/app/actions/job";
 const formSchema = z.object({
   title: z.string().min(5, "标题至少5个字，给你的需求起个响亮的名字吧"),
   description: z.string().min(20, "描述至少20个字，详情越清楚，开发者接单越快"),
-  budget: z.coerce.number().gt(0, "预算必须大于 0"),
+  budget: z.coerce.number().positive().int("预算必须是正整数"),
 });
 
 type CreateJobFormValues = z.infer<typeof formSchema>;
 
-const shakeVariants = {
+
+const shakeVariants: Variants = {
   shake: {
     x: [0, -8, 8, -8, 8, -4, 4, -2, 2, 0],
-    transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] },
+    transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] as const },
   },
 };
 
@@ -97,6 +98,8 @@ export function CreateJobForm() {
       });
       router.push("/dashboard/jobs");
     } catch (error: unknown) {
+      if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
+
       const err = error as { message?: string; digest?: string } | null | undefined;
 
       // 严格按指令：遇到 NEXT_REDIRECT 直接 return

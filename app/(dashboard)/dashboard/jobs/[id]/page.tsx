@@ -113,7 +113,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
         <div className="lg:col-span-1">
           <div className="lg:sticky lg:top-6 space-y-6">
             <div className="rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-br from-blue-600 via-indigo-700 to-indigo-900 p-6 text-white">
+              <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-6 text-white">
                 <div className="text-sm/6 opacity-90">预算</div>
                 <div className="mt-2 text-3xl font-extrabold tracking-tight font-mono">
                   ${budget ? budget : "-"}
@@ -122,7 +122,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   <div className="mt-4 inline-flex items-center gap-2 text-sm/6 opacity-90">
                     <CalendarClock className="h-4 w-4" />
                     <span>
-                      <ClientDate date={createdAt} />
+                      <ClientDate date={createdAt} formatStr="yyyy-MM-dd HH:mm" />
                     </span>
                   </div>
                 ) : null}
