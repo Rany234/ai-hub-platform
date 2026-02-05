@@ -8,6 +8,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createJob, type CreateJobInput } from "@/app/actions/job";
@@ -44,53 +52,73 @@ export function CreateJobForm() {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <div>
-        <label className="text-sm font-medium">任务标题</label>
-        <Input
-          {...form.register("title")}
-          placeholder="例如：开发一个 AI 聊天机器人"
-          disabled={isSubmitting}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>任务标题</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="例如：开发一个 AI 聊天机器人"
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {form.formState.errors.title && (
-          <p className="text-sm text-red-600 mt-1">{form.formState.errors.title.message}</p>
-        )}
-      </div>
 
-      <div>
-        <label className="text-sm font-medium">任务描述</label>
-        <Textarea
-          {...form.register("description")}
-          placeholder="请详细描述你的需求，包括功能、技术栈、交付时间等..."
-          rows={6}
-          disabled={isSubmitting}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>任务描述</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="请详细描述你的需求，包括功能、技术栈、交付时间等..."
+                  rows={6}
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {form.formState.errors.description && (
-          <p className="text-sm text-red-600 mt-1">{form.formState.errors.description.message}</p>
-        )}
-      </div>
 
-      <div>
-        <label className="text-sm font-medium">预算（元）</label>
-        <Input
-          type="number"
-          {...form.register("budget", { valueAsNumber: true })}
-          placeholder="例如：5000"
-          disabled={isSubmitting}
+        <FormField
+          control={form.control}
+          name="budget"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>预算（元）</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="例如：5000"
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {form.formState.errors.budget && (
-          <p className="text-sm text-red-600 mt-1">{form.formState.errors.budget.message}</p>
-        )}
-      </div>
 
-      <div className="flex items-center gap-4">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "发布中..." : "发布任务"}
-        </Button>
-        <Button variant="outline" asChild>
-          <Link href="/dashboard">取消</Link>
-        </Button>
-      </div>
-    </form>
+        <div className="flex items-center gap-4">
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "发布中..." : "发布任务"}
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard">取消</Link>
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
