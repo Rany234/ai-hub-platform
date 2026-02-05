@@ -9,31 +9,37 @@ import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 const createJobSchema = z.object({
   title: z.string().min(5, "标题至少5个字，给你的需求起个响亮的名字吧"),
   description: z.string().min(20, "描述至少20个字，详情越清楚，开发者接单越快"),
-  budget: z.coerce.number().gt(0, "预算必须大于 0"),
+  budget: z.coerce.number().positive().int("预算必须是正整数"),
 });
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 
 export async function getJobById(id: string) {
-  const supabase = await createSupabaseServerClient();
+  try {
+    const supabase = await createSupabaseServerClient();
 
-  if (!id?.trim()) {
-    throw new Error("Invalid job id");
+    if (!id?.trim()) {
+      throw new Error("Invalid job id");
+    }
+
+    const { data, error } = await supabase
+      .from("jobs")
+      .select(
+        "id,title,description,budget,status,created_at,creator_id,profiles:creator_id(id,full_name,avatar_url,role)"
+      )
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("getJobById failed", { id, message, error });
+    throw new Error(`Failed to fetch job: ${message}`);
   }
-
-  const { data, error } = await supabase
-    .from("jobs")
-    .select(
-      "id,title,description,budget,status,created_at,creator_id,profiles:creator_id(id,full_name,avatar_url,role)"
-    )
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
 }
 
 export async function deleteJob(id: string) {
