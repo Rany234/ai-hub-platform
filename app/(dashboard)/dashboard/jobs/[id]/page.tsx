@@ -50,7 +50,7 @@ function getStatusClassName(status?: string | null) {
 }
 
 export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const job = await getJobById(params.id);
+  const job = (await getJobById(params.id)) as JobWithProfile | null;
 
   if (!job) {
     return notFound();
@@ -59,14 +59,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const profile =
     Array.isArray(job?.profiles) && job.profiles.length > 0 ? job.profiles[0] : null;
 
+  const budget = job?.budget ? Number(job.budget) : 0;
+  const description = job?.description || "暂无详细描述";
+
   const createdAtRaw = job?.created_at ?? null;
   const createdAtDate = createdAtRaw ? new Date(createdAtRaw) : null;
-
-  if (!createdAtDate || Number.isNaN(createdAtDate.getTime())) {
-    return notFound();
-  }
-
-  const createdAtText = format(createdAtDate, "yyyy-MM-dd HH:mm");
+  const createdAtText =
+    createdAtDate && !Number.isNaN(createdAtDate.getTime())
+      ? format(createdAtDate, "yyyy-MM-dd HH:mm")
+      : "";
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -75,24 +76,24 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           <ArrowLeft className="mr-2 h-4 w-4" />
           返回列表
         </Button>
-        <div className="text-sm text-muted-foreground truncate">Job ID: {job.id}</div>
+        <div className="text-sm text-muted-foreground truncate">Job ID: {job?.id}</div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-4">
-            <h1 className="text-4xl font-bold text-slate-900 tracking-tight break-words">
-              {job.title ?? "未命名任务"}
+            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight break-words">
+              {job?.title ?? "未命名任务"}
             </h1>
             <div className="flex flex-wrap items-center gap-2">
               <Badge
-                variant={getStatusBadgeVariant(job.status)}
-                className={`rounded-full px-3 py-1 ${getStatusClassName(job.status)}`}
+                variant={getStatusBadgeVariant(job?.status)}
+                className={`rounded-full px-3 py-1 ${getStatusClassName(job?.status)}`}
               >
                 <BadgeCheck className="mr-1 h-4 w-4" />
-                {getStatusLabel(job.status)}
+                {getStatusLabel(job?.status)}
               </Badge>
-              {job.budget !== null && job.budget !== undefined ? (
+              {job?.budget !== null && job?.budget !== undefined ? (
                 <Badge variant="secondary" className="rounded-full px-3 py-1">
                   <Coins className="mr-1 h-4 w-4" />
                   预算已设置
@@ -101,20 +102,22 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             </div>
           </div>
 
-          <div className="prose prose-blue max-w-none dark:prose-invert">
-            <ReactMarkdown>
-              {job.description?.trim() ? job.description : "暂无描述"}
-            </ReactMarkdown>
+          <div className="bg-white/50 p-8 rounded-3xl border border-slate-100">
+            <div className="prose prose-blue prose-lg max-w-none dark:prose-invert">
+              <ReactMarkdown>
+                {description?.trim() ? description : "暂无描述"}
+              </ReactMarkdown>
+            </div>
           </div>
         </div>
 
         <div className="lg:col-span-1">
           <div className="lg:sticky lg:top-6 space-y-6">
             <div className="rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-6 text-white">
+              <div className="bg-gradient-to-br from-blue-600 via-indigo-700 to-indigo-900 p-6 text-white">
                 <div className="text-sm/6 opacity-90">预算</div>
-                <div className="mt-2 text-3xl font-extrabold tracking-tight">
-                  ${job.budget ?? "-"}
+                <div className="mt-2 text-3xl font-extrabold tracking-tight font-mono">
+                  ${budget ? budget : "-"}
                 </div>
                 {createdAtText ? (
                   <div className="mt-4 inline-flex items-center gap-2 text-sm/6 opacity-90">
@@ -148,7 +151,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
             <Button
               size="lg"
-              className="w-full rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-700 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
+              className="w-full rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
             >
               <Hammer className="mr-2 h-5 w-5" />
               立即投标
