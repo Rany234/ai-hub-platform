@@ -53,14 +53,10 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const job = await getJobById(params.id);
 
   if (!job) {
-    notFound();
+    return notFound();
   }
 
-  const profile = job?.profiles
-    ? Array.isArray(job.profiles)
-      ? job.profiles[0] ?? null
-      : job.profiles
-    : null;
+  const profile = Array.isArray(job?.profiles) ? job.profiles[0] : job?.profiles;
 
   const createdAt = job?.created_at ? new Date(job.created_at) : null;
   const createdAtText = createdAt && !Number.isNaN(createdAt.getTime())
