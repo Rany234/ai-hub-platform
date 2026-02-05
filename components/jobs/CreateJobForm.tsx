@@ -90,23 +90,31 @@ export function CreateJobForm() {
   const onSubmit = async (values: FormData) => {
     console.log("Submit Clicked");
     console.log("表单提交中...", values);
-    setIsSubmitting(true);
 
-    const toastId = toast.loading("正在发布您的 AI 需求...");
+    setIsSubmitting(true);
+    toast.loading("正在发布您的 AI 需求...");
 
     try {
       await createJob(values as CreateJobInput);
-      toast.success("🚀 需求已发布！正在返回控制台...", { id: toastId });
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
 
-      if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+      toast.dismiss();
+      toast.success("🚀 发布成功，正在进入控制台...");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 150);
+    } catch (error: any) {
+      // 1. 如果是重定向指令，直接忽略，让系统自然跳转
+      if (error?.message === "NEXT_REDIRECT" || error?.digest?.includes("NEXT_REDIRECT")) {
         return;
       }
 
-      const message = error instanceof Error ? error.message : "发布失败，请稍后重试";
-      toast.error(message, { id: toastId });
+      // 2. 只有真正的错误才关闭 loading 并报错
+      toast.dismiss();
+      toast.error(error?.message || "发布失败");
+      console.error(error);
+    } finally {
+      // 3. 状态强制重置，彻底杀掉按钮的转圈状态
       setIsSubmitting(false);
     }
   };
