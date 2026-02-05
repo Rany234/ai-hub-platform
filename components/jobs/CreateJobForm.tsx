@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,16 +24,41 @@ import { Textarea } from "@/components/ui/textarea";
 import { createJob, type CreateJobInput } from "@/app/actions/job";
 
 const formSchema = z.object({
-  title: z.string().min(1, "标题至少需要 1 个字"),
-  description: z.string().min(1, "描述至少需要 1 个字"),
+  title: z.string().min(5, "标题是需求的门面，至少需要 5 个字哦"),
+  description: z.string().min(20, "请详细描述需求（至少 20 字），这样才能吸引到大牛"),
   budget: z.coerce.number().gt(0, "预算必须大于 0"),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
+const shakeVariants = {
+  shake: {
+    x: [0, -8, 8, -8, 8, -4, 4, -2, 2, 0],
+    transition: { duration: 0.5, ease: "easeInOut" },
+  },
+};
+
+function ShakeWrapper({
+  children,
+  shouldShake,
+}: {
+  children: React.ReactNode;
+  shouldShake: boolean;
+}) {
+  return (
+    <motion.div
+      variants={shakeVariants}
+      animate={shouldShake ? "shake" : ""}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export function CreateJobForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [shakeFields, setShakeFields] = useState<Set<string>>(new Set());
 
   const form = useForm<FormData>({
     mode: "onChange",
@@ -58,35 +84,60 @@ export function CreateJobForm() {
       router.push("/dashboard");
     } catch (e) {
       console.error(e);
-      toast.error("发布失败，请检查输入项或稍后重试", { id: toastId });
+      const message = e instanceof Error ? e.message : "发布失败，请稍后重试";
+      toast.error(message, { id: toastId });
       setIsSubmitting(false);
+    }
+  };
+
+  const onInvalid = () => {
+    console.error("校验未通过", form.getValues());
+    toast.warning("哎呀，表单还没填好，请查看红字提示");
+
+    // 找出所有错误字段
+    const errors = Object.keys(form.formState.errors);
+    if (errors.length > 0) {
+      // 触发震动
+      setShakeFields(new Set(errors));
+      setTimeout(() => setShakeFields(new Set()), 600);
+
+      // 自动滚动到第一个错误字段
+      const firstErrorField = errors[0];
+      const firstErrorElement = document.querySelector(
+        `[data-field="${firstErrorField}"]`
+      );
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
     }
   };
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(
-          onSubmit,
-          () => console.error("校验未通过", form.getValues())
-        )}
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
         className="space-y-6"
       >
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>任务标题</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="例如：开发一个 AI 聊天机器人"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className="text-red-500 font-medium mt-1" />
-            </FormItem>
+            <ShakeWrapper shouldShake={shakeFields.has("title")}>
+              <FormItem data-field="title">
+                <FormLabel>任务标题</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="例如：开发一个 AI 聊天机器人"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500 font-medium mt-1" />
+              </FormItem>
+            </ShakeWrapper>
           )}
         />
 
@@ -94,18 +145,20 @@ export function CreateJobForm() {
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>任务描述</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="请详细描述你的需求，包括功能、技术栈、交付时间等..."
-                  rows={6}
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className="text-red-500 font-medium mt-1" />
-            </FormItem>
+            <ShakeWrapper shouldShake={shakeFields.has("description")}>
+              <FormItem data-field="description">
+                <FormLabel>任务描述</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="请详细描述你的需求，包括功能、技术栈、交付时间等..."
+                    rows={6}
+                    disabled={isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500 font-medium mt-1" />
+              </FormItem>
+            </ShakeWrapper>
           )}
         />
 
@@ -113,18 +166,20 @@ export function CreateJobForm() {
           control={form.control}
           name="budget"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>预算（元）</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="例如：5000"
-                  disabled={isSubmitting}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage className="text-red-500 font-medium mt-1" />
-            </FormItem>
+            <ShakeWrapper shouldShake={shakeFields.has("budget")}>
+              <FormItem data-field="budget">
+                <FormLabel>预算（元）</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    placeholder="例如：5000"
+                    disabled={isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-500 font-medium mt-1" />
+              </FormItem>
+            </ShakeWrapper>
           )}
         />
 
