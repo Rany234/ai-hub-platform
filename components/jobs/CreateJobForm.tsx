@@ -96,7 +96,7 @@ export function CreateJobForm() {
 
     try {
       await createJob(values as CreateJobInput);
-      toast.success("🚀 发布成功，正在前往控制台...", { id: toastId });
+      toast.success("需求已入库！正在为你刷新控制台...", { id: toastId });
       router.push("/dashboard");
     } catch (e) {
       console.error(e);
