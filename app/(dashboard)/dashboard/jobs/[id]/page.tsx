@@ -58,13 +58,19 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     return notFound();
   }
 
-  const profile =
-    Array.isArray(job?.profiles) && job.profiles.length > 0 ? job.profiles[0] : null;
+  // 兼容 profiles 数组/对象/undefined 等结构
+  const profileRaw = job?.profiles;
+  const profile = Array.isArray(profileRaw) ? profileRaw?.[0] : profileRaw;
 
   const budget = job?.budget ? Number(job?.budget) : 0;
-  const description = job?.description || "暂无详细描述";
+  const description = job?.description;
 
-  const createdAt = job?.created_at ?? null;
+  // 极度安全的时间处理：防止下游 date-fns/format 崩溃
+  const rawDate = job?.created_at;
+  const safeDate =
+    rawDate && !Number.isNaN(new Date(rawDate).getTime())
+      ? new Date(rawDate)
+      : new Date();
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -103,9 +109,9 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
           <div className="bg-white/50 p-8 rounded-3xl border border-slate-100">
             <div className="prose prose-blue prose-lg max-w-none prose-headings:mt-8 prose-p:leading-relaxed dark:prose-invert">
-              <ReactMarkdown>
-                {description?.trim() ? description : "暂无描述"}
-              </ReactMarkdown>
+              {typeof description === "string" ? (
+                <ReactMarkdown>{description.trim() ? description : "暂无描述"}</ReactMarkdown>
+              ) : null}
             </div>
           </div>
         </div>
@@ -118,14 +124,12 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 <div className="mt-2 text-3xl font-extrabold tracking-tight font-mono">
                   ${budget ? budget : "-"}
                 </div>
-                {createdAt ? (
-                  <div className="mt-4 inline-flex items-center gap-2 text-sm/6 opacity-90">
-                    <CalendarClock className="h-4 w-4" />
-                    <span>
-                      <ClientDate date={createdAt} formatStr="yyyy-MM-dd HH:mm" />
-                    </span>
-                  </div>
-                ) : null}
+                <div className="mt-4 inline-flex items-center gap-2 text-sm/6 opacity-90">
+                  <CalendarClock className="h-4 w-4" />
+                  <span>
+                    <ClientDate date={safeDate} formatStr="yyyy-MM-dd HH:mm" />
+                  </span>
+                </div>
               </div>
             </div>
 
