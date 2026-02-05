@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { loginAction, resendVerificationAction } from "@/features/auth/actions";
 import { toastError } from "@/lib/toast";
+import { toast } from "sonner";
 
 type State =
   | { success?: undefined; error?: undefined }
@@ -31,6 +32,7 @@ export default function LoginForm() {
     if (!state || state.success === undefined) return;
 
     if (state.success) {
+      toast.success("欢迎回来！");
       router.push(state.redirectTo ?? "/dashboard");
       router.refresh();
       return;

@@ -3,7 +3,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, BadgeCheck, CalendarClock, Coins, Hammer } from "lucide-react";
 
-import FormattedDate from "@/components/jobs/FormattedDate";
+import ClientDate from "@/components/jobs/ClientDate";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -122,7 +122,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                   <div className="mt-4 inline-flex items-center gap-2 text-sm/6 opacity-90">
                     <CalendarClock className="h-4 w-4" />
                     <span>
-                      <FormattedDate date={createdAt} />
+                      <ClientDate date={createdAt} />
                     </span>
                   </div>
                 ) : null}
