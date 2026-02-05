@@ -51,8 +51,15 @@ function getStatusClassName(status?: string | null) {
   return "bg-muted text-foreground";
 }
 
-export default async function JobDetailPage({ params }: { params: { id: string } }) {
-  const job = (await getJobById(params.id)) as JobWithProfile | null;
+export default async function JobDetailPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
+
+  if (!id || id === "undefined") {
+    return notFound();
+  }
+
+  const job = (await getJobById(id)) as JobWithProfile | null;
 
   if (!job) {
     return notFound();

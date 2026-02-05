@@ -98,7 +98,7 @@ export function CreateJobForm() {
       });
       router.push("/dashboard/jobs");
     } catch (error: unknown) {
-      if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
+      if (error instanceof Error && error.message === 'NEXT_REDIRECT') throw error;
 
       const err = error as { message?: string; digest?: string } | null | undefined;
 
