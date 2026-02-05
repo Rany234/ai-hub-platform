@@ -56,12 +56,17 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     return notFound();
   }
 
-  const profile = Array.isArray(job?.profiles) ? job.profiles[0] : job?.profiles;
+  const profile =
+    Array.isArray(job?.profiles) && job.profiles.length > 0 ? job.profiles[0] : null;
 
-  const createdAt = job?.created_at ? new Date(job.created_at) : null;
-  const createdAtText = createdAt && !Number.isNaN(createdAt.getTime())
-    ? format(createdAt, "yyyy-MM-dd HH:mm")
-    : "";
+  const createdAtRaw = job?.created_at ?? null;
+  const createdAtDate = createdAtRaw ? new Date(createdAtRaw) : null;
+
+  if (!createdAtDate || Number.isNaN(createdAtDate.getTime())) {
+    return notFound();
+  }
+
+  const createdAtText = format(createdAtDate, "yyyy-MM-dd HH:mm");
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
