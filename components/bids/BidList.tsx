@@ -1,4 +1,9 @@
+import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AcceptBidModal } from "@/components/bids/AcceptBidModal";
 
 function formatDeliveryTime(value?: string | null) {
   if (!value) return "-";
@@ -24,6 +29,7 @@ type BidWithProfile = {
   proposal: string | null;
   created_at: string | null;
   bidder_id: string | null;
+  status?: string | null;
   profiles?:
     | {
         id: any;
@@ -40,6 +46,8 @@ type BidWithProfile = {
 };
 
 export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmployer: boolean }) {
+  const router = useRouter();
+
   if (!isEmployer) {
     return (
       <div className="rounded-2xl border border-slate-100 bg-white p-6 text-sm text-muted-foreground">
@@ -56,6 +64,9 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
     );
   }
 
+  const acceptedBidId = bids.find((b) => b?.status === "accepted")?.id;
+  const hasAccepted = Boolean(acceptedBidId);
+
   return (
     <div>
       {bids.map((bid) => {
@@ -65,16 +76,29 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
         const amountNum = bid?.amount !== null && bid?.amount !== undefined ? Number(bid.amount) : NaN;
         const amountLabel = Number.isFinite(amountNum) ? `￥${amountNum}` : "-";
 
+        const isAccepted = bid?.status === "accepted";
+        const isDimmed = hasAccepted && !isAccepted;
+
+        const developerName = profile?.full_name ?? "匿名用户";
+
         return (
-          <div key={bid.id} className="bg-white border border-slate-100 rounded-2xl p-6 mb-4">
-            <div className="flex items-center justify-between gap-4">
+          <div
+            key={bid.id}
+            className={`bg-white border border-slate-100 rounded-2xl p-6 mb-4 ${isDimmed ? "opacity-50" : ""}`}
+          >
+            <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={profile?.avatar_url ?? ""} />
-                  <AvatarFallback>{profile?.full_name?.[0] ?? "U"}</AvatarFallback>
+                  <AvatarFallback>{developerName?.[0] ?? "U"}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <div className="font-medium truncate">{profile?.full_name ?? "匿名用户"}</div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="font-medium truncate">{developerName}</div>
+                    {isAccepted ? (
+                      <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">Accepted</Badge>
+                    ) : null}
+                  </div>
                   <div className="text-xs text-muted-foreground">{formatDateTime(bid.created_at)}</div>
                 </div>
               </div>
@@ -92,6 +116,20 @@ export function BidList({ bids, isEmployer }: { bids: BidWithProfile[]; isEmploy
             ) : (
               <div className="mt-4 text-sm text-muted-foreground">（未填写方案）</div>
             )}
+
+            {!hasAccepted && !isAccepted ? (
+              <div className="mt-5 flex justify-end">
+                <AcceptBidModal
+                  bidId={bid.id}
+                  developerName={developerName}
+                  amountLabel={amountLabel}
+                  onAccepted={() => router.refresh()}
+                  trigger={
+                    <Button className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">采纳</Button>
+                  }
+                />
+              </div>
+            ) : null}
           </div>
         );
       })}
