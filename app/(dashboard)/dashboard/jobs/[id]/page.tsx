@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, BadgeCheck, CalendarClock, Coins, Hammer } from "lucide-react";
@@ -59,7 +60,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const profile =
     Array.isArray(job?.profiles) && job.profiles.length > 0 ? job.profiles[0] : null;
 
-  const budget = job?.budget ? Number(job.budget) : 0;
+  const budget = job?.budget ? Number(job?.budget) : 0;
   const description = job?.description || "暂无详细描述";
 
   const createdAtRaw = job?.created_at ?? null;
@@ -72,9 +73,11 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between gap-4">
-        <Button variant="ghost" className="px-0" onClick={() => history.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          返回列表
+        <Button variant="ghost" className="px-0" asChild>
+          <Link href="/dashboard/jobs">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            返回列表
+          </Link>
         </Button>
         <div className="text-sm text-muted-foreground truncate">Job ID: {job?.id}</div>
       </div>
