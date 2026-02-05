@@ -162,6 +162,32 @@ export async function signUpAction(
   }
 }
 
+export async function resendVerificationAction(email: string): Promise<ActionResult<null>> {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    const callbackUrl = process.env.NODE_ENV === 'production'
+      ? 'https://ai-hub-platform.vercel.app/auth/callback'
+      : 'http://localhost:3000/auth/callback';
+
+    const { error } = await supabase.auth.resend({
+      email,
+      type: 'signup',
+      options: {
+        emailRedirectTo: callbackUrl,
+      },
+    });
+
+    if (error) {
+      return { success: false, error: "重发验证邮件失败，请稍后重试" };
+    }
+
+    return { success: true, data: null };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "重发验证邮件失败" };
+  }
+}
+
 export async function loginAndRedirectAction(formData: FormData): Promise<never> {
   const result = await loginAction(null, formData);
   if (!result.success) {

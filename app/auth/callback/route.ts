@@ -15,7 +15,10 @@ export async function GET(request: Request) {
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
-    return NextResponse.redirect(`${origin}/login?verified=true`);
+    const message = encodeURIComponent(error.message);
+    return NextResponse.redirect(
+      `${origin}/login?error=auth_callback&error_description=${message}`
+    );
   }
 
   return NextResponse.redirect(`${origin}/welcome`);

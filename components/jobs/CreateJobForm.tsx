@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +35,7 @@ export function CreateJobForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormData>({
+    mode: "onChange",
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -44,12 +47,16 @@ export function CreateJobForm() {
   const onSubmit = async (values: FormData) => {
     console.log("表单提交中...", values);
     setIsSubmitting(true);
+
+    const toastId = toast.loading("正在发布您的 AI 需求...");
+
     try {
       await createJob(values as CreateJobInput);
-      alert("发布成功，正在跳转...");
+      toast.success("发布成功！正在为您跳转到控制台", { id: toastId });
       router.push("/dashboard");
     } catch (e) {
       console.error(e);
+      toast.error("发布失败，请检查输入项或稍后重试", { id: toastId });
       setIsSubmitting(false);
     }
   };
@@ -115,7 +122,14 @@ export function CreateJobForm() {
 
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "发布中..." : "发布任务"}
+            {isSubmitting ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                发布中...
+              </span>
+            ) : (
+              "发布任务"
+            )}
           </Button>
           <Button variant="outline" asChild>
             <Link href="/dashboard">取消</Link>

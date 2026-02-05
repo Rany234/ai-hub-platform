@@ -1,9 +1,9 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import { loginAction } from "@/features/auth/actions";
+import { loginAction, resendVerificationAction } from "@/features/auth/actions";
 import { toastError } from "@/lib/toast";
 
 type State =
@@ -13,8 +13,13 @@ type State =
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const authErrorDescription = searchParams.get("error_description");
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendDone, setResendDone] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,8 +40,41 @@ export default function LoginForm() {
     setIsLoading(false);
   }, [state, router]);
 
+  const showExpired = !!authErrorDescription;
+
   return (
     <div>
+      {showExpired ? (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+          <div className="text-sm font-semibold">验证链接已过期或失效？</div>
+          <div className="mt-1 text-sm opacity-90">{authErrorDescription}</div>
+          <div className="mt-3 flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              disabled={!email || isResending || resendDone}
+              className="rounded-md bg-amber-900 text-amber-50 px-4 py-2 text-sm font-medium disabled:opacity-60"
+              onClick={async () => {
+                if (!email) return;
+                setIsResending(true);
+                const res = await resendVerificationAction(email);
+                setIsResending(false);
+                if (!res.success) {
+                  toastError(res.error);
+                  return;
+                }
+                setResendDone(true);
+              }}
+            >
+              {resendDone ? "已发送，请查收" : isResending ? "发送中..." : "重新发送验证邮件"}
+            </button>
+            <a className="rounded-md border border-amber-300 bg-white px-4 py-2 text-sm font-medium" href="/signup">
+              重新注册
+            </a>
+          </div>
+          <div className="mt-2 text-xs opacity-80">提示：请先在下方填写邮箱，再点击重发。</div>
+        </div>
+      ) : null}
+
       <form
         action={async (formData) => {
           setIsLoading(true);
