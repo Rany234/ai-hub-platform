@@ -78,7 +78,7 @@ export function DeliveryDrawer({
         return;
       }
 
-      toast.success("交付提交成功！等待雇主验收。", { id: loadingId, duration: 4000 });
+      toast.success("交付成功！请等待雇主验收。", { id: loadingId, duration: 4000 });
 
       await new Promise((r) => setTimeout(r, 400));
       setOpen(false);

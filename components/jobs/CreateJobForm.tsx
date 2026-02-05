@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
+
+import { createJob, type CreateJobInput } from "@/app/actions/job";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +22,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { createJob, type CreateJobInput } from "@/app/actions/job";
 
 const formSchema = z.object({
   title: z.string().min(5, "标题至少5个字，给你的需求起个响亮的名字吧"),
@@ -31,149 +31,65 @@ const formSchema = z.object({
 
 type CreateJobFormValues = z.infer<typeof formSchema>;
 
-
-const shakeVariants: Variants = {
-  shake: {
-    x: [0, -8, 8, -8, 8, -4, 4, -2, 2, 0],
-    transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] as const },
-  },
+const defaultValues = {
+  title: "",
+  description: "",
+  budget: 0,
 };
-
-function ShakeWrapper({
-  children,
-  shouldShake,
-}: {
-  children: React.ReactNode;
-  shouldShake: boolean;
-}) {
-  return (
-    <motion.div variants={shakeVariants} animate={shouldShake ? "shake" : ""}>
-      {children}
-    </motion.div>
-  );
-}
 
 export function CreateJobForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [shakeFields, setShakeFields] = useState<Set<string>>(new Set());
-
-  const minTitleChars = 5;
-  const minDescriptionChars = 20;
 
   const form = useForm<CreateJobFormValues>({
+    resolver: zodResolver(formSchema) as any,
     mode: "onChange",
-    resolver: zodResolver(formSchema),
-    shouldFocusError: false,
-    defaultValues: {
-      title: "",
-      description: "",
-      budget: 0,
-    },
+    defaultValues,
   });
-
-  const titleValue = form.watch("title") ?? "";
-  const descriptionValue = form.watch("description") ?? "";
-
-  const titleRemaining = useMemo(
-    () => Math.max(0, minTitleChars - titleValue.trim().length),
-    [minTitleChars, titleValue]
-  );
-
-  const descriptionRemaining = useMemo(
-    () => Math.max(0, minDescriptionChars - descriptionValue.trim().length),
-    [minDescriptionChars, descriptionValue]
-  );
 
   const onSubmit = async (values: CreateJobFormValues) => {
     setIsSubmitting(true);
-
-    const loadingToastId = toast.loading("正在发布您的 AI 需求...");
+    const loadingId = toast.loading("正在发布任务...");
 
     try {
-      await createJob(values as CreateJobInput);
+      const payload: CreateJobInput = {
+        title: values.title,
+        description: values.description,
+        budget: values.budget,
+      };
 
-      toast.success("🚀 需求已入库，正在为你跳转控制台...", {
-        id: loadingToastId,
-      });
+      await createJob(payload);
+      toast.success("发布成功！", { id: loadingId, duration: 3000 });
       router.push("/dashboard/jobs");
     } catch (error: unknown) {
-      if (error instanceof Error && error.message === 'NEXT_REDIRECT') throw error;
+      if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
 
-      const err = error as { message?: string; digest?: string } | null | undefined;
-
-      // 严格按指令：遇到 NEXT_REDIRECT 直接 return
-      if (
-        err?.message === "NEXT_REDIRECT" ||
-        err?.digest?.includes("NEXT_REDIRECT")
-      ) {
-        return;
-      }
-
-      toast.error(err?.message || "提交失败", { id: loadingToastId });
+      const message = error instanceof Error ? error.message : "发布失败";
+      toast.error(message, { id: loadingId, duration: 6000 });
     } finally {
-      // 绝对指令：强制关闭所有弹窗并重置提交状态
       toast.dismiss();
       setIsSubmitting(false);
     }
   };
 
-  const onInvalid = () => {
-    const firstErrorKey = Object.keys(form.formState.errors)[0] as
-      | keyof CreateJobFormValues
-      | undefined;
-    const firstErrorMessage = firstErrorKey
-      ? (form.formState.errors[firstErrorKey]?.message as string | undefined)
-      : undefined;
-
-    toast.error(firstErrorMessage ?? "请检查红字提示，补充必要信息");
-
-    const errors = Object.keys(form.formState.errors);
-    if (errors.length > 0) {
-      setShakeFields(new Set(errors));
-      setTimeout(() => setShakeFields(new Set()), 600);
-
-      const firstErrorField = errors[0];
-      const firstErrorElement = document.querySelector(
-        `[data-field="${firstErrorField}"]`
-      );
-      if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }
-    }
-  };
-
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-        className="space-y-6"
-      >
+      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
-            <ShakeWrapper shouldShake={shakeFields.has("title")}>
-              <FormItem data-field="title">
-                <FormLabel>任务标题</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="例如：开发一个 AI 聊天机器人"
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                {titleRemaining > 0 && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    还差 {titleRemaining} 个字
-                  </p>
-                )}
-                <FormMessage className="text-red-500 font-medium mt-1" />
-              </FormItem>
-            </ShakeWrapper>
+            <FormItem>
+              <FormLabel>任务标题</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="例如：开发一个 AI 聊天机器人"
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
@@ -181,25 +97,18 @@ export function CreateJobForm() {
           control={form.control}
           name="description"
           render={({ field }) => (
-            <ShakeWrapper shouldShake={shakeFields.has("description")}>
-              <FormItem data-field="description">
-                <FormLabel>任务描述</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="请详细描述你的需求，包括功能、技术栈、交付时间等..."
-                    rows={6}
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                {descriptionRemaining > 0 && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    还差 {descriptionRemaining} 个字
-                  </p>
-                )}
-                <FormMessage className="text-red-500 font-medium mt-1" />
-              </FormItem>
-            </ShakeWrapper>
+            <FormItem>
+              <FormLabel>任务描述</FormLabel>
+              <FormControl>
+                <Textarea
+                  rows={7}
+                  placeholder="请详细描述你的需求，包括功能、技术栈、交付时间等..."
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
@@ -207,25 +116,24 @@ export function CreateJobForm() {
           control={form.control}
           name="budget"
           render={({ field }) => (
-            <ShakeWrapper shouldShake={shakeFields.has("budget")}>
-              <FormItem data-field="budget">
-                <FormLabel>预算（元）</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="例如：5000"
-                    disabled={isSubmitting}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-500 font-medium mt-1" />
-              </FormItem>
-            </ShakeWrapper>
+            <FormItem>
+              <FormLabel>预算（元）</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="例如：5000"
+                  disabled={isSubmitting}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
         />
 
-        <div className="flex items-center gap-4">
-          <Button type="submit" disabled={isSubmitting}>
+        <div className="flex items-center gap-3">
+          <Button type="submit" disabled={!form.formState.isValid || isSubmitting}>
             {isSubmitting ? (
               <span className="inline-flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -235,7 +143,8 @@ export function CreateJobForm() {
               "发布任务"
             )}
           </Button>
-          <Button variant="outline" asChild>
+
+          <Button variant="outline" asChild disabled={isSubmitting}>
             <Link href="/dashboard/jobs">取消</Link>
           </Button>
         </div>

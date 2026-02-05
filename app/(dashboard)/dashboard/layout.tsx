@@ -31,7 +31,7 @@ export default async function DashboardLayout({
     { key: "overview", label: "📊 概览", href: "/dashboard" },
     { key: "listings", label: "🛍️ 我发布的服务", href: "/dashboard/listings" },
     { key: "jobs", label: "📢 我发布的任务", href: "/dashboard/jobs" },
-    { key: "sales", label: "💰 销售与订单", href: "/dashboard/sales" },
+    { key: "sales", label: "💰 销售与订单", href: "/dashboard/my-tasks" }
     { key: "settings", label: "⚙️ 账号设置", href: "/dashboard/settings" },
   ];
 

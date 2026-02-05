@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Hammer, PackageCheck, ShieldCheck } from "lucide-react";
+import { ExternalLink, Hammer, PackageCheck, ShieldCheck } from "lucide-react";
 
 import { completeJob } from "@/app/actions/job";
 
@@ -35,20 +35,20 @@ export function BidButtonWithDrawer({
       return null;
     }
 
-    return (
-      <BidDrawer
-        jobId={jobId}
-        trigger={
-          <Button
-            size="lg"
-            className="w-full rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] shadow-blue-500/50 transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
-          >
-            <Hammer className="mr-2 h-5 w-5" />
-            立即投标
-          </Button>
-        }
-      />
-    );
+  return (
+    <BidDrawer
+      jobId={jobId}
+      trigger={
+        <Button
+          size="lg"
+          className="w-full rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] shadow-blue-500/50 transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
+        >
+          <Hammer className="mr-2 h-5 w-5" />
+          立即投标
+        </Button>
+      }
+    />
+  );
   }
 
   // 2) In progress + winner -> delivery submission
@@ -72,7 +72,46 @@ export function BidButtonWithDrawer({
     );
   }
 
-  // 3) In progress + owner -> acceptance
+  // 3) Completed -> view delivery result (disabled)
+  if (jobStatus === "completed") {
+    const hasDelivery = Boolean(deliveryUrl || deliveryNote);
+
+    return (
+      <div className="space-y-3">
+        <Button
+          size="lg"
+          disabled
+          className="w-full rounded-2xl bg-slate-200 text-slate-700"
+        >
+          查看交付结果
+        </Button>
+
+        {hasDelivery ? (
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 space-y-3">
+            {deliveryUrl ? (
+              <a
+                href={deliveryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+              >
+                <ExternalLink className="h-4 w-4" />
+                交付链接
+              </a>
+            ) : null}
+
+            {deliveryNote ? (
+              <div className="text-sm text-slate-700 whitespace-pre-wrap break-words bg-slate-50 rounded-xl p-3">
+                {deliveryNote}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  // 4) In progress + owner -> acceptance
   if (jobStatus === "in_progress" && isOwner) {
     const handleComplete = async () => {
       const loadingId = toast.loading("正在验收并完成任务...");
