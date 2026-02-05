@@ -11,7 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { getJobById } from "@/app/actions/job";
+import { BidList } from "@/components/bids/BidList";
+
+import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { getBidsByJobId, getJobById } from "@/app/actions/job";
 
 export const dynamic = "force-dynamic";
 
@@ -60,11 +63,20 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     return notFound();
   }
 
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const job = (await getJobById(id)) as JobWithProfile | null;
 
   if (!job) {
     return notFound();
   }
+
+  const isEmployer = Boolean(user?.id && job?.creator_id && user.id === job.creator_id);
+
+  const bids = await getBidsByJobId(id);
 
   // 兼容 profiles 数组/对象/undefined 等结构
   const profileRaw = job?.profiles;
@@ -121,6 +133,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 <ReactMarkdown>{description.trim() ? description : "暂无描述"}</ReactMarkdown>
               ) : null}
             </div>
+          </div>
+
+          <div className="border-t border-slate-100" />
+
+          <div>
+            <div className="mb-4 text-lg font-semibold text-slate-900">
+              收到的投标 ({bids?.length ?? 0})
+            </div>
+            <BidList bids={(bids as any) ?? []} isEmployer={isEmployer} />
           </div>
         </div>
 

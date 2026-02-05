@@ -42,6 +42,34 @@ export async function getJobById(id: string) {
   }
 }
 
+export async function getBidsByJobId(jobId: string) {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    if (!jobId?.trim()) {
+      throw new Error("Invalid job id");
+    }
+
+    const { data, error } = await supabase
+      .from("bids")
+      .select(
+        "id,amount,delivery_time,proposal,created_at,bidder_id,profiles:bidder_id(id,full_name,avatar_url,role)"
+      )
+      .eq("job_id", jobId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return data;
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("getBidsByJobId failed", { jobId, message, error });
+    throw new Error(`Failed to fetch bids: ${message}`);
+  }
+}
+
 export async function deleteJob(id: string) {
   const supabase = await createSupabaseServerClient();
   const {
