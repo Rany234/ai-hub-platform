@@ -96,11 +96,16 @@ export function CreateJobForm() {
 
     try {
       await createJob(values as CreateJobInput);
-      toast.success("需求已入库！正在为你刷新控制台...", { id: toastId });
+      toast.success("🚀 需求已发布！正在返回控制台...", { id: toastId });
       router.push("/dashboard");
     } catch (e) {
       console.error(e);
+
       const message = e instanceof Error ? e.message : "发布失败，请稍后重试";
+      if (message.includes("NEXT_REDIRECT")) {
+        return;
+      }
+
       toast.error(message, { id: toastId });
       setIsSubmitting(false);
     }
