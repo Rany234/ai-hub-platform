@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-import { ArrowLeft, BadgeCheck, CalendarClock, Coins, Hammer } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CalendarClock, Coins } from "lucide-react";
 
 import ClientDate from "@/components/jobs/ClientDate";
+import { BidButtonWithDrawer } from "@/components/bids/BidButtonWithDrawer";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -161,13 +162,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </CardContent>
             </Card>
 
-            <Button
-              size="lg"
-              className="w-full rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-700 to-indigo-900 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)] shadow-blue-500/50 transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
-            >
-              <Hammer className="mr-2 h-5 w-5" />
-              立即投标
-            </Button>
+            <BidButtonWithDrawer jobId={id} />
           </div>
         </div>
       </div>
