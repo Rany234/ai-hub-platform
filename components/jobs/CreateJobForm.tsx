@@ -46,6 +46,7 @@ export function CreateJobForm() {
   });
 
   const onSubmit = async (values: FormData) => {
+    console.log("Submit Clicked");
     console.log("表单提交中...", values);
     setIsSubmitting(true);
 
