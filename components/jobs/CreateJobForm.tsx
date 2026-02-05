@@ -29,12 +29,12 @@ const formSchema = z.object({
   budget: z.coerce.number().gt(0, "预算必须大于 0"),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type CreateJobFormValues = z.infer<typeof formSchema>;
 
 const shakeVariants = {
   shake: {
     x: [0, -8, 8, -8, 8, -4, 4, -2, 2, 0],
-    transition: { duration: 0.5, ease: "easeInOut" },
+    transition: { duration: 0.5, ease: [0.42, 0, 0.58, 1] },
   },
 };
 
@@ -60,7 +60,7 @@ export function CreateJobForm() {
   const minTitleChars = 5;
   const minDescriptionChars = 20;
 
-  const form = useForm<FormData>({
+  const form = useForm<CreateJobFormValues>({
     mode: "onChange",
     resolver: zodResolver(formSchema),
     shouldFocusError: false,
@@ -84,7 +84,7 @@ export function CreateJobForm() {
     [minDescriptionChars, descriptionValue]
   );
 
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async (values: CreateJobFormValues) => {
     setIsSubmitting(true);
 
     const loadingToastId = toast.loading("正在发布您的 AI 需求...");
@@ -95,29 +95,29 @@ export function CreateJobForm() {
       toast.success("🚀 需求已入库，正在为你跳转控制台...", {
         id: loadingToastId,
       });
+      router.push("/dashboard/jobs");
     } catch (error: unknown) {
       const err = error as { message?: string; digest?: string } | null | undefined;
 
-      // 必须放行 NEXT_REDIRECT 错误，否则重定向会被拦截导致 loading 不消失
+      // 严格按指令：遇到 NEXT_REDIRECT 直接 return
       if (
         err?.message === "NEXT_REDIRECT" ||
         err?.digest?.includes("NEXT_REDIRECT")
       ) {
-        throw error;
+        return;
       }
 
-      toast.dismiss();
       toast.error(err?.message || "提交失败", { id: loadingToastId });
     } finally {
-      // 无论成败，必须重置提交状态并关闭 loading 提示
+      // 绝对指令：强制关闭所有弹窗并重置提交状态
+      toast.dismiss();
       setIsSubmitting(false);
-      toast.dismiss(loadingToastId);
     }
   };
 
   const onInvalid = () => {
     const firstErrorKey = Object.keys(form.formState.errors)[0] as
-      | keyof FormData
+      | keyof CreateJobFormValues
       | undefined;
     const firstErrorMessage = firstErrorKey
       ? (form.formState.errors[firstErrorKey]?.message as string | undefined)
@@ -233,7 +233,7 @@ export function CreateJobForm() {
             )}
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/dashboard">取消</Link>
+            <Link href="/dashboard/jobs">取消</Link>
           </Button>
         </div>
       </form>
