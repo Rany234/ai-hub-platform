@@ -11,7 +11,7 @@ function getRedirectUrl(req: NextRequest, pathname: string) {
 }
 
 export async function middleware(req: NextRequest) {
-  let res = NextResponse.next({
+  const res = NextResponse.next({
     request: {
       headers: req.headers,
     },
@@ -39,7 +39,6 @@ export async function middleware(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isAuthRoute = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/signup");
-  const isOnboardingRoute = req.nextUrl.pathname.startsWith("/onboarding");
 
   // If user is not logged in, protect /app routes (you can expand this list).
   const isProtected = req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/account");
@@ -49,7 +48,7 @@ export async function middleware(req: NextRequest) {
   }
 
   if (user && isAuthRoute) {
-    return NextResponse.redirect(getRedirectUrl(req, "/"));
+    return NextResponse.redirect(getRedirectUrl(req, "/dashboard"));
   }
 
 

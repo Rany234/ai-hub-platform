@@ -18,7 +18,7 @@ export default function LoginForm() {
   const authError = searchParams.get("error");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  
   const [isResending, setIsResending] = useState(false);
   const [resendDone, setResendDone] = useState(false);
 
@@ -31,14 +31,12 @@ export default function LoginForm() {
     if (!state || state.success === undefined) return;
 
     if (state.success) {
-      setIsSuccess(true);
+      router.push(state.redirectTo ?? "/dashboard");
       router.refresh();
-      router.push(state.redirectTo ?? "/");
       return;
     }
 
     toastError(state.error);
-    setIsLoading(false);
   }, [state, router]);
 
   useEffect(() => {
@@ -102,7 +100,7 @@ export default function LoginForm() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading || isSuccess}
+            disabled={isLoading}
           />
         </div>
 
@@ -119,18 +117,18 @@ export default function LoginForm() {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading || isSuccess}
+            disabled={isLoading}
           />
         </div>
 
         <button
           type="submit"
-          disabled={isLoading || isSuccess}
+          disabled={isLoading}
           className={`w-full rounded-md py-2 text-white disabled:opacity-60 ${
             isSuccess ? "bg-green-600" : "bg-black"
           }`}
         >
-          {isSuccess ? "登录成功，正在跳转..." : isLoading ? "登录中..." : "登录"}
+          {isLoading ? "登录中..." : "登录"}
         </button>
 
         {state && state.success === false ? (

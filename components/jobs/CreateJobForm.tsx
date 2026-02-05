@@ -46,10 +46,7 @@ function ShakeWrapper({
   shouldShake: boolean;
 }) {
   return (
-    <motion.div
-      variants={shakeVariants}
-      animate={shouldShake ? "shake" : ""}
-    >
+    <motion.div variants={shakeVariants} animate={shouldShake ? "shake" : ""}>
       {children}
     </motion.div>
   );
@@ -70,7 +67,7 @@ export function CreateJobForm() {
     defaultValues: {
       title: "",
       description: "",
-      budget: undefined,
+      budget: 0,
     },
   });
 
@@ -88,8 +85,7 @@ export function CreateJobForm() {
   );
 
   const onSubmit = async (values: FormData) => {
-    console.log("Submit Clicked");
-    console.log("表单提交中...", values);
+    toast.dismiss();
 
     setIsSubmitting(true);
     toast.loading("正在发布您的 AI 需求...");
@@ -97,46 +93,42 @@ export function CreateJobForm() {
     try {
       await createJob(values as CreateJobInput);
 
-      toast.dismiss();
       toast.success("🚀 发布成功，正在进入控制台...");
 
       setTimeout(() => {
         router.push("/dashboard");
       }, 150);
-    } catch (error: any) {
-      // 1. 如果是重定向指令，直接忽略，让系统自然跳转
-      if (error?.message === "NEXT_REDIRECT" || error?.digest?.includes("NEXT_REDIRECT")) {
+    } catch (error: unknown) {
+      const err = error as { message?: string; digest?: string } | null | undefined;
+      if (
+        err?.message === "NEXT_REDIRECT" ||
+        err?.digest?.includes("NEXT_REDIRECT")
+      ) {
         return;
       }
 
-      // 2. 只有真正的错误才关闭 loading 并报错
       toast.dismiss();
-      toast.error(error?.message || "发布失败");
-      console.error(error);
+      toast.error("发布失败：" + (err?.message || "未知错误"));
     } finally {
-      // 3. 状态强制重置，彻底杀掉按钮的转圈状态
       setIsSubmitting(false);
     }
   };
 
   const onInvalid = () => {
-    console.error("校验未通过", form.getValues());
-
-    const firstErrorKey = Object.keys(form.formState.errors)[0] as keyof FormData | undefined;
+    const firstErrorKey = Object.keys(form.formState.errors)[0] as
+      | keyof FormData
+      | undefined;
     const firstErrorMessage = firstErrorKey
       ? (form.formState.errors[firstErrorKey]?.message as string | undefined)
       : undefined;
 
     toast.error(firstErrorMessage ?? "请检查红字提示，补充必要信息");
 
-    // 找出所有错误字段
     const errors = Object.keys(form.formState.errors);
     if (errors.length > 0) {
-      // 触发震动
       setShakeFields(new Set(errors));
       setTimeout(() => setShakeFields(new Set()), 600);
 
-      // 自动滚动到第一个错误字段
       const firstErrorField = errors[0];
       const firstErrorElement = document.querySelector(
         `[data-field="${firstErrorField}"]`
