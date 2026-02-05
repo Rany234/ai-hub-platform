@@ -25,7 +25,7 @@ export async function getJobById(id: string) {
     const { data, error } = await supabase
       .from("jobs")
       .select(
-        "id,title,description,budget,status,created_at,creator_id,profiles:creator_id(id,full_name,avatar_url,role)"
+        "id,title,description,budget,status,created_at,creator_id,delivery_url,delivery_note,selected_bid_id,profiles:creator_id(id,full_name,avatar_url,role)"
       )
       .eq("id", id)
       .maybeSingle();
@@ -164,6 +164,170 @@ export async function acceptBid(bidId: string): Promise<{ success: true } | { su
       if (jobUpdateError) {
         return { success: false, error: jobUpdateError.message };
       }
+    }
+
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
+
+    const message = error instanceof Error ? error.message : "未知错误";
+    return { success: false, error: message };
+  }
+}
+
+export async function submitDelivery({
+  jobId,
+  deliveryUrl,
+  deliveryNote,
+}: {
+  jobId: string;
+  deliveryUrl: string;
+  deliveryNote: string;
+}): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (!jobId?.trim()) {
+      return { success: false, error: "Invalid job id" };
+    }
+
+    // 1) Load job to verify status and selected_bid_id
+    const { data: job, error: jobError } = await supabase
+      .from("jobs")
+      .select("id,status,creator_id,selected_bid_id")
+      .eq("id", jobId)
+      .maybeSingle();
+
+    if (jobError) {
+      return { success: false, error: jobError.message };
+    }
+
+    if (!job) {
+      return { success: false, error: "Job not found" };
+    }
+
+    if (job.status !== "in_progress") {
+      return { success: false, error: "Job is not in progress" };
+    }
+
+    // 2) Verify the current user is the selected winner
+    const winnerId = job.selected_bid_id;
+    if (!winnerId) {
+      // Fallback: find accepted bid
+      const { data: acceptedBid, error: acceptedError } = await supabase
+        .from("bids")
+        .select("bidder_id")
+        .eq("job_id", jobId)
+        .eq("status", "accepted")
+        .maybeSingle();
+
+      if (acceptedError) {
+        return { success: false, error: acceptedError.message };
+      }
+
+      if (!acceptedBid) {
+        return { success: false, error: "No accepted bid found" };
+      }
+
+      if (acceptedBid.bidder_id !== user.id) {
+        return { success: false, error: "Forbidden: not the winner" };
+      }
+    } else {
+      // Directly compare selected_bid_id with current user's bids
+      const { data: selectedBid, error: selectedError } = await supabase
+        .from("bids")
+        .select("bidder_id")
+        .eq("id", winnerId)
+        .maybeSingle();
+
+      if (selectedError) {
+        return { success: false, error: selectedError.message };
+      }
+
+      if (!selectedBid || selectedBid.bidder_id !== user.id) {
+        return { success: false, error: "Forbidden: not the selected winner" };
+      }
+    }
+
+    // 3) Update delivery fields on job
+    const updatePayload: Record<string, any> = {
+      delivery_url: deliveryUrl,
+      delivery_note: deliveryNote,
+    };
+
+    const { error: updateError } = await supabase
+      .from("jobs")
+      .update(updatePayload)
+      .eq("id", jobId);
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === "NEXT_REDIRECT") throw error;
+
+    const message = error instanceof Error ? error.message : "未知错误";
+    return { success: false, error: message };
+  }
+}
+
+export async function completeJob(jobId: string): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (!jobId?.trim()) {
+      return { success: false, error: "Invalid job id" };
+    }
+
+    // Verify job exists and belongs to current user
+    const { data: job, error: jobError } = await supabase
+      .from("jobs")
+      .select("id,status,creator_id")
+      .eq("id", jobId)
+      .maybeSingle();
+
+    if (jobError) {
+      return { success: false, error: jobError.message };
+    }
+
+    if (!job) {
+      return { success: false, error: "Job not found" };
+    }
+
+    if (job.creator_id !== user.id) {
+      return { success: false, error: "Forbidden" };
+    }
+
+    if (job.status !== "in_progress") {
+      return { success: false, error: "Job is not in progress" };
+    }
+
+    // Update job status to completed
+    const { error: updateError } = await supabase
+      .from("jobs")
+      .update({ status: "completed" })
+      .eq("id", jobId);
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
     }
 
     revalidatePath(`/dashboard/jobs/${jobId}`);

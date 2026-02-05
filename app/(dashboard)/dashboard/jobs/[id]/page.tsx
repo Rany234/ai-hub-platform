@@ -74,9 +74,20 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     return notFound();
   }
 
-  const isEmployer = Boolean(user?.id && job?.creator_id && user.id === job.creator_id);
+  const isOwner = Boolean(user?.id && job?.creator_id && user.id === job.creator_id);
 
   const bids = await getBidsByJobId(id);
+
+  const selectedBidId = (job as any)?.selected_bid_id as string | null | undefined;
+  const winnerBid = selectedBidId ? bids?.find((b: any) => b?.id === selectedBidId) : undefined;
+  const acceptedBid = bids?.find((b: any) => b?.status === "accepted");
+  const winnerBidderId = (winnerBid as any)?.bidder_id ?? (acceptedBid as any)?.bidder_id;
+  const isWinner = Boolean(user?.id && winnerBidderId && user.id === winnerBidderId);
+
+  const { data: currentProfile } = user?.id
+    ? await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle()
+    : { data: null };
+  const userRole = currentProfile?.role ?? null;
 
   // 兼容 profiles 数组/对象/undefined 等结构
   const profileRaw = job?.profiles;
@@ -141,7 +152,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             <div className="mb-4 text-lg font-semibold text-slate-900">
               收到的投标 ({bids?.length ?? 0})
             </div>
-            <BidList bids={(bids as any) ?? []} isEmployer={isEmployer} />
+            <BidList bids={(bids as any) ?? []} isEmployer={isOwner} />
           </div>
         </div>
 
@@ -183,7 +194,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               </CardContent>
             </Card>
 
-            <BidButtonWithDrawer jobId={id} />
+            <BidButtonWithDrawer
+              jobId={id}
+              jobStatus={job?.status}
+              isOwner={isOwner}
+              isWinner={isWinner}
+              userRole={userRole}
+              deliveryUrl={(job as any)?.delivery_url}
+              deliveryNote={(job as any)?.delivery_note}
+            />
           </div>
         </div>
       </div>
