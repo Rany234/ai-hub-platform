@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { Briefcase, Code2, Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,23 +10,27 @@ type Role = "client" | "freelancer";
 
 export default function OnboardingRolePage() {
   const [isPending, startTransition] = useTransition();
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const handleSelect = (role: Role) => {
     if (isPending) return;
 
-    setSelectedRole(role);
-
     startTransition(async () => {
       try {
+        console.log("正在提交身份:", role);
+
         const result = await updateUserRole(role);
+        console.log("Server Action 返回:", result);
 
         if (result && result.success) {
+          console.log("准备强制跳转...");
           window.location.href = "/dashboard";
+          return;
         }
+
+        alert("保存失败，请重试。");
       } catch (e) {
-        console.error("Failed to update role:", e);
-        setSelectedRole(null);
+        console.error("发生错误:", e);
+        alert("网络错误，请稍后再试");
       }
     });
   };
@@ -62,7 +66,7 @@ export default function OnboardingRolePage() {
             <Card
               className={
                 "cursor-pointer hover:border-primary hover:shadow-lg transition-all " +
-                (selectedRole === "client" ? "border-primary" : "")
+                ""
               }
             >
               <CardHeader className="text-center">
@@ -89,7 +93,7 @@ export default function OnboardingRolePage() {
             <Card
               className={
                 "cursor-pointer hover:border-primary hover:shadow-lg transition-all " +
-                (selectedRole === "freelancer" ? "border-primary" : "")
+                ""
               }
             >
               <CardHeader className="text-center">
