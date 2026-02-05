@@ -98,15 +98,16 @@ export function CreateJobForm() {
     } catch (error: unknown) {
       const err = error as { message?: string; digest?: string } | null | undefined;
 
-      // 核心：如果是重定向指令，直接 return，不要弹错误提示
+      // 必须放行 NEXT_REDIRECT 错误，否则重定向会被拦截导致 loading 不消失
       if (
         err?.message === "NEXT_REDIRECT" ||
         err?.digest?.includes("NEXT_REDIRECT")
       ) {
-        return;
+        throw error;
       }
 
-      toast.error(err?.message || "发布失败", { id: loadingToastId });
+      toast.dismiss();
+      toast.error(err?.message || "提交失败", { id: loadingToastId });
     } finally {
       // 无论成败，必须重置提交状态并关闭 loading 提示
       setIsSubmitting(false);
