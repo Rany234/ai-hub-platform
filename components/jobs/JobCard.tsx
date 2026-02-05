@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatDistanceToNow } from "date-fns";
+import { Clock } from "lucide-react";
+import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
   const resolvedIsOwner = ownerByProp ?? ownerByUserId ?? false;
 
   const createdAt = j.created_at ? new Date(j.created_at) : null;
-  const timeAgo = createdAt ? formatDistanceToNow(createdAt, { addSuffix: true }) : "";
+  const createdAtText = createdAt ? format(createdAt, "yyyy-MM-dd HH:mm") : "";
 
   return (
     <Card>
@@ -80,7 +81,12 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
       <CardFooter className="flex items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <div className="font-semibold">💰 ${j.budget ?? "-"}</div>
-          <div className="text-xs text-muted-foreground">{timeAgo}</div>
+          {createdAtText ? (
+            <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" />
+              <span>{createdAtText}</span>
+            </div>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-2">
