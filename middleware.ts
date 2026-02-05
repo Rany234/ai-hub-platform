@@ -52,22 +52,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(getRedirectUrl(req, "/"));
   }
 
-  // Role onboarding guard: logged in but no role -> redirect to role selection
-  // Exclusions: onboarding itself (avoid loop) and auth callback (PKCE exchange)
-  const pathname = req.nextUrl.pathname;
-  const isAuthCallback = pathname.startsWith("/auth/callback");
-
-  if (user && !isOnboardingRoute && !isAuthCallback) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile?.role) {
-      return NextResponse.redirect(new URL("/onboarding/role", req.url));
-    }
-  }
 
   return res;
 }

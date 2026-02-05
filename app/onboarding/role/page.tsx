@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Briefcase, Code2, Loader2 } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { updateUserRole } from "@/app/actions/profile";
 type Role = "client" | "freelancer";
 
 export default function OnboardingRolePage() {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   const handleSelect = (role: Role) => {
@@ -22,8 +24,8 @@ export default function OnboardingRolePage() {
         console.log("Server Action 返回:", result);
 
         if (result && result.success) {
-          console.log("准备强制跳转...");
-          window.location.href = "/dashboard";
+          router.push("/dashboard");
+          router.refresh();
           return;
         }
 

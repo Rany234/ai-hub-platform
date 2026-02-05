@@ -17,6 +17,16 @@ export default async function DashboardLayout({
     redirect("/login?redirectedFrom=/dashboard");
   }
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile?.role) {
+    redirect("/onboarding/role");
+  }
+
   const navItems = [
     { key: "overview", label: "📊 概览", href: "/dashboard" },
     { key: "listings", label: "🛍️ 我发布的服务", href: "/dashboard/listings" },
