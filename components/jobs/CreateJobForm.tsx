@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -60,6 +60,9 @@ export function CreateJobForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shakeFields, setShakeFields] = useState<Set<string>>(new Set());
 
+  const minTitleChars = 5;
+  const minDescriptionChars = 20;
+
   const form = useForm<FormData>({
     mode: "onChange",
     resolver: zodResolver(formSchema),
@@ -70,6 +73,19 @@ export function CreateJobForm() {
       budget: undefined,
     },
   });
+
+  const titleValue = form.watch("title") ?? "";
+  const descriptionValue = form.watch("description") ?? "";
+
+  const titleRemaining = useMemo(
+    () => Math.max(0, minTitleChars - titleValue.trim().length),
+    [minTitleChars, titleValue]
+  );
+
+  const descriptionRemaining = useMemo(
+    () => Math.max(0, minDescriptionChars - descriptionValue.trim().length),
+    [minDescriptionChars, descriptionValue]
+  );
 
   const onSubmit = async (values: FormData) => {
     console.log("Submit Clicked");
@@ -141,6 +157,11 @@ export function CreateJobForm() {
                     {...field}
                   />
                 </FormControl>
+                {titleRemaining > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    还差 {titleRemaining} 个字
+                  </p>
+                )}
                 <FormMessage className="text-red-500 font-medium mt-1" />
               </FormItem>
             </ShakeWrapper>
@@ -162,6 +183,11 @@ export function CreateJobForm() {
                     {...field}
                   />
                 </FormControl>
+                {descriptionRemaining > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    还差 {descriptionRemaining} 个字
+                  </p>
+                )}
                 <FormMessage className="text-red-500 font-medium mt-1" />
               </FormItem>
             </ShakeWrapper>

@@ -3,5 +3,5 @@ FIX_DEPLOY - Trigger fresh Vercel deployment.
 Date: 2026-02-05
 Purpose: Force a new build to resolve any deployment deadlock.
 
-Updated: 2026-02-05T10:35:00Z
-Reason: Ensure Vercel rebuild after UI component verification and route cleanup.
+Updated: 2026-02-05T10:46:00Z
+Reason: Emergency Fix: move routes to correct path and fix build errors. Routes aligned: /dashboard/jobs/new, redundant app/jobs removed, character count reminders added, smooth scroll to errors implemented.
