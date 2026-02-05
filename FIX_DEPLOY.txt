@@ -1,0 +1,4 @@
+FIX_DEPLOY - Trigger fresh Vercel deployment.
+
+Date: 2026-02-05
+Purpose: Force a new build to resolve any deployment deadlock.

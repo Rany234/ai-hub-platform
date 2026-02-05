@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
 const createJobSchema = z.object({
-  title: z.string().min(5, "标题是需求的门面，至少需要 5 个字哦"),
-  description: z.string().min(20, "请详细描述需求（至少 20 字），这样才能吸引到大牛"),
+  title: z.string().min(5, "标题至少5个字，给你的需求起个响亮的名字吧"),
+  description: z.string().min(20, "描述至少20个字，详情越清楚，开发者接单越快"),
   budget: z.coerce.number().gt(0, "预算必须大于 0"),
 });
 

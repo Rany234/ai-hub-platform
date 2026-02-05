@@ -24,8 +24,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { createJob, type CreateJobInput } from "@/app/actions/job";
 
 const formSchema = z.object({
-  title: z.string().min(5, "标题是需求的门面，至少需要 5 个字哦"),
-  description: z.string().min(20, "请详细描述需求（至少 20 字），这样才能吸引到大牛"),
+  title: z.string().min(5, "标题至少5个字，给你的需求起个响亮的名字吧"),
+  description: z.string().min(20, "描述至少20个字，详情越清楚，开发者接单越快"),
   budget: z.coerce.number().gt(0, "预算必须大于 0"),
 });
 
@@ -80,7 +80,7 @@ export function CreateJobForm() {
 
     try {
       await createJob(values as CreateJobInput);
-      toast.success("发布成功！正在为您跳转到控制台", { id: toastId });
+      toast.success("🚀 发布成功，正在前往控制台...", { id: toastId });
       router.push("/dashboard");
     } catch (e) {
       console.error(e);
@@ -92,7 +92,13 @@ export function CreateJobForm() {
 
   const onInvalid = () => {
     console.error("校验未通过", form.getValues());
-    toast.warning("哎呀，表单还没填好，请查看红字提示");
+
+    const firstErrorKey = Object.keys(form.formState.errors)[0] as keyof FormData | undefined;
+    const firstErrorMessage = firstErrorKey
+      ? (form.formState.errors[firstErrorKey]?.message as string | undefined)
+      : undefined;
+
+    toast.error(firstErrorMessage ?? "请检查红字提示，补充必要信息");
 
     // 找出所有错误字段
     const errors = Object.keys(form.formState.errors);
