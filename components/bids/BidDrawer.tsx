@@ -90,7 +90,7 @@ export function BidDrawer({
       const res = await createBid(payload);
 
       if (!res.success) {
-        toast.error(res.error, { id: loadingId });
+        toast.error(res.error, { id: loadingId, duration: 5000 });
         return;
       }
 
