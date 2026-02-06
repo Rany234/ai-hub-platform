@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { Star } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -145,18 +147,24 @@ type BidWithProfile = {
   created_at: string | null;
   bidder_id: string | null;
   status?: string | null;
+  avg_rating?: number | null;
+  review_count?: number | null;
   profiles?:
     | {
         id: any;
         full_name: any;
         avatar_url: any;
         role: any;
+        email?: any;
+        wechat_id?: any;
       }
     | Array<{
         id: any;
         full_name: any;
         avatar_url: any;
         role: any;
+        email?: any;
+        wechat_id?: any;
       }>;
 };
 
@@ -223,6 +231,15 @@ export function BidList({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="font-medium truncate">{developerName}</div>
+                    {bid?.avg_rating !== null && bid?.avg_rating !== undefined ? (
+                      <div className="inline-flex items-center gap-1 text-xs text-slate-700">
+                        <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+                        <span>{Number(bid.avg_rating).toFixed(1)}</span>
+                        {bid?.review_count ? (
+                          <span className="text-muted-foreground">({bid.review_count})</span>
+                        ) : null}
+                      </div>
+                    ) : null}
                     {isHired ? (
                       <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">🏆 已中标 (Hired)</Badge>
                     ) : isNotSelected ? (

@@ -50,7 +50,7 @@ export async function getBidsByJobId(jobId: string) {
       throw new Error("Invalid job id");
     }
 
-    const { data, error } = await supabase
+    const { data: bids, error } = await supabase
       .from("bids")
       .select(
         "id,amount,delivery_time,proposal,created_at,bidder_id,status,profiles:bidder_id(id,full_name,avatar_url,role,email,wechat_id)"
@@ -62,7 +62,29 @@ export async function getBidsByJobId(jobId: string) {
       throw new Error(error.message);
     }
 
-    return data;
+    // Aggregate ratings for each bidder
+    const bidsWithRatings = await Promise.all(
+      (bids || []).map(async (bid) => {
+        const { data: reviews } = await supabase
+          .from("reviews")
+          .select("rating")
+          .eq("reviewee_id", bid.bidder_id);
+
+        const ratings = reviews?.map((r) => r.rating) || [];
+        const avgRating = ratings.length > 0 
+          ? Number((ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1))
+          : null;
+        const reviewCount = ratings.length;
+
+        return {
+          ...bid,
+          avg_rating: avgRating,
+          review_count: reviewCount,
+        };
+      })
+    );
+
+    return bidsWithRatings;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("getBidsByJobId failed", { jobId, message, error });

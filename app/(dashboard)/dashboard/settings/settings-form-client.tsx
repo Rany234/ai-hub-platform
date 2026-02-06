@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { toast } from "sonner";
+
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { Button } from "@/components/ui/button";
@@ -60,6 +62,7 @@ export function SettingsFormClient({
         throw new Error(result?.error ?? "保存失败");
       }
 
+      toast.success("个人资料已更新");
       router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
