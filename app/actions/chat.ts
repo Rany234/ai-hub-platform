@@ -162,45 +162,55 @@ export async function handleOffer(
 
   if (!user) throw new Error("Unauthorized");
 
+  const adminClient = createSupabaseAdminClient();
   const status = action === "accept" ? "accepted" : "rejected";
 
-  const { data: message, error: readError } = await supabase
+  // Step B: Get message and validate payload
+  const { data: message, error: readError } = await adminClient
     .from("messages")
     .select("payload")
     .eq("id", messageId)
     .single();
 
-  if (readError) throw readError;
+  if (readError || !message) throw new Error(`Failed to read message: ${readError?.message}`);
+  
+  console.log('Offer Payload:', message.payload);
 
   const currentPayload =
-    typeof message?.payload === "object" && message?.payload ? message.payload : {};
+    typeof message?.payload === "object" && message?.payload ? (message.payload as any) : {};
 
+  // Step C: If accepted, perform "God update" on job (bypass RLS)
+  if (action === "accept") {
+    const jobId = currentPayload.jobId;
+    if (!jobId) {
+      throw new Error("Job ID missing in offer payload");
+    }
+
+    const { error: jobError } = await adminClient
+      .from("jobs")
+      .update({ 
+        status: "in_progress", 
+        worker_id: user.id 
+      } as any)
+      .eq("id", jobId);
+
+    if (jobError) throw new Error(`Job update failed: ${jobError.message}`);
+  }
+
+  // Step D: Update message status using adminClient to ensure success
   const nextPayload = {
     ...currentPayload,
     status,
   };
 
-  const { error } = await supabase
+  const { error: msgUpdateError } = await adminClient
     .from("messages")
     .update({
       payload: nextPayload,
     })
     .eq("id", messageId);
 
-  if (error) throw error;
-
-  if (action === "accept") {
-    const jobId = (currentPayload as any)?.jobId as string | undefined;
-    if (jobId) {
-      const admin = createSupabaseAdminClient();
-      const { error: jobError } = await admin
-        .from("jobs")
-        .update({ status: "in_progress", worker_id: user.id } as any)
-        .eq("id", jobId);
-
-      if (jobError) throw jobError;
-    }
-  }
+  if (msgUpdateError) throw new Error(`Message update failed: ${msgUpdateError.message}`);
 
   revalidatePath(`/dashboard/chat`);
   return { success: true };
