@@ -591,42 +591,60 @@ export async function deleteJob(id: string) {
   revalidatePath("/dashboard");
 }
 
-export async function createJob(input: CreateJobInput) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export async function createJob(
+  input: CreateJobInput
+): Promise<{ success: true } | { success: false; error: "INSUFFICIENT_FUNDS" | string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    throw new Error("Unauthorized");
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      return { success: false, error: profileError.message };
+    }
+
+    if (profile?.role !== "client") {
+      return { success: false, error: "只有雇主可以发布任务" };
+    }
+
+    const validated = createJobSchema.parse(input);
+
+    const { data: jobId, error: rpcError } = await supabase.rpc(
+      "create_job_with_escrow",
+      {
+        p_title: validated.title,
+        p_description: validated.description,
+        p_budget: validated.budget,
+      }
+    );
+
+    if (rpcError) {
+      const msg = rpcError.message ?? "";
+      if (msg.includes("insufficient_funds")) {
+        return { success: false, error: "INSUFFICIENT_FUNDS" };
+      }
+      return { success: false, error: msg || "Failed to create job" };
+    }
+
+    revalidatePath("/dashboard");
+    if (jobId) {
+      revalidatePath(`/dashboard/jobs/${jobId}`);
+    }
+
+    return { success: true };
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    return { success: false, error: message };
   }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "client") {
-    throw new Error("只有雇主可以发布任务");
-  }
-
-  const validated = createJobSchema.parse(input);
-
-  const { error } = await supabase
-    .from("jobs")
-    .insert({
-      title: validated.title,
-      description: validated.description,
-      budget: validated.budget,
-      creator_id: user.id,
-      status: "open",
-    });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
 }
