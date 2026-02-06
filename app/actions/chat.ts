@@ -91,16 +91,32 @@ export async function sendMessage(conversationId: string, content: string) {
 }
 
 export async function startChat(otherUserId: string) {
+  console.log("🚀 Starting chat with:", otherUserId);
+
+  if (!otherUserId || otherUserId === "undefined" || otherUserId === "null") {
+    console.error("❌ Error: otherUserId is missing or invalid!");
+    throw new Error("Target user ID is missing");
+  }
+
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Unauthorized");
 
-  const { data: convId, error } = await supabase.rpc("get_or_create_conversation", {
-    p_other_user_id: otherUserId
-  });
+  try {
+    const { data: convId, error } = await supabase.rpc("get_or_create_conversation", {
+      p_other_user_id: otherUserId
+    });
 
-  if (error) throw error;
+    if (error) {
+      console.error("❌ Supabase RPC Error (get_or_create_conversation):", error);
+      throw new Error(error.message);
+    }
 
-  redirect(`/dashboard/chat?id=${convId}`);
+    console.log("✅ Conversation established ID:", convId);
+    redirect(`/dashboard/chat?id=${convId}`);
+  } catch (err) {
+    console.error("💥 Critical error in startChat:", err);
+    throw err;
+  }
 }
