@@ -8,6 +8,7 @@ import {
   Globe,
   MessageCircle,
   LayoutDashboard,
+  Briefcase,
 } from "lucide-react"
 
 import {
@@ -58,7 +59,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/jobs"}>
                   <Link href="/dashboard/jobs">
                     <Globe className="size-4" />
-                    <span>任务大厅</span>
+                    <span>任务广场</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/my-jobs"}>
+                  <Link href="/dashboard/my-jobs">
+                    <Briefcase className="size-4" />
+                    <span>我的工作台</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
