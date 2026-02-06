@@ -19,11 +19,19 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-function ContactDeveloperDialog({ developerName }: { developerName: string }) {
+function ContactDeveloperDialog({
+  developerName,
+  email,
+  wechatId,
+}: {
+  developerName: string;
+  email?: string | null;
+  wechatId?: string | null;
+}) {
   const [open, setOpen] = useState(false);
 
-  const mockEmail = `${developerName.replace(/\s+/g, "").toLowerCase()}@example.com`;
-  const mockWechat = `wx_${developerName.replace(/\s+/g, "").toLowerCase()}`;
+  const normalizedEmail = email?.trim() ? email.trim() : null;
+  const normalizedWechatId = wechatId?.trim() ? wechatId.trim() : null;
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -64,30 +72,42 @@ function ContactDeveloperDialog({ developerName }: { developerName: string }) {
           <div className="rounded-xl border border-slate-100 bg-white p-4">
             <div className="text-sm font-medium text-slate-700 mb-2">邮箱</div>
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-sm text-blue-600">{mockEmail}</span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => void copyToClipboard(mockEmail)}
-                className="shrink-0"
-              >
-                复制
-              </Button>
+              {normalizedEmail ? (
+                <>
+                  <span className="font-mono text-sm text-blue-600">{normalizedEmail}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void copyToClipboard(normalizedEmail)}
+                    className="shrink-0"
+                  >
+                    复制
+                  </Button>
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground">该用户未公开联系方式</span>
+              )}
             </div>
           </div>
 
           <div className="rounded-xl border border-slate-100 bg-white p-4">
             <div className="text-sm font-medium text-slate-700 mb-2">微信</div>
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-sm text-green-600">{mockWechat}</span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => void copyToClipboard(mockWechat)}
-                className="shrink-0"
-              >
-                复制
-              </Button>
+              {normalizedWechatId ? (
+                <>
+                  <span className="font-mono text-sm text-green-600">{normalizedWechatId}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void copyToClipboard(normalizedWechatId)}
+                    className="shrink-0"
+                  >
+                    复制
+                  </Button>
+                </>
+              ) : (
+                <span className="text-sm text-muted-foreground">该用户未公开联系方式</span>
+              )}
             </div>
           </div>
         </div>
@@ -241,7 +261,11 @@ export function BidList({
               </div>
             ) : isHired ? (
               <div className="mt-5 flex justify-end gap-2">
-                <ContactDeveloperDialog developerName={developerName} />
+                <ContactDeveloperDialog
+                  developerName={developerName}
+                  email={(profile as any)?.email ?? null}
+                  wechatId={(profile as any)?.wechat_id ?? null}
+                />
               </div>
             ) : null}
           </div>

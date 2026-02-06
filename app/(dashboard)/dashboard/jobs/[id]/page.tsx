@@ -107,7 +107,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
     <div className="max-w-7xl mx-auto p-6 space-y-8">
       <div className="flex items-center justify-between gap-4">
         <Button variant="ghost" className="px-0" asChild>
-          <Link href="/dashboard/jobs">
+          <Link href={isOwner ? "/dashboard/jobs" : "/dashboard"}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             返回列表
           </Link>

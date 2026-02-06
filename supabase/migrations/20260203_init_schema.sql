@@ -5,6 +5,8 @@ create table public.profiles (
   full_name text,
   avatar_url text,
   role text check (role in ('buyer', 'creator', 'admin')) default 'buyer',
+  email text,
+  wechat_id text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

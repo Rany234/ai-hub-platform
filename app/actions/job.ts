@@ -53,7 +53,7 @@ export async function getBidsByJobId(jobId: string) {
     const { data, error } = await supabase
       .from("bids")
       .select(
-        "id,amount,delivery_time,proposal,created_at,bidder_id,status,profiles:bidder_id(id,full_name,avatar_url,role)"
+        "id,amount,delivery_time,proposal,created_at,bidder_id,status,profiles:bidder_id(id,full_name,avatar_url,role,email,wechat_id)"
       )
       .eq("job_id", jobId)
       .order("created_at", { ascending: false });
