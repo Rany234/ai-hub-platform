@@ -291,12 +291,7 @@ export default function ChatClient({
       try {
         await handleOffer(messageId, action);
 
-        // Fallback refresh (keeps UI consistent if realtime is delayed/missed)
-        const data = (await getMessages(activeId)) as MessageRow[];
-        setMessages((data ?? []) as MessageRow[]);
 
-        const list = (await getUserConversations()) as ConversationListItem[];
-        setConversations((list ?? []) as ConversationListItem[]);
       } catch (error) {
         console.error("Offer update failed:", error);
       }
