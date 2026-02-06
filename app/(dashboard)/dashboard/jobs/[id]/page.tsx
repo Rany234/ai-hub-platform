@@ -16,6 +16,8 @@ import { BidList } from "@/components/bids/BidList";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { getBidsByJobId, getJobById } from "@/app/actions/job";
 import { JobDeliveryActions } from "./JobDeliveryActions";
+import { JobReviews } from "./JobReviews";
+import { getJobReviews } from "@/app/actions/reviews";
 
 export const dynamic = "force-dynamic";
 
@@ -96,6 +98,10 @@ export default async function JobDetailPage({ params }: { params: { id: string }
 
   const budget = job?.budget ? Number(job?.budget) : 0;
   const description = job?.description;
+
+  const reviews = await getJobReviews(id);
+  const creatorId = (job as any)?.creator_id as string;
+  const workerId = (job as any)?.worker_id as string | null | undefined;
 
   // 极度安全的时间处理：防止下游 date-fns/format 崩溃
   const rawDate = job?.created_at;
@@ -223,6 +229,15 @@ export default async function JobDetailPage({ params }: { params: { id: string }
           </div>
         </div>
       </div>
+
+      <JobReviews
+        jobId={id}
+        jobStatus={job?.status ?? null}
+        currentUserId={user?.id ?? null}
+        creatorId={creatorId}
+        workerId={workerId ?? null}
+        reviews={(reviews as any) ?? []}
+      />
     </div>
   );
 }
