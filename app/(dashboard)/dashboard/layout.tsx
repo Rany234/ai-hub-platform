@@ -1,72 +1,51 @@
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { AppSidebar } from "@/components/app-sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
-
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?redirectedFrom=/dashboard");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!profile?.role) {
-    redirect("/onboarding/role");
-  }
-
-  const items = [
-    {
-      key: "overview",
-      label: "📊 概览",
-      href: "/dashboard",
-    },
-    {
-      key: "my-tasks",
-      label: "💰 销售与订单",
-      href: "/dashboard/my-tasks",
-    },
-    {
-      key: "jobs",
-      label: "📢 我发布的服务",
-      href: "/dashboard/jobs",
-    },
-    {
-      key: "settings",
-      label: "⚙️ 账号设置",
-      href: "/dashboard/settings",
-    },
-  ] as const;
-
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 border-r bg-muted/10">
-        <nav className="p-4 space-y-1">
-          {items.map((item) => (
-            <Link
-              key={item.key}
-              href={item.href}
-              className="block rounded-md px-3 py-2 text-sm hover:bg-muted/40 transition-colors"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </aside>
-
-      <main className="flex-1">{children}</main>
-    </div>
-  );
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/dashboard">
+                    Dashboard
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Overview</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }
