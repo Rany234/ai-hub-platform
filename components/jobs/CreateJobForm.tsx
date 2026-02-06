@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { AlertCircle, Wallet } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -22,17 +24,17 @@ import { createJob, type CreateJobInput } from "@/app/actions/job";
 const formSchema = z.object({
   title: z.string().min(5, "标题至少需要 5 个字"),
   description: z.string().min(2, "描述太短啦，再多写几个字吧"),
-  budget: z.coerce.number().gt(0, "预算必须大于 0"),
+  budget: z.number().positive("预算必须大于 0"),
 });
 
-type FormData = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 export function CreateJobForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<FormData>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -41,7 +43,7 @@ export function CreateJobForm() {
     },
   });
 
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async (values: FormValues) => {
     setError(null);
     setIsSubmitting(true);
     try {
@@ -111,7 +113,8 @@ export function CreateJobForm() {
                     type="number"
                     placeholder="例如：5000"
                     disabled={isSubmitting}
-                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    value={field.value}
                   />
                 </FormControl>
                 <FormMessage />
