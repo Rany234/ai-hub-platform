@@ -6,11 +6,7 @@ import { usePathname } from "next/navigation"
 import {
   PieChart,
   Globe,
-  Briefcase,
-  CheckSquare,
-  Wallet,
   MessageCircle,
-  Settings,
   LayoutDashboard,
 } from "lucide-react"
 
@@ -26,44 +22,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-
-const items = [
-  {
-    title: "概览",
-    url: "/dashboard",
-    icon: PieChart,
-  },
-  {
-    title: "任务大厅",
-    url: "/dashboard",
-    icon: Globe,
-  },
-  {
-    title: "我发布的",
-    url: "/dashboard/jobs",
-    icon: Briefcase,
-  },
-  {
-    title: "我的任务",
-    url: "/dashboard/my-tasks",
-    icon: CheckSquare,
-  },
-  {
-    title: "钱包",
-    url: "/dashboard/wallet",
-    icon: Wallet,
-  },
-  {
-    title: "消息",
-    url: "/dashboard/chat",
-    icon: MessageCircle,
-  },
-  {
-    title: "设置",
-    url: "/dashboard/settings",
-    icon: Settings,
-  },
-]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
@@ -86,20 +44,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.url}
-                    tooltip={item.title}
-                  >
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {/* Hardcoded items to ensure visibility */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard"} tooltip="概览">
+                  <Link href="/dashboard">
+                    <PieChart className="size-4" />
+                    <span>概览</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/jobs"} tooltip="任务大厅">
+                  <Link href="/dashboard/jobs">
+                    <Globe className="size-4" />
+                    <span>任务大厅</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/chat"} tooltip="消息">
+                  <Link href="/dashboard/chat">
+                    <MessageCircle className="size-4" />
+                    <span>消息</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
