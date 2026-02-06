@@ -15,6 +15,7 @@ import { BidList } from "@/components/bids/BidList";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { getBidsByJobId, getJobById } from "@/app/actions/job";
+import { JobDeliveryActions } from "./JobDeliveryActions";
 
 export const dynamic = "force-dynamic";
 
@@ -198,6 +199,14 @@ export default async function JobDetailPage({ params }: { params: { id: string }
                 </div>
               </CardContent>
             </Card>
+
+            <JobDeliveryActions
+              jobId={id}
+              status={job?.status ?? null}
+              isOwner={isOwner}
+              isWorker={Boolean(user?.id && (job as any)?.worker_id && user.id === (job as any)?.worker_id)}
+              deliverables={(job as any)?.deliverables ?? null}
+            />
 
             <BidButtonWithDrawer
               jobId={id}
