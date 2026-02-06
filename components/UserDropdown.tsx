@@ -64,6 +64,15 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
 
             <Link
               className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              href="/dashboard/wallet"
+              onClick={() => setOpen(false)}
+              title="⌘B"
+            >
+              💰 我的钱包
+            </Link>
+
+            <Link
+              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
               href="/dashboard/orders"
               onClick={() => setOpen(false)}
             >
