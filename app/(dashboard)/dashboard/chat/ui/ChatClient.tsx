@@ -272,14 +272,33 @@ export default function ChatClient({
   const handleOfferAction = async (messageId: string, action: "accept" | "decline") => {
     if (!activeId) return;
 
+    const newStatus = action === "accept" ? "accepted" : "rejected";
+
+    // Optimistic update: update local UI immediately
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? {
+              ...msg,
+              payload: msg.payload ? { ...msg.payload, status: newStatus } : msg.payload,
+            }
+          : msg
+      )
+    );
+
+    // Background sync
     startTransition(async () => {
-      const result = await handleOffer(messageId, action);
-      if (result?.success) {
+      try {
+        await handleOffer(messageId, action);
+
+        // Fallback refresh (keeps UI consistent if realtime is delayed/missed)
         const data = (await getMessages(activeId)) as MessageRow[];
         setMessages((data ?? []) as MessageRow[]);
 
         const list = (await getUserConversations()) as ConversationListItem[];
         setConversations((list ?? []) as ConversationListItem[]);
+      } catch (error) {
+        console.error("Offer update failed:", error);
       }
     });
   };
