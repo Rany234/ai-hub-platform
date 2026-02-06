@@ -41,6 +41,8 @@ export function JobDeliveryActions({
         const result = await submitWork(jobId, content);
         if ((result as any)?.success) {
           setOpen(false);
+        } else {
+          setError((result as any)?.error ?? "提交失败");
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : "提交失败");

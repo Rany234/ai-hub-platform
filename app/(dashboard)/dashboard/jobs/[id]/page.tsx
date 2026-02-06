@@ -205,7 +205,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
               status={job?.status ?? null}
               isOwner={isOwner}
               isWorker={Boolean(user?.id && (job as any)?.worker_id && user.id === (job as any)?.worker_id)}
-              deliverables={(job as any)?.deliverables ?? null}
+              deliverables={typeof (job as any)?.deliverables === "string" ? (job as any)?.deliverables : null}
             />
 
             <BidButtonWithDrawer

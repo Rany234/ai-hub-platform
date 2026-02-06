@@ -555,86 +555,107 @@ export async function completeJob(jobId: string): Promise<{ success: true } | { 
   }
 }
 
-export async function submitWork(jobId: string, content: string) {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+export async function submitWork(jobId: string, content: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
-  const adminClient = createClient(url, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  
-  // Verify worker identity
-  const { data: job } = await adminClient.from("jobs").select("worker_id, status").eq("id", jobId).single();
-  if (!job || (job as any).worker_id !== user.id) throw new Error("Only the assigned worker can submit work");
-  if ((job as any).status !== "in_progress") throw new Error("Job is not in progress");
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+    const adminClient = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    
+    // Verify worker identity
+    const { data: job, error: fetchError } = await adminClient.from("jobs").select("worker_id, status").eq("id", jobId).single();
+    if (fetchError || !job) throw new Error("Job not found or fetch error");
+    if ((job as any).worker_id !== user.id) throw new Error("Only the assigned worker can submit work");
+    if ((job as any).status !== "in_progress") throw new Error("Job is not in progress");
 
-  const { error } = await adminClient
-    .from("jobs")
-    .update({
-      status: "in_review",
-      deliverables: content,
-    } as any)
-    .eq("id", jobId);
+    const { error: updateError } = await adminClient
+      .from("jobs")
+      .update({
+        status: "in_review",
+        deliverables: content,
+      } as any)
+      .eq("id", jobId);
 
-  if (error) throw error;
-  revalidatePath(`/dashboard/jobs/${jobId}`);
-  return { success: true };
+    if (updateError) throw updateError;
+    
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Submit Work Error:', error);
+    return { success: false, error: error instanceof Error ? error.message : "未知错误" };
+  }
 }
 
-export async function approveWork(jobId: string) {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+export async function approveWork(jobId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
-  const adminClient = createClient(url, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+    const adminClient = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-  // Verify employer identity
-  const { data: job } = await adminClient.from("jobs").select("creator_id, status").eq("id", jobId).single();
-  if (!job || (job as any).creator_id !== user.id) throw new Error("Only the job creator can approve work");
+    // Verify employer identity
+    const { data: job, error: fetchError } = await adminClient.from("jobs").select("creator_id, status").eq("id", jobId).single();
+    if (fetchError || !job) throw new Error("Job not found or fetch error");
+    if ((job as any).creator_id !== user.id) throw new Error("Only the job creator can approve work");
 
-  const { error } = await adminClient
-    .from("jobs")
-    .update({ status: "completed" })
-    .eq("id", jobId);
+    const { error: updateError } = await adminClient
+      .from("jobs")
+      .update({ status: "completed" })
+      .eq("id", jobId);
 
-  if (error) throw error;
-  revalidatePath(`/dashboard/jobs/${jobId}`);
-  return { success: true };
+    if (updateError) throw updateError;
+    
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Approve Work Error:', error);
+    return { success: false, error: error instanceof Error ? error.message : "未知错误" };
+  }
 }
 
-export async function rejectWork(jobId: string) {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
+export async function rejectWork(jobId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
-  const adminClient = createClient(url, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
+    const adminClient = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-  // Verify employer identity
-  const { data: job } = await adminClient.from("jobs").select("creator_id, status").eq("id", jobId).single();
-  if (!job || (job as any).creator_id !== user.id) throw new Error("Only the job creator can reject work");
+    // Verify employer identity
+    const { data: job, error: fetchError } = await adminClient.from("jobs").select("creator_id, status").eq("id", jobId).single();
+    if (fetchError || !job) throw new Error("Job not found or fetch error");
+    if ((job as any).creator_id !== user.id) throw new Error("Only the job creator can reject work");
 
-  const { error } = await adminClient
-    .from("jobs")
-    .update({ status: "in_progress" })
-    .eq("id", jobId);
+    const { error: updateError } = await adminClient
+      .from("jobs")
+      .update({ status: "in_progress" })
+      .eq("id", jobId);
 
-  if (error) throw error;
-  revalidatePath(`/dashboard/jobs/${jobId}`);
-  return { success: true };
+    if (updateError) throw updateError;
+    
+    revalidatePath(`/dashboard/jobs/${jobId}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Reject Work Error:', error);
+    return { success: false, error: error instanceof Error ? error.message : "未知错误" };
+  }
 }
 
 export async function deleteJob(id: string) {
