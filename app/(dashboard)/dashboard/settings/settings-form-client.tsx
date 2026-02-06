@@ -1,9 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { AvatarUpload } from "@/components/AvatarUpload";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+import { updateProfile } from "@/app/actions/profile";
 
 type Profile = {
   id: string;
@@ -12,6 +20,8 @@ type Profile = {
   bio: string | null;
   website: string | null;
   avatar_url: string | null;
+  email?: string | null;
+  wechat_id?: string | null;
 };
 
 export function SettingsFormClient({
@@ -22,38 +32,35 @@ export function SettingsFormClient({
   initialProfile: Profile | null;
 }) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const router = useRouter();
 
   const [fullName, setFullName] = useState(initialProfile?.full_name ?? "");
   const [bio, setBio] = useState(initialProfile?.bio ?? "");
-  const [website, setWebsite] = useState(initialProfile?.website ?? "");
   const [avatarUrl, setAvatarUrl] = useState(initialProfile?.avatar_url ?? "");
+  const [email, setEmail] = useState((initialProfile as any)?.email ?? "");
+  const [wechatId, setWechatId] = useState((initialProfile as any)?.wechat_id ?? "");
 
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function saveProfile() {
     setSaving(true);
-    setMessage(null);
     setError(null);
 
     try {
-      const { error: upsertError } = await supabase.from("profiles").upsert({
-        id: userId,
-        full_name: fullName || null,
-        bio: bio || null,
-        website: website || null,
-        avatar_url: avatarUrl || null,
-        updated_at: new Date().toISOString(),
-      });
+      const formData = new FormData();
+      formData.set("full_name", fullName);
+      formData.set("bio", bio);
+      formData.set("email", email);
+      formData.set("wechat_id", wechatId);
+      formData.set("avatar_url", avatarUrl);
 
-      if (upsertError) throw upsertError;
+      const result = await updateProfile(formData);
+      if (!result?.success) {
+        throw new Error(result?.error ?? "保存失败");
+      }
 
-      setMessage("保存成功");
-
-      setTimeout(() => {
-        setMessage((m) => (m === "保存成功" ? null : m));
-      }, 2500);
+      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "保存失败");
     } finally {
@@ -62,74 +69,74 @@ export function SettingsFormClient({
   }
 
   return (
-    <div className="border rounded-lg p-4">
-      <AvatarUpload
-        userId={userId}
-        currentUrl={avatarUrl || null}
-        onUploaded={(url) => {
-          setAvatarUrl(url);
-        }}
-      />
+    <Card className="rounded-2xl">
+      <CardHeader>
+        <CardTitle>个人资料</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <div>
+            <Label className="mb-2 block">头像</Label>
+            <AvatarUpload
+              userId={userId}
+              currentUrl={avatarUrl || null}
+              onUploaded={(url) => {
+                setAvatarUrl(url);
+              }}
+            />
+          </div>
 
-      <form
-        className="mt-6 flex flex-col gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void saveProfile();
-        }}
-      >
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium" htmlFor="full_name">
-            昵称 / 姓名
-          </label>
-          <input
-            id="full_name"
-            className="border rounded-md px-3 py-2"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="例如：张三"
-          />
-        </div>
+          <div className="grid gap-2">
+            <Label htmlFor="full_name">昵称（Full Name）</Label>
+            <Input
+              id="full_name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="例如：张三"
+            />
+          </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium" htmlFor="bio">
-            简介
-          </label>
-          <textarea
-            id="bio"
-            className="border rounded-md px-3 py-2 min-h-24"
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            placeholder="介绍一下你擅长的领域、工作方式等"
-          />
-        </div>
+          <div className="grid gap-2">
+            <Label htmlFor="bio">简介（Bio）</Label>
+            <Textarea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="介绍一下你擅长的领域、工作方式等"
+            />
+          </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium" htmlFor="website">
-            个人网站
-          </label>
-          <input
-            id="website"
-            className="border rounded-md px-3 py-2"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
+          <div className="border-t pt-6" />
 
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            className="border rounded-md px-4 py-2 bg-black text-white disabled:opacity-50"
-            disabled={saving}
-          >
-            {saving ? "保存中..." : "保存"}
-          </button>
+          <div className="grid gap-2">
+            <Label htmlFor="email">邮箱（Email）</Label>
+            <Input
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
 
-          {message ? <div className="text-sm text-green-700">{message}</div> : null}
+          <div className="grid gap-2">
+            <Label htmlFor="wechat_id">微信号（WeChat ID）</Label>
+            <Input
+              id="wechat_id"
+              value={wechatId}
+              onChange={(e) => setWechatId(e.target.value)}
+              placeholder="填写你的微信号"
+            />
+          </div>
+
           {error ? <div className="text-sm text-red-600">{error}</div> : null}
+
+          <div>
+            <Button onClick={() => void saveProfile()} disabled={saving}>
+              {saving ? "保存中..." : "保存修改"}
+            </Button>
+          </div>
         </div>
-      </form>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
