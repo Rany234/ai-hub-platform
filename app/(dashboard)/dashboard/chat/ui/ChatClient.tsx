@@ -8,11 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import {
-  getMessages,
-  getUserConversations,
-  sendMessage,
-} from "@/app/actions/chat";
+import { getMessages, getUserConversations, sendMessage } from "@/app/actions/chat";
 
 type ConversationListItem = {
   id: string;
@@ -41,7 +37,11 @@ function formatTime(ts?: string | null) {
   return d.toLocaleString();
 }
 
-export default function ChatClient() {
+export default function ChatClient({
+  currentUserId,
+}: {
+  currentUserId: string;
+}) {
   const searchParams = useSearchParams();
   const initialConversationId = searchParams.get("id");
 
@@ -170,31 +170,29 @@ export default function ChatClient() {
             ) : messages.length === 0 ? (
               <div className="text-sm text-muted-foreground">还没有消息，发一条试试</div>
             ) : (
-              messages.map((m) => {
-                const isMine = false; // Client doesn't know current user id without extra fetch; keep MVP neutral
+              messages.map((msg) => {
+                // Debug log
+                console.log("Msg Sender:", msg.sender_id, "Current:", currentUserId);
+
+                const isMe = msg.sender_id === currentUserId;
                 return (
-                  <div
-                    key={m.id}
-                    className={
-                      "flex " + (isMine ? "justify-end" : "justify-start")
-                    }
-                  >
+                  <div key={msg.id} className={"flex " + (isMe ? "justify-end" : "justify-start")}>
                     <div
                       className={
                         "max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm " +
-                        (isMine
-                          ? "bg-blue-600 text-white"
+                        (isMe
+                          ? "ml-auto bg-primary text-primary-foreground"
                           : "bg-muted text-foreground")
                       }
                     >
-                      <div className="whitespace-pre-wrap break-words">{m.content}</div>
+                      <div className="whitespace-pre-wrap break-words">{msg.content}</div>
                       <div
                         className={
                           "mt-1 text-[10px] opacity-70 " +
-                          (isMine ? "text-white" : "text-muted-foreground")
+                          (isMe ? "text-primary-foreground" : "text-muted-foreground")
                         }
                       >
-                        {formatTime(m.created_at)}
+                        {formatTime(msg.created_at)}
                       </div>
                     </div>
                   </div>

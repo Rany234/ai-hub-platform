@@ -13,5 +13,5 @@ export default async function ChatPage() {
     redirect("/login?redirectedFrom=/dashboard/chat");
   }
 
-  return <ChatClient />;
+  return <ChatClient currentUserId={user.id} />;
 }

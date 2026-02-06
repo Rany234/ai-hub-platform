@@ -46,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {/* Hardcoded items to ensure visibility */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/dashboard"} tooltip="概览">
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
                   <Link href="/dashboard">
                     <PieChart className="size-4" />
                     <span>概览</span>
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuItem>
 
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/dashboard/jobs"} tooltip="任务大厅">
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/jobs"}>
                   <Link href="/dashboard/jobs">
                     <Globe className="size-4" />
                     <span>任务大厅</span>
@@ -64,10 +64,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuItem>
 
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/dashboard/chat"} tooltip="消息">
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/chat"}>
                   <Link href="/dashboard/chat">
                     <MessageCircle className="size-4" />
-                    <span>消息</span>
+                    <span>消息中心</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
