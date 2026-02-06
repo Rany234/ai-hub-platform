@@ -20,7 +20,7 @@ export default async function MyTasksPage() {
   const { data: bids, error } = await supabase
     .from("bids")
     .select(
-      "id,amount,delivery_time,proposal,created_at,status,jobs!inner(id,title,status,created_at,delivery_url,delivery_note)"
+      "id,amount,delivery_time,proposal,created_at,status,jobs!bids_job_id_fkey!inner(id,title,status,created_at,delivery_url,delivery_note)"
     )
     .eq("bidder_id", user.id)
     .eq("status", "accepted")
