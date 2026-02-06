@@ -81,8 +81,84 @@ export async function sendMessage(conversationId: string, content: string) {
     .insert({
       conversation_id: conversationId,
       sender_id: user.id,
-      content: content.trim()
+      content: content.trim(),
+      type: "text",
+      payload: null,
     });
+
+  if (error) throw error;
+
+  revalidatePath(`/dashboard/chat`);
+  return { success: true };
+}
+
+export async function sendOffer(
+  conversationId: string,
+  amount: number,
+  description: string
+) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const normalizedAmount = Number(amount);
+  if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+    throw new Error("Invalid amount");
+  }
+
+  const content = `发起了一份聘书: ${normalizedAmount}`;
+
+  const { error } = await supabase
+    .from("messages")
+    .insert({
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content,
+      type: "offer",
+      payload: {
+        amount: normalizedAmount,
+        status: "pending",
+        description: (description ?? "").toString(),
+      },
+    });
+
+  if (error) throw error;
+
+  revalidatePath(`/dashboard/chat`);
+  return { success: true };
+}
+
+export async function handleOffer(
+  messageId: string,
+  action: "accept" | "decline"
+) {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const status = action === "accept" ? "accepted" : "rejected";
+
+  const { data: message, error: readError } = await supabase
+    .from("messages")
+    .select("payload")
+    .eq("id", messageId)
+    .single();
+
+  if (readError) throw readError;
+
+  const nextPayload = {
+    ...(typeof message?.payload === "object" && message?.payload ? message.payload : {}),
+    status,
+  };
+
+  const { error } = await supabase
+    .from("messages")
+    .update({
+      payload: nextPayload,
+    })
+    .eq("id", messageId);
 
   if (error) throw error;
 
