@@ -14,50 +14,86 @@ const createJobSchema = z.object({
 
 export type CreateJobInput = z.infer<typeof createJobSchema>;
 
-export async function getJobById(id: string) {
+export async function getJobById(jobId: string) {
+  // 使用项目正确的 Supabase Client
+  const supabase = await createSupabaseServerClient()
+  console.log(`🔍 [Debug] Start fetching job: ${jobId}`)
+
   try {
-    const supabase = await createSupabaseServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // ---------------------------------------------------------
+    // 阶段 1: 基础查询 (Base Query)
+    // 目的: 验证 Job ID 是否存在，以及最基本的表权限
+    // ---------------------------------------------------------
+    const { data: jobBase, error: baseError } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('id', jobId)
+      .single()
 
-    if (!id?.trim()) {
-      throw new Error("Invalid job id");
+    if (baseError) {
+      console.error('❌ [Debug] Base Job Fetch Error:', JSON.stringify(baseError, null, 2))
+      return null // 基础数据都没有，只能返回 null
     }
 
-    const { data, error } = await supabase
-      .from("jobs")
-      .select(
-        "id,title,description,budget,status,rejection_reason,created_at,creator_id,delivery_url,delivery_note,selected_bid_id,profiles:creator_id!jobs_creator_id_fkey(id,full_name,avatar_url,role)"
-      )
-      .eq("id", id)
-      .maybeSingle();
+    // ---------------------------------------------------------
+    // 阶段 2: 完整关联查询 (Full Relation Query)
+    // 目的: 尝试获取关联数据，如果失败则回退到 jobBase
+    // ---------------------------------------------------------
+    console.log('🔍 [Debug] Attempting full relation fetch...')
+    const { data: jobFull, error: fullError } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        profiles:creator_id!jobs_creator_id_fkey (
+          id,
+          full_name,
+          avatar_url,
+          email
+        ),
+        bids:bids!bids_job_id_fkey (
+          id
+        )
+      `)
+      .eq('id', jobId)
+      .single()
 
-    if (error) {
-      throw new Error(error.message);
+    let finalJob = jobBase
+    if (fullError) {
+      console.error('⚠️ [Debug] Full Relation Fetch Failed (Using Base Fallback):', JSON.stringify(fullError, null, 2))
+      // 这里不 throw，而是降级使用 base 数据，保证页面不崩
+    } else {
+      console.log('✅ [Debug] Full relation fetch success')
+      finalJob = jobFull
     }
 
-    let hasReviewed = false;
-    if (user?.id && data?.id) {
-      const { data: existingReview, error: reviewError } = await supabase
-        .from("reviews")
-        .select("id")
-        .eq("job_id", data.id)
-        .eq("reviewer_id", user.id)
-        .maybeSingle();
-
-      if (reviewError) {
-        throw new Error(reviewError.message);
+    // ---------------------------------------------------------
+    // 阶段 3: 评价状态查询 (Review Check)
+    // 目的: 独立检查，互不影响
+    // ---------------------------------------------------------
+    let hasReviewed = false
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user && finalJob.status === 'completed') {
+        const { data: review, error: reviewError } = await supabase
+          .from('reviews')
+          .select('id')
+          .eq('job_id', jobId)
+          .eq('reviewer_id', user.id)
+          .maybeSingle()
+        
+        if (reviewError) {
+           console.error('⚠️ [Debug] Review check error:', reviewError)
+        }
+        if (review) hasReviewed = true
       }
-
-      hasReviewed = !!existingReview;
+    } catch (e) {
+      console.error('⚠️ [Debug] Review check crashed:', e)
     }
 
-    return data ? { ...data, hasReviewed } : data;
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error("getJobById failed", { id, message, error });
-    throw new Error(`Failed to fetch job: ${message}`);
+    return { ...finalJob, hasReviewed }
+  } catch (err) {
+    console.error('💥 [Debug] Critical Crash in getJobById:', err)
+    return null
   }
 }
 
