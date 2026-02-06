@@ -265,8 +265,18 @@ export function BidList({
               <div className="mt-4 text-sm text-muted-foreground">（未填写方案）</div>
             )}
 
-            {isJobOpen ? (
-              <div className="mt-5 flex justify-end gap-2">
+            <div className="mt-5 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                className="rounded-xl gap-2"
+                onClick={() => startChat(String(bid.bidder_id))}
+                disabled={!bid.bidder_id}
+              >
+                <MessageCircle className="h-4 w-4" />
+                💬 联系
+              </Button>
+
+              {isJobOpen ? (
                 <AcceptBidModal
                   bidId={bid.id}
                   developerName={developerName}
@@ -276,25 +286,14 @@ export function BidList({
                     <Button className="rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">采纳</Button>
                   }
                 />
-              </div>
-            ) : isHired ? (
-              <div className="mt-5 flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  className="rounded-xl gap-2"
-                  onClick={() => startChat(String(bid.bidder_id))}
-                  disabled={!bid.bidder_id}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  联系开发者
-                </Button>
+              ) : isHired ? (
                 <ContactDeveloperDialog
                   developerName={developerName}
                   email={(profile as any)?.email ?? null}
                   wechatId={(profile as any)?.wechat_id ?? null}
                 />
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         );
       })}
