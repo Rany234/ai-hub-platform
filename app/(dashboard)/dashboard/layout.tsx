@@ -13,6 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { NotificationBell } from "@/components/notifications/NotificationBell"
 
 export default function DashboardLayout({
   children,
@@ -40,6 +41,9 @@ export default function DashboardLayout({
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
+          </div>
+          <div className="ml-auto flex items-center gap-4 px-4">
+            <NotificationBell />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
