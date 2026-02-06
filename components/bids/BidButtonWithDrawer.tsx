@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BidDrawer } from "@/components/bids/BidDrawer";
 import { DeliveryDrawer } from "@/components/delivery/DeliveryDrawer";
 import { ReviewDrawer } from "@/components/delivery/ReviewDrawer";
+import { ReviewModal } from "@/components/reviews/ReviewModal";
 
 export function BidButtonWithDrawer({
   jobId,
@@ -18,6 +19,8 @@ export function BidButtonWithDrawer({
   deliveryUrl,
   deliveryNote,
   rejectionReason,
+  hasReviewed,
+  revieweeId,
 }: {
   jobId: string;
   jobStatus?: string | null;
@@ -27,6 +30,8 @@ export function BidButtonWithDrawer({
   deliveryUrl?: string | null;
   deliveryNote?: string | null;
   rejectionReason?: string | null;
+  hasReviewed?: boolean;
+  revieweeId?: string | null;
 }) {
   const router = useRouter();
 
@@ -88,7 +93,7 @@ export function BidButtonWithDrawer({
     );
   }
 
-  // 3) Completed -> view delivery result (disabled)
+  // 3) Completed -> view delivery result (disabled) + review button for owner
   if (jobStatus === "completed") {
     const hasDelivery = Boolean(deliveryUrl || deliveryNote);
 
@@ -123,6 +128,28 @@ export function BidButtonWithDrawer({
             ) : null}
           </div>
         ) : null}
+
+        {/* Review button for owner when job is completed */}
+        {isOwner && revieweeId && (
+          hasReviewed ? (
+            <Button size="lg" disabled className="w-full rounded-2xl border border-green-200 bg-green-50 text-green-700">
+              ✅ 已完成评价
+            </Button>
+          ) : (
+            <ReviewModal
+              jobId={jobId}
+              revieweeId={revieweeId}
+              trigger={
+                <Button
+                  size="lg"
+                  className="w-full rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-[0_0_20px_rgba(251,146,60,0.3)] transition-all hover:scale-105"
+                >
+                  ⭐ 评价开发者
+                </Button>
+              }
+            />
+          )
+        )}
       </div>
     );
   }

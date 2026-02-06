@@ -17,6 +17,9 @@ export type CreateJobInput = z.infer<typeof createJobSchema>;
 export async function getJobById(id: string) {
   try {
     const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!id?.trim()) {
       throw new Error("Invalid job id");
@@ -34,7 +37,23 @@ export async function getJobById(id: string) {
       throw new Error(error.message);
     }
 
-    return data;
+    let hasReviewed = false;
+    if (user?.id && data?.id) {
+      const { data: existingReview, error: reviewError } = await supabase
+        .from("reviews")
+        .select("id")
+        .eq("job_id", data.id)
+        .eq("reviewer_id", user.id)
+        .maybeSingle();
+
+      if (reviewError) {
+        throw new Error(reviewError.message);
+      }
+
+      hasReviewed = !!existingReview;
+    }
+
+    return data ? { ...data, hasReviewed } : data;
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("getJobById failed", { id, message, error });
