@@ -110,15 +110,9 @@ export function JobReviews({
     return isCreator || isWorker;
   }, [currentUserId, creatorId, workerId, isCompleted]);
 
-  const employerReview = useMemo(() => {
-    if (!creatorId || !workerId) return null;
-    return reviews.find((r) => r.reviewer_id === creatorId && r.reviewee_id === workerId) ?? null;
-  }, [creatorId, workerId, reviews]);
-
-  const workerReview = useMemo(() => {
-    if (!creatorId || !workerId) return null;
-    return reviews.find((r) => r.reviewer_id === workerId && r.reviewee_id === creatorId) ?? null;
-  }, [creatorId, workerId, reviews]);
+  const otherReviews = useMemo(() => {
+    return reviews.filter((r) => r.reviewer_id !== currentUserId);
+  }, [currentUserId, reviews]);
 
   if (!isCompleted) return null;
 
@@ -132,7 +126,7 @@ export function JobReviews({
       {canReview ? (
         myReview ? (
           <div className="rounded-xl border bg-muted/10 p-4 space-y-2">
-            <div className="font-semibold">你已评价</div>
+            <div className="font-semibold text-blue-600">你已评价</div>
             <div className="flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, i) => {
                 const n = i + 1;
@@ -149,7 +143,7 @@ export function JobReviews({
             <div className="text-sm whitespace-pre-wrap break-words">{myReview.comment ?? "(无文字评价)"}</div>
           </div>
         ) : (
-          <div className="rounded-xl border p-4 space-y-3">
+          <div className="rounded-xl border p-4 space-y-3 shadow-sm bg-slate-50/50">
             <div className="font-semibold">提交评价</div>
             <StarsInput value={rating} onChange={setRating} disabled={isPending} />
             <Textarea
@@ -157,6 +151,7 @@ export function JobReviews({
               onChange={(e) => setComment(e.target.value)}
               placeholder="写下你的评价（可选）"
               disabled={isPending}
+              className="bg-white"
             />
             {error ? <div className="text-sm text-red-600">{error}</div> : null}
             <Button
@@ -177,13 +172,18 @@ export function JobReviews({
           </div>
         )
       ) : (
-        <div className="text-sm text-muted-foreground">登录后且为任务参与者才可评价。</div>
+        <div className="text-sm text-muted-foreground italic">任务参与者在完成后即可进行评价。</div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {employerReview ? <ReviewCard title="雇主的评价" review={employerReview} /> : null}
-        {workerReview ? <ReviewCard title="开发者的评价" review={workerReview} /> : null}
-      </div>
+      {otherReviews.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {otherReviews.map((review) => {
+            const isFromEmployer = review.reviewer_id === creatorId;
+            const title = isFromEmployer ? "来自雇主的评价" : "来自开发者的评价";
+            return <ReviewCard key={review.id} title={title} review={review} />;
+          })}
+        </div>
+      )}
     </div>
   );
 }
