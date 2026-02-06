@@ -533,14 +533,13 @@ export async function completeJob(jobId: string): Promise<{ success: true } | { 
       return { success: false, error: "Job is not in progress" };
     }
 
-    // Update job status to completed
-    const { error: updateError } = await supabase
-      .from("jobs")
-      .update({ status: "completed" })
-      .eq("id", jobId);
+    const { error } = await supabase.rpc("release_job_payment", {
+      p_job_id: jobId,
+      p_user_id: user.id,
+    });
 
-    if (updateError) {
-      return { success: false, error: updateError.message };
+    if (error) {
+      throw new Error(error.message);
     }
 
     revalidatePath(`/dashboard/jobs/${jobId}`);
