@@ -407,14 +407,15 @@ export async function approveDelivery(jobId: string): Promise<{ success: true } 
       return { success: false, error: "Job is not under review" };
     }
 
-    // Update job status to completed and clear rejection_reason
-    const { error: updateError } = await supabase
-      .from("jobs")
-      .update({ status: "completed", rejection_reason: null })
-      .eq("id", jobId);
+    // 必须使用 RPC 以保证资金和状态原子化更新
+    const { error } = await supabase.rpc("release_job_payment", {
+      p_job_id: jobId,
+      p_user_id: user.id,
+    });
 
-    if (updateError) {
-      return { success: false, error: updateError.message };
+    if (error) {
+      console.error("Payment release failed:", error);
+      throw new Error(error.message || "验收失败，资金划转异常");
     }
 
     revalidatePath(`/dashboard/jobs/${jobId}`);
