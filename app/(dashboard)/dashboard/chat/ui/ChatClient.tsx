@@ -270,9 +270,17 @@ export default function ChatClient({
   };
 
   const handleOfferAction = async (messageId: string, action: "accept" | "decline") => {
+    if (!activeId) return;
+
     startTransition(async () => {
-      await handleOffer(messageId, action);
-      // Realtime will pick up the update event
+      const result = await handleOffer(messageId, action);
+      if (result?.success) {
+        const data = (await getMessages(activeId)) as MessageRow[];
+        setMessages((data ?? []) as MessageRow[]);
+
+        const list = (await getUserConversations()) as ConversationListItem[];
+        setConversations((list ?? []) as ConversationListItem[]);
+      }
     });
   };
 
