@@ -2,10 +2,12 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  LayoutDashboard,
-  ShoppingBag,
+  PieChart,
+  Globe,
   Briefcase,
+  CheckSquare,
   Settings,
+  LayoutDashboard,
 } from "lucide-react"
 
 import {
@@ -23,22 +25,27 @@ import {
 
 const items = [
   {
-    title: "📊 概览",
+    title: "概览",
     url: "/dashboard",
-    icon: LayoutDashboard,
+    icon: PieChart,
   },
   {
-    title: "💰 销售与订单",
-    url: "/dashboard/my-tasks",
-    icon: ShoppingBag,
+    title: "任务大厅",
+    url: "/dashboard",
+    icon: Globe,
   },
   {
-    title: "📢 我发布的服务",
+    title: "我发布的",
     url: "/dashboard/jobs",
     icon: Briefcase,
   },
   {
-    title: "⚙️ 账号设置",
+    title: "我的任务",
+    url: "/dashboard/my-tasks",
+    icon: CheckSquare,
+  },
+  {
+    title: "设置",
     url: "/dashboard/settings",
     icon: Settings,
   },
