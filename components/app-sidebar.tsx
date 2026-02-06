@@ -8,6 +8,7 @@ import {
   Globe,
   Briefcase,
   CheckSquare,
+  Wallet,
   Settings,
   LayoutDashboard,
 } from "lucide-react"
@@ -45,6 +46,11 @@ const items = [
     title: "我的任务",
     url: "/dashboard/my-tasks",
     icon: CheckSquare,
+  },
+  {
+    title: "钱包",
+    url: "/dashboard/wallet",
+    icon: Wallet,
   },
   {
     title: "设置",
