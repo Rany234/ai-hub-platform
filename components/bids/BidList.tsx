@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Star } from "lucide-react";
+import { Star, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AcceptBidModal } from "@/components/bids/AcceptBidModal";
+import { startChat } from "@/app/actions/chat";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -278,6 +279,15 @@ export function BidList({
               </div>
             ) : isHired ? (
               <div className="mt-5 flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  className="rounded-xl gap-2"
+                  onClick={() => startChat(String(bid.bidder_id))}
+                  disabled={!bid.bidder_id}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  联系开发者
+                </Button>
                 <ContactDeveloperDialog
                   developerName={developerName}
                   email={(profile as any)?.email ?? null}

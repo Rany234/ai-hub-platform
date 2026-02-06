@@ -9,6 +9,7 @@ import {
   Briefcase,
   CheckSquare,
   Wallet,
+  MessageCircle,
   Settings,
   LayoutDashboard,
 } from "lucide-react"
@@ -51,6 +52,11 @@ const items = [
     title: "钱包",
     url: "/dashboard/wallet",
     icon: Wallet,
+  },
+  {
+    title: "消息",
+    url: "/dashboard/chat",
+    icon: MessageCircle,
   },
   {
     title: "设置",
