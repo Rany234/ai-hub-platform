@@ -13,7 +13,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { NotificationBell } from "@/components/notifications/NotificationBell"
+import dynamic from "next/dynamic"
+
+const NotificationBell = dynamic(
+  () => import("@/components/notifications/NotificationBell").then((m) => m.NotificationBell),
+  { ssr: false }
+)
 
 export default function DashboardLayout({
   children,
