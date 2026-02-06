@@ -13,12 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import dynamic from "next/dynamic"
-
-const NotificationBell = dynamic(
-  () => import("@/components/notifications/NotificationBell").then((m) => m.NotificationBell),
-  { ssr: false }
-)
+import BellWrapper from "@/components/notifications/BellWrapper"
 
 export default function DashboardLayout({
   children,
@@ -48,7 +43,7 @@ export default function DashboardLayout({
             </Breadcrumb>
           </div>
           <div className="ml-auto flex items-center gap-4 px-4">
-            <NotificationBell />
+            <BellWrapper />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
