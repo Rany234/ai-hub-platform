@@ -18,7 +18,15 @@ import {
 } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 
-import { getMessages, getUserConversations, sendMessage, sendOffer, handleOffer } from "@/app/actions/chat";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { getMessages, getUserConversations, sendMessage, sendOffer, handleOffer, getEmployerJobs } from "@/app/actions/chat";
 
 type ConversationListItem = {
   id: string;
@@ -44,6 +52,7 @@ type MessageRow = {
     amount: number;
     status: "pending" | "accepted" | "rejected";
     description?: string;
+    jobId?: string;
   } | null;
 };
 
@@ -140,6 +149,9 @@ export default function ChatClient({
   const [offerAmount, setOfferAmount] = useState("");
   const [offerNote, setOfferNote] = useState("");
   const [isOfferOpen, setIsOfferOpen] = useState(false);
+
+  const [employerJobs, setEmployerJobs] = useState<{ id: string; title: string }[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string>("");
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const supabase = createSupabaseBrowserClient();
@@ -252,19 +264,37 @@ export default function ChatClient({
     });
   };
 
+  const loadEmployerJobs = async () => {
+    try {
+      const data = (await getEmployerJobs()) as { id: string; title: string }[];
+      setEmployerJobs(data ?? []);
+    } catch (e) {
+      console.error("Failed to load employer jobs:", e);
+      setEmployerJobs([]);
+    }
+  };
+
+  useEffect(() => {
+    if (isOfferOpen) {
+      loadEmployerJobs();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOfferOpen]);
+
   const onSendOffer = async () => {
     if (!activeId || !offerAmount) return;
+    if (!selectedJobId) return;
+
     const amount = parseFloat(offerAmount);
     if (isNaN(amount) || amount <= 0) return;
 
     setIsOfferOpen(false);
     startTransition(async () => {
-      const result = await sendOffer(activeId, amount, offerNote);
+      const result = await sendOffer(activeId, selectedJobId, amount, offerNote);
       if (result.success) {
         setOfferAmount("");
         setOfferNote("");
-        const data = (await getMessages(activeId)) as MessageRow[];
-        setMessages((data ?? []) as MessageRow[]);
+        setSelectedJobId("");
       }
     });
   };
@@ -419,6 +449,28 @@ export default function ChatClient({
                   </div>
                   <div className="space-y-3">
                     <div className="space-y-1">
+                      <Label className="text-xs">选择任务</Label>
+                      <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="请选择一个任务" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {employerJobs.length === 0 ? (
+                            <SelectItem value="__empty" disabled>
+                              暂无可用任务
+                            </SelectItem>
+                          ) : (
+                            employerJobs.map((job) => (
+                              <SelectItem key={job.id} value={job.id}>
+                                {job.title}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1">
                       <Label htmlFor="amount" className="text-xs">金额 (CNY)</Label>
                       <Input
                         id="amount"
@@ -440,7 +492,7 @@ export default function ChatClient({
                     <Button 
                       className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
                       onClick={onSendOffer}
-                      disabled={!offerAmount || parseFloat(offerAmount) <= 0}
+                      disabled={!selectedJobId || !offerAmount || parseFloat(offerAmount) <= 0}
                     >
                       确认发送
                     </Button>

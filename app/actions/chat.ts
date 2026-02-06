@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { createSupabaseAdminClient } from "@/features/auth/supabase/admin";
 
 export async function getUserConversations() {
   const supabase = await createSupabaseServerClient();
@@ -56,6 +57,23 @@ export async function getUserConversations() {
   });
 }
 
+export async function getEmployerJobs() {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("id,title")
+    .eq("creator_id", user.id)
+    .eq("status", "open")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
 export async function getMessages(conversationId: string) {
   const supabase = await createSupabaseServerClient();
   
@@ -94,6 +112,7 @@ export async function sendMessage(conversationId: string, content: string) {
 
 export async function sendOffer(
   conversationId: string,
+  jobId: string,
   amount: number,
   description: string
 ) {
@@ -105,6 +124,10 @@ export async function sendOffer(
   const normalizedAmount = Number(amount);
   if (!Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
     throw new Error("Invalid amount");
+  }
+
+  if (!jobId?.trim()) {
+    throw new Error("Invalid jobId");
   }
 
   const content = `发起了一份聘书: ${normalizedAmount}`;
@@ -120,6 +143,7 @@ export async function sendOffer(
         amount: normalizedAmount,
         status: "pending",
         description: (description ?? "").toString(),
+        jobId: jobId.trim(),
       },
     });
 
@@ -148,8 +172,11 @@ export async function handleOffer(
 
   if (readError) throw readError;
 
+  const currentPayload =
+    typeof message?.payload === "object" && message?.payload ? message.payload : {};
+
   const nextPayload = {
-    ...(typeof message?.payload === "object" && message?.payload ? message.payload : {}),
+    ...currentPayload,
     status,
   };
 
@@ -161,6 +188,19 @@ export async function handleOffer(
     .eq("id", messageId);
 
   if (error) throw error;
+
+  if (action === "accept") {
+    const jobId = (currentPayload as any)?.jobId as string | undefined;
+    if (jobId) {
+      const admin = createSupabaseAdminClient();
+      const { error: jobError } = await admin
+        .from("jobs")
+        .update({ status: "in_progress", worker_id: user.id } as any)
+        .eq("id", jobId);
+
+      if (jobError) throw jobError;
+    }
+  }
 
   revalidatePath(`/dashboard/chat`);
   return { success: true };
