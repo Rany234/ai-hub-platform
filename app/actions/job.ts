@@ -28,7 +28,7 @@ export async function getJobById(id: string) {
     const { data, error } = await supabase
       .from("jobs")
       .select(
-        "id,title,description,budget,status,rejection_reason,created_at,creator_id,delivery_url,delivery_note,selected_bid_id,profiles:creator_id(id,full_name,avatar_url,role)"
+        "id,title,description,budget,status,rejection_reason,created_at,creator_id,delivery_url,delivery_note,selected_bid_id,profiles:creator_id!jobs_creator_id_fkey(id,full_name,avatar_url,role)"
       )
       .eq("id", id)
       .maybeSingle();

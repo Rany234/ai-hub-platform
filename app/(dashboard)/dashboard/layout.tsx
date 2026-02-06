@@ -28,11 +28,27 @@ export default async function DashboardLayout({
   }
 
   const items = [
-    { key: "overview", label: "📊 概览", href: "/dashboard" },
-    { key: "my-tasks", label: "💰 销售与订单", href: "/dashboard/my-tasks" },
-    { key: "jobs", label: "📢 我发布的服务", href: "/dashboard/jobs" },
-    { key: "settings", label: "⚙️ 账号设置", href: "/dashboard/settings" },
-  ];
+    {
+      key: "overview",
+      label: "📊 概览",
+      href: "/dashboard",
+    },
+    {
+      key: "my-tasks",
+      label: "💰 销售与订单",
+      href: "/dashboard/my-tasks",
+    },
+    {
+      key: "jobs",
+      label: "📢 我发布的服务",
+      href: "/dashboard/jobs",
+    },
+    {
+      key: "settings",
+      label: "⚙️ 账号设置",
+      href: "/dashboard/settings",
+    },
+  ] as const;
 
   return (
     <div className="flex min-h-screen">
