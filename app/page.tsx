@@ -5,6 +5,7 @@ import { BentoCard } from "@/components/BentoCard";
 import { HeroExploreButton } from "@/components/HeroExploreButton";
 import { AIDemoComponent } from "@/components/AIDemoComponent";
 import { FeaturedWorkCard } from "@/components/FeaturedWorkCard";
+import { LiveActivityTicker } from "@/components/LiveActivityTicker";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
@@ -107,6 +108,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <LiveActivityTicker />
+
       {/* Featured Works */}
       <section className="bg-slate-950">
         <div className="mx-auto max-w-6xl px-6 py-14">
@@ -155,11 +158,33 @@ export default async function HomePage() {
             </div>
           ) : (
             <div className="mt-10 columns-1 gap-6 space-y-6 sm:columns-2 lg:columns-3">
-              {(listings ?? []).slice(0, 12).map((listing, idx) => (
-                <div key={listing.id} className="break-inside-avoid">
-                  <FeaturedWorkCard listing={listing} index={idx} />
-                </div>
-              ))}
+              {Array.from({ length: 6 }).map((_, idx) => {
+                const listing = (listings ?? [])[idx];
+                const hasPreview = Boolean(listing?.preview_url);
+                const injectedPreviewUrl = `https://picsum.photos/seed/${Math.floor(Math.random() * 100000)}/800/600`;
+
+                const injected = listing
+                  ? ({
+                      ...listing,
+                      preview_url: hasPreview ? listing.preview_url : injectedPreviewUrl,
+                    } as any)
+                  : ({
+                      id: `injected-${idx}`,
+                      title: `AI 艺术作品 ${idx + 1}`,
+                      description: "AI 生成演示",
+                      preview_url: injectedPreviewUrl,
+                      metadata: {
+                        seller_name: "AI 艺术家",
+                        seller_avatar_url: null,
+                      },
+                    } as any);
+
+                return (
+                  <div key={injected.id} className="break-inside-avoid">
+                    <FeaturedWorkCard listing={injected} index={idx} />
+                  </div>
+                );
+              })}
             </div>
           )}
 
