@@ -21,8 +21,68 @@ type Props = {
   initialData?: Listing | null;
 };
 
+type PackageTierKey = "basic" | "standard" | "premium";
+
+type ListingPackageDraft = {
+  enabled: boolean;
+  price: string;
+  delivery_days: number;
+  features: string[];
+};
+
+type ListingPackagesDraft = Record<PackageTierKey, ListingPackageDraft>;
+
 function randomString() {
   return Math.random().toString(36).slice(2);
+}
+
+const TIER_META: Array<{ key: PackageTierKey; title: string; subtitle: string }> = [
+  { key: "basic", title: "Basic", subtitle: "基础版" },
+  { key: "standard", title: "Standard", subtitle: "标准版" },
+  { key: "premium", title: "Premium", subtitle: "高级版" },
+];
+
+const DEFAULT_FEATURES = [
+  "提供源代码",
+  "支持商用",
+  "含部署指导",
+  "提供文档",
+  "一次修改机会",
+  "优先响应",
+];
+
+function clampInt(n: number, min: number) {
+  if (!Number.isFinite(n)) return min;
+  return Math.max(min, Math.trunc(n));
+}
+
+function parseExistingPackages(initialData: Listing | null | undefined): ListingPackagesDraft {
+  const raw = (initialData as any)?.packages as any;
+
+  const fallback: ListingPackagesDraft = {
+    basic: { enabled: true, price: "", delivery_days: 3, features: [] },
+    standard: { enabled: true, price: "", delivery_days: 3, features: [] },
+    premium: { enabled: true, price: "", delivery_days: 3, features: [] },
+  };
+
+  if (!raw || typeof raw !== "object") return fallback;
+
+  const next = { ...fallback } as ListingPackagesDraft;
+
+  (Object.keys(next) as PackageTierKey[]).forEach((k) => {
+    const p = raw[k];
+    if (!p || typeof p !== "object") return;
+    next[k] = {
+      enabled: p.enabled !== false,
+      price: typeof p.price === "number" ? String(p.price) : typeof p.price === "string" ? p.price : "",
+      delivery_days: clampInt(Number(p.delivery_days ?? 3), 1),
+      features: Array.isArray(p.features) ? p.features.filter((x: any) => typeof x === "string") : [],
+    };
+  });
+
+  next.basic.enabled = true;
+
+  return next;
 }
 
 export function ListingForm({ mode = "create", initialData }: Props) {
@@ -34,36 +94,41 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   const [pending, setPending] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Fields we want to live-preview
   const [title, setTitle] = useState(initialData?.title ?? "");
-  const [price, setPrice] = useState(String(initialData?.price ?? ""));
   const [description, setDescription] = useState(initialData?.description ?? "");
   const [category, setCategory] = useState<"prompt" | "workflow" | "image_set">(
     (initialData?.category as any) ?? "prompt"
   );
   const [previewUrl, setPreviewUrl] = useState(initialData?.preview_url ?? "");
-  const [deliveryDays, setDeliveryDays] = useState(
-    ((initialData?.metadata as any)?.delivery_days as number) ?? 3
-  );
 
-  const [options, setOptions] = useState<Array<{ label: string; price: string }>>(
-    ((initialData?.options as any) ?? []).map((o: any) => ({
-      label: o.label ?? "",
-      price: String(o.price ?? ""),
-    }))
-  );
+  const [packages, setPackages] = useState<ListingPackagesDraft>(() => parseExistingPackages(initialData));
+  const [previewTier, setPreviewTier] = useState<PackageTierKey>("basic");
 
   const onSubmit = async (formData: FormData) => {
     setPending(true);
 
-    const cleaned = options
-      .map((o) => ({
-        label: o.label.trim(),
-        price: Number(o.price),
-      }))
-      .filter((o) => o.label.length > 0 && Number.isFinite(o.price) && o.price >= 0);
+    const payload = {
+      basic: {
+        enabled: true,
+        price: Number(packages.basic.price),
+        delivery_days: packages.basic.delivery_days,
+        features: packages.basic.features,
+      },
+      standard: {
+        enabled: packages.standard.enabled,
+        price: Number(packages.standard.price),
+        delivery_days: packages.standard.delivery_days,
+        features: packages.standard.features,
+      },
+      premium: {
+        enabled: packages.premium.enabled,
+        price: Number(packages.premium.price),
+        delivery_days: packages.premium.delivery_days,
+        features: packages.premium.features,
+      },
+    };
 
-    formData.set("options", JSON.stringify(cleaned));
+    formData.set("packages", JSON.stringify(payload));
 
     let result;
     if (mode === "edit" && initialData?.id) {
@@ -91,12 +156,10 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       const ext = file.name.split(".").pop() || "png";
       const path = `public/${Date.now()}-${randomString()}.${ext}`;
 
-      const { data, error } = await supabase.storage
-        .from("listings")
-        .upload(path, file, {
-          upsert: false,
-          contentType: file.type || undefined,
-        });
+      const { data, error } = await supabase.storage.from("listings").upload(path, file, {
+        upsert: false,
+        contentType: file.type || undefined,
+      });
 
       if (error) {
         setCreateState({ success: false, error: "上传失败，请稍后重试" });
@@ -104,9 +167,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
         return;
       }
 
-      const publicUrl = supabase.storage
-        .from("listings")
-        .getPublicUrl(data.path).data.publicUrl;
+      const publicUrl = supabase.storage.from("listings").getPublicUrl(data.path).data.publicUrl;
       setPreviewUrl(publicUrl);
     } finally {
       setIsUploading(false);
@@ -133,35 +194,158 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   };
 
   const previewListing = useMemo(() => {
+    const tier = packages[previewTier];
+
     const listing: Listing = {
       id: "preview",
       created_at: new Date().toISOString(),
       creator_id: "preview",
       title: title || "（未填写服务标题）",
       description: description || null,
-      price: Number.isFinite(Number(price)) ? Number(price) : 0,
+      price: Number.isFinite(Number(tier.price)) ? Number(tier.price) : 0,
       category: category ?? null,
-      metadata: { delivery_days: deliveryDays } as unknown as Listing["metadata"],
+      metadata: { delivery_days: tier.delivery_days } as unknown as Listing["metadata"],
       preview_url: previewUrl || null,
       options: [],
       status: "active",
     };
     return listing;
-  }, [title, price, description, category, previewUrl, deliveryDays]);
+  }, [title, description, category, previewUrl, packages, previewTier]);
 
   const state = mode === "edit" ? editState : createState;
   const successMessage = mode === "edit" ? "更新成功" : "发布成功";
 
+  const renderTierCard = (key: PackageTierKey) => {
+    const t = packages[key];
+    const meta = TIER_META.find((x) => x.key === key)!;
+
+    return (
+      <div className={`border rounded-xl p-4 bg-white ${!t.enabled ? "opacity-60" : ""}`}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="font-semibold">{meta.title}</div>
+            <div className="text-xs text-muted-foreground">{meta.subtitle}</div>
+          </div>
+
+          {key === "basic" ? (
+            <div className="text-xs text-muted-foreground">必选</div>
+          ) : (
+            <label className="flex items-center gap-2 text-xs select-none">
+              <input
+                type="checkbox"
+                checked={t.enabled}
+                onChange={(e) => {
+                  const enabled = e.target.checked;
+                  setPackages((prev) => ({
+                    ...prev,
+                    [key]: { ...prev[key], enabled },
+                  }));
+                }}
+              />
+              启用
+            </label>
+          )}
+        </div>
+
+        <div className="mt-4 space-y-3">
+          <div className="space-y-1">
+            <label className="text-sm" htmlFor={`price_${key}`}>
+              价格
+            </label>
+            <input
+              id={`price_${key}`}
+              type="number"
+              step="0.01"
+              min={0}
+              disabled={!t.enabled}
+              className="w-full border rounded-md px-3 py-2"
+              value={t.price}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPackages((prev) => ({
+                  ...prev,
+                  [key]: { ...prev[key], price: value },
+                }));
+              }}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm" htmlFor={`delivery_${key}`}>
+              预计交付（天）
+            </label>
+            <input
+              id={`delivery_${key}`}
+              type="number"
+              min={1}
+              step={1}
+              disabled={!t.enabled}
+              className="w-full border rounded-md px-3 py-2"
+              value={t.delivery_days}
+              onChange={(e) => {
+                const value = clampInt(Number(e.target.value), 1);
+                setPackages((prev) => ({
+                  ...prev,
+                  [key]: { ...prev[key], delivery_days: value },
+                }));
+              }}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="text-sm">包含内容</div>
+
+            <div className="space-y-2">
+              {DEFAULT_FEATURES.map((f) => {
+                const checked = t.features.includes(f);
+                return (
+                  <label key={`${key}_${f}`} className="flex items-center gap-2 text-sm select-none">
+                    <input
+                      type="checkbox"
+                      disabled={!t.enabled}
+                      checked={checked}
+                      onChange={(e) => {
+                        const nextChecked = e.target.checked;
+                        setPackages((prev) => {
+                          const curr = prev[key].features;
+                          const nextFeatures = nextChecked
+                            ? Array.from(new Set([...curr, f]))
+                            : curr.filter((x) => x !== f);
+                          return {
+                            ...prev,
+                            [key]: { ...prev[key], features: nextFeatures },
+                          };
+                        });
+                      }}
+                    />
+                    {f}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="w-full rounded-md border px-3 py-2"
+            onClick={() => setPreviewTier(key)}
+            disabled={!t.enabled}
+          >
+            预览此套餐
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="w-full max-w-5xl mx-auto min-h-[calc(100vh-8rem)]">
+    <div className="w-full max-w-6xl mx-auto min-h-[calc(100vh-8rem)]">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3">
           <div className="bg-white border rounded-2xl p-6 shadow-sm">
             <h1 className="text-2xl font-semibold">{mode === "edit" ? "编辑服务" : "发布服务"}</h1>
 
-            {state.success === false ? (
-              <p className="mt-2 text-sm text-red-600">{state.error}</p>
-            ) : null}
+            {state.success === false ? <p className="mt-2 text-sm text-red-600">{state.error}</p> : null}
             {state.success === true ? (
               <p className="mt-2 text-sm text-green-700">
                 {successMessage}
@@ -200,51 +384,10 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-sm" htmlFor="price">
-                      服务价格
-                    </label>
-                    <input
-                      id="price"
-                      name="price"
-                      type="number"
-                      step="0.01"
-                      required
-                      className="w-full border rounded-md px-3 py-2"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-sm" htmlFor="delivery_days">
-                      预计交付（天）
-                    </label>
-                    <input
-                      id="delivery_days"
-                      name="delivery_days"
-                      type="number"
-                      min={1}
-                      step={1}
-                      required
-                      className="w-full border rounded-md px-3 py-2"
-                      value={deliveryDays}
-                      onChange={(e) => setDeliveryDays(Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <label className="text-sm">服务封面 / 案例展示</label>
 
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={onFileChange}
-                  />
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
 
                   <div
                     className="border rounded-lg p-6 text-center cursor-pointer select-none"
@@ -262,74 +405,9 @@ export function ListingForm({ mode = "create", initialData }: Props) {
               </section>
 
               <section className="space-y-4">
-                <h2 className="text-sm font-semibold text-muted-foreground">增值服务配置</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground">三段式套餐</h2>
 
-                <div className="space-y-3">
-                  {options.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">暂无增值选项。</p>
-                  ) : null}
-
-                  {options.map((opt, idx) => (
-                    <div key={idx} className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
-                      <div className="sm:col-span-3 space-y-1">
-                        <label className="text-sm" htmlFor={`opt_label_${idx}`}>
-                          选项名称
-                        </label>
-                        <input
-                          id={`opt_label_${idx}`}
-                          className="w-full border rounded-md px-3 py-2"
-                          value={opt.label}
-                          onChange={(e) => {
-                            const next = options.slice();
-                            next[idx] = { ...next[idx], label: e.target.value };
-                            setOptions(next);
-                          }}
-                          placeholder="例如：提供源文件"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-1 space-y-1">
-                        <label className="text-sm" htmlFor={`opt_price_${idx}`}>
-                          额外价格
-                        </label>
-                        <input
-                          id={`opt_price_${idx}`}
-                          type="number"
-                          step="1"
-                          min={0}
-                          className="w-full border rounded-md px-3 py-2"
-                          value={opt.price}
-                          onChange={(e) => {
-                            const next = options.slice();
-                            next[idx] = { ...next[idx], price: e.target.value };
-                            setOptions(next);
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-1">
-                        <button
-                          type="button"
-                          className="w-full rounded-md border px-3 py-2"
-                          onClick={() => {
-                            setOptions(options.filter((_, i) => i !== idx));
-                          }}
-                        >
-                          删除
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  <button
-                    type="button"
-                    className="rounded-md bg-black text-white px-4 py-2"
-                    onClick={() => setOptions([...options, { label: "", price: "" }])}
-                  >
-                    + 添加选项
-                  </button>
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{TIER_META.map((t) => renderTierCard(t.key))}</div>
               </section>
 
               <section className="space-y-4">
@@ -358,7 +436,15 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                 disabled={pending || isUploading}
                 className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60"
               >
-                {isUploading ? "上传中..." : pending ? (mode === "edit" ? "更新中..." : "发布中...") : (mode === "edit" ? "更新服务" : "发布服务")}
+                {isUploading
+                  ? "上传中..."
+                  : pending
+                    ? mode === "edit"
+                      ? "更新中..."
+                      : "发布中..."
+                    : mode === "edit"
+                      ? "更新服务"
+                      : "发布服务"}
               </button>
             </form>
           </div>
@@ -366,7 +452,26 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
         <div className="md:col-span-2">
           <div className="md:sticky md:top-6">
-            <div className="mb-3 text-sm font-semibold text-muted-foreground">实时预览</div>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="text-sm font-semibold text-muted-foreground">实时预览</div>
+              <div className="flex items-center gap-1">
+                {TIER_META.map((t) => {
+                  const enabled = packages[t.key].enabled;
+                  const active = previewTier === t.key;
+                  return (
+                    <button
+                      key={`preview_${t.key}`}
+                      type="button"
+                      className={`rounded-md border px-2 py-1 text-xs ${active ? "bg-black text-white" : "bg-white"} ${!enabled ? "opacity-50" : ""}`}
+                      onClick={() => setPreviewTier(t.key)}
+                      disabled={!enabled}
+                    >
+                      {t.title}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <ListingCard listing={previewListing} />
           </div>
         </div>

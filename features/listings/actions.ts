@@ -22,22 +22,18 @@ export async function createListing(
   formData: FormData
 ): Promise<ActionResult<{ id: string }>> {
   try {
-    const rawOptions = formData.get("options");
-    const parsedOptions =
-      typeof rawOptions === "string" && rawOptions.length > 0
-        ? JSON.parse(rawOptions)
+    const rawPackages = formData.get("packages");
+    const parsedPackages =
+      typeof rawPackages === "string" && rawPackages.length > 0
+        ? JSON.parse(rawPackages)
         : undefined;
 
     const input = createListingSchema.parse({
       title: formData.get("title"),
       description: formData.get("description") || undefined,
-      price: formData.get("price"),
       category: formData.get("category") || undefined,
       previewUrl: formData.get("previewUrl") || undefined,
-      metadata: {
-        delivery_days: formData.get("delivery_days"),
-      },
-      options: parsedOptions,
+      packages: parsedPackages,
     });
 
     const supabase = await createSupabaseServerClient();
@@ -56,10 +52,8 @@ export async function createListing(
           creator_id: user.id,
           title: input.title,
           description: input.description ?? null,
-          price: input.price,
+          packages: input.packages,
           category: input.category ?? null,
-          metadata: input.metadata,
-          options: input.options ?? null,
           preview_url: input.previewUrl ?? null,
           status: "active",
         })
@@ -89,22 +83,18 @@ export async function updateListing(
   formData: FormData
 ): Promise<ActionResult<null>> {
   try {
-    const rawOptions = formData.get("options");
-    const parsedOptions =
-      typeof rawOptions === "string" && rawOptions.length > 0
-        ? JSON.parse(rawOptions)
+    const rawPackages = formData.get("packages");
+    const parsedPackages =
+      typeof rawPackages === "string" && rawPackages.length > 0
+        ? JSON.parse(rawPackages)
         : undefined;
 
     const input = createListingSchema.parse({
       title: formData.get("title"),
       description: formData.get("description") || undefined,
-      price: formData.get("price"),
       category: formData.get("category") || undefined,
       previewUrl: formData.get("previewUrl") || undefined,
-      metadata: {
-        delivery_days: formData.get("delivery_days"),
-      },
-      options: parsedOptions,
+      packages: parsedPackages,
     });
 
     const id = formData.get("id");
@@ -127,10 +117,8 @@ export async function updateListing(
         .update({
           title: input.title,
           description: input.description ?? null,
-          price: input.price,
+          packages: input.packages,
           category: input.category ?? null,
-          metadata: input.metadata,
-          options: input.options ?? null,
           preview_url: input.previewUrl ?? null,
         })
         .eq("id", id)
