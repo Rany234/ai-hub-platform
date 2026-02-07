@@ -152,10 +152,10 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   const successMessage = mode === "edit" ? "更新成功" : "发布成功";
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-        <div className="md:col-span-3">
-          <div className="border rounded-lg p-6">
+    <div className="w-full max-w-5xl mx-auto min-h-[calc(100vh-8rem)]">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        <div className="lg:col-span-3">
+          <div className="bg-white border rounded-2xl p-6 shadow-sm">
             <h1 className="text-2xl font-semibold">{mode === "edit" ? "编辑服务" : "发布服务"}</h1>
 
             {state.success === false ? (
