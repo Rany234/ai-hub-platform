@@ -32,14 +32,14 @@ export function EmptyState({
   );
 
   return (
-    <div className="flex flex-col items-center justify-center py-12">
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       {Icon && (
-        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-muted/50">
-          <Icon className="w-8 h-8 text-muted-foreground" />
+        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-slate-50 mb-6 group transition-all duration-300">
+          <Icon className="w-10 h-10 text-slate-300 group-hover:text-primary/40 transition-colors" />
         </div>
       )}
-      <h2 className="mt-4 text-xl font-semibold">{title}</h2>
-      <p className="mt-2 text-sm text-muted-foreground max-w-sm text-center">
+      <h2 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h2>
+      <p className="mt-2 text-sm text-slate-500 max-w-sm leading-relaxed">
         {description}
       </p>
       {buttonContent}
