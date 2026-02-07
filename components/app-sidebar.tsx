@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Briefcase,
   User,
+  ArrowLeftCircle,
 } from "lucide-react"
 
 import {
@@ -31,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-2">
+        <Link href="/dashboard" className="flex items-center gap-2 px-2 py-2 hover:opacity-80 transition-opacity">
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
             <LayoutDashboard className="size-4" />
           </div>
@@ -39,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <span className="truncate font-semibold">AI Hub</span>
             <span className="truncate text-xs text-muted-foreground">Platform</span>
           </div>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -50,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
                   <Link href="/dashboard">
-                    <PieChart className="size-4" />
+                    <LayoutDashboard className="size-4" />
                     <span>概览</span>
                   </Link>
                 </SidebarMenuButton>
@@ -79,6 +80,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Link href="/dashboard/profile/me">
                     <User className="size-4" />
                     <span>个人主页</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href="/" target="_self">
+                    <ArrowLeftCircle className="size-4" />
+                    <span>返回官网</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
