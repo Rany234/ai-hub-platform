@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { AlertCircle, Wallet } from "lucide-react";
+import { AlertCircle, Loader2, Wallet } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createJob, type CreateJobInput } from "@/app/actions/job";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   title: z.string().min(5, "标题至少需要 5 个字"),
@@ -49,8 +50,9 @@ export function CreateJobForm() {
     try {
       const result = await createJob(values as CreateJobInput);
       if (result.success) {
+        toast.success("操作成功！");
         router.push("/dashboard");
-      } else {
+      } else {"}
         setError(result.error);
         setIsSubmitting(false);
       }
@@ -146,7 +148,14 @@ export function CreateJobForm() {
 
           <div className="flex items-center gap-4">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "发布中..." : "发布任务"}
+              {isSubmitting ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="size-4 animate-spin" />
+                  发布中...
+                </span>
+              ) : (
+                "发布任务"
+              )}
             </Button>
             <Button variant="outline" asChild disabled={isSubmitting}>
               <Link href="/dashboard/jobs">取消</Link>

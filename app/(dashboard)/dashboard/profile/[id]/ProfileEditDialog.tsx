@@ -2,6 +2,9 @@
 
 import { useState, useTransition } from "react";
 
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -54,6 +57,7 @@ export function ProfileEditDialog({
         return;
       }
 
+      toast.success("操作成功！");
       setOpen(false);
     });
   };
@@ -104,7 +108,14 @@ export function ProfileEditDialog({
             取消
           </Button>
           <Button onClick={onSave} disabled={isPending} className="bg-blue-600 hover:bg-blue-700">
-            {isPending ? "保存中..." : "保存"}
+            {isPending ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="size-4 animate-spin" />
+                保存中...
+              </span>
+            ) : (
+              "保存"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

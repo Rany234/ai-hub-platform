@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { Star, Trophy, MapPin, Globe, Briefcase, Mail } from "lucide-react";
+import { Star, Trophy, MapPin, Globe, Briefcase, Mail, CalendarClock, MessageSquareQuote } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { getUserProfile } from "@/app/actions/profile";
 import { getWorkerServices } from "@/app/actions/services";
 import { ProfileEditDialog } from "./ProfileEditDialog";
 import { ServiceCreateDialog } from "./ServiceCreateDialog";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -108,9 +109,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
             </div>
             
             {services.length === 0 ? (
-              <div className="bg-slate-50 border border-dashed rounded-3xl p-12 text-center text-slate-500">
-                尚未发布任何技能服务
-              </div>
+              <EmptyState
+                title="暂无服务"
+                description="尚未发布任何技能服务"
+                icon={CalendarClock}
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {services.map((service) => (
@@ -142,9 +145,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
           <section className="space-y-6 pt-4 border-t border-slate-100">
             <h2 className="text-2xl font-bold text-slate-900 px-2">收到的评价 ({reviews.length})</h2>
             {reviews.length === 0 ? (
-              <div className="bg-slate-50 border border-dashed rounded-3xl p-12 text-center text-slate-500">
-                暂无评价记录
-              </div>
+              <EmptyState
+                title="暂无评价"
+                description="暂无评价记录"
+                icon={MessageSquareQuote}
+              />
             ) : (
               <div className="space-y-4">
                 {reviews.map((review) => (

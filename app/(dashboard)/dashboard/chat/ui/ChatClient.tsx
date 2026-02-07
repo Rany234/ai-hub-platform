@@ -223,12 +223,12 @@ export default function ChatClient({
         },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            const newMessage = payload.new as MessageRow;
-            setMessages((prev) => {
-              // Prevent duplicate if user just sent it and it arrived via RPC then Realtime
-              if (prev.some((m) => m.id === newMessage.id)) return prev;
-              return [...prev, newMessage];
-            });
+          const newMessage = payload.new as MessageRow;
+          setMessages((prev) => {
+            // Prevent duplicate if user just sent it and it arrived via RPC then Realtime
+            if (prev.some((m) => m.id === newMessage.id)) return prev;
+            return [...prev, newMessage];
+          });
           } else if (payload.eventType === "UPDATE") {
             const updated = payload.new as MessageRow;
             setMessages((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
@@ -407,24 +407,24 @@ export default function ChatClient({
                     {isOffer ? (
                       <OfferCard msg={msg} isMe={isMe} onAction={handleOfferAction} />
                     ) : (
+                    <div
+                      className={
+                        "max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm " +
+                        (isMe
+                          ? "bg-blue-600 text-white rounded-br-none"
+                          : "bg-white border border-slate-100 text-slate-800 rounded-bl-none")
+                      }
+                    >
+                      <div className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</div>
                       <div
                         className={
-                          "max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm " +
-                          (isMe
-                            ? "bg-blue-600 text-white rounded-br-none"
-                            : "bg-white border border-slate-100 text-slate-800 rounded-bl-none")
+                          "mt-1 text-[10px] " +
+                          (isMe ? "text-blue-100" : "text-muted-foreground")
                         }
                       >
-                        <div className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</div>
-                        <div
-                          className={
-                            "mt-1 text-[10px] " +
-                            (isMe ? "text-blue-100" : "text-muted-foreground")
-                          }
-                        >
-                          {formatTime(msg.created_at)}
-                        </div>
+                        {formatTime(msg.created_at)}
                       </div>
+                    </div>
                     )}
                   </div>
                 );

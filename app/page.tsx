@@ -79,7 +79,7 @@ export default async function HomePage() {
           ) : (
             <Link className="text-sm underline" href="/login">
               登录 / 注册
-            </Link>
+          </Link>
           )}
         </div>
 

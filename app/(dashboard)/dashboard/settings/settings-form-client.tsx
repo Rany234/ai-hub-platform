@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -135,7 +136,14 @@ export function SettingsFormClient({
 
           <div>
             <Button onClick={() => void saveProfile()} disabled={saving}>
-              {saving ? "保存中..." : "保存修改"}
+              {saving ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="size-4 animate-spin" />
+                  保存中...
+                </span>
+              ) : (
+                "保存修改"
+              )}
             </Button>
           </div>
         </div>

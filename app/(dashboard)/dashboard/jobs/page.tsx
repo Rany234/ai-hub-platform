@@ -49,7 +49,7 @@ export default async function JobMarketplacePage() {
         />
       ) : (
         <div className="bg-card rounded-xl border shadow-sm p-1">
-          <JobsClient jobs={(jobs as any) ?? []} />
+        <JobsClient jobs={(jobs as any) ?? []} />
         </div>
       )}
     </div>

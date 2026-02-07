@@ -16,13 +16,13 @@ export default function NewJobPage() {
             <li className="text-foreground font-medium">New Job</li>
           </ol>
         </nav>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">发布一个新需求</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              详细描述你的需求，吸引最优秀的 AI 开发者
-            </p>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">发布一个新需求</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            详细描述你的需求，吸引最优秀的 AI 开发者
+          </p>
+        </div>
         </div>
       </div>
 
