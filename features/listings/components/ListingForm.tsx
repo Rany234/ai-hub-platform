@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createListing, updateListing } from "@/features/listings/actions";
@@ -86,6 +89,7 @@ function parseExistingPackages(initialData: Listing | null | undefined): Listing
 }
 
 export function ListingForm({ mode = "create", initialData }: Props) {
+  const router = useRouter();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -105,6 +109,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   const [previewTier, setPreviewTier] = useState<PackageTierKey>("basic");
 
   const onSubmit = async (formData: FormData) => {
+    if (pending) return;
     setPending(true);
 
     const payload = {
@@ -140,7 +145,12 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       setCreateState(result);
     }
 
-    setPending(false);
+    if (result.success) {
+      toast.success(mode === "edit" ? "更新成功！" : "服务发布成功！");
+      router.push("/dashboard/services");
+    } else {
+      setPending(false);
+    }
   };
 
   const onPickFile = () => {
@@ -213,7 +223,6 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   }, [title, description, category, previewUrl, packages, previewTier]);
 
   const state = mode === "edit" ? editState : createState;
-  const successMessage = mode === "edit" ? "更新成功" : "发布成功";
 
   const renderTierCard = (key: PackageTierKey) => {
     const t = packages[key];
@@ -346,12 +355,6 @@ export function ListingForm({ mode = "create", initialData }: Props) {
             <h1 className="text-2xl font-semibold">{mode === "edit" ? "编辑服务" : "发布服务"}</h1>
 
             {state.success === false ? <p className="mt-2 text-sm text-red-600">{state.error}</p> : null}
-            {state.success === true ? (
-              <p className="mt-2 text-sm text-green-700">
-                {successMessage}
-                {mode === "create" && typeof state.data?.id === "string" ? `：${state.data.id}` : ""}
-              </p>
-            ) : null}
 
             <form action={onSubmit} className="mt-6 space-y-8">
               <section className="space-y-4">
@@ -434,17 +437,23 @@ export function ListingForm({ mode = "create", initialData }: Props) {
               <button
                 type="submit"
                 disabled={pending || isUploading}
-                className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60"
+                className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                {isUploading
-                  ? "上传中..."
-                  : pending
-                    ? mode === "edit"
-                      ? "更新中..."
-                      : "发布中..."
-                    : mode === "edit"
-                      ? "更新服务"
-                      : "发布服务"}
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>上传中...</span>
+                  </>
+                ) : pending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>{mode === "edit" ? "更新中..." : "发布中..."}</span>
+                  </>
+                ) : mode === "edit" ? (
+                  "更新服务"
+                ) : (
+                  "发布服务"
+                )}
               </button>
             </form>
           </div>
