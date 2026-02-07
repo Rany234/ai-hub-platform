@@ -9,15 +9,27 @@ export const listingMetadataSchema = z.object({
 
 export type ListingMetadata = z.infer<typeof listingMetadataSchema>;
 
-export const listingPackageSchema = z.object({
-  enabled: z.coerce.boolean().default(true),
-  price: z.coerce.number().positive({ message: "价格必须大于 0" }),
-  delivery_days: z.coerce
-    .number()
-    .int({ message: "预计交付天数必须为整数" })
-    .positive({ message: "预计交付天数必须大于 0" }),
-  features: z.array(z.string().min(1)).default([]),
-});
+export const listingPackageSchema = z
+  .object({
+    enabled: z.coerce.boolean().default(true),
+    price: z.coerce.number({ invalid_type_error: "价格必须是数字" }),
+    delivery_days: z.coerce
+      .number()
+      .int({ message: "预计交付天数必须为整数" })
+      .positive({ message: "预计交付天数必须大于 0" }),
+    features: z.array(z.string().min(1)).default([]),
+  })
+  .superRefine((val, ctx) => {
+    if (val.enabled === false) return;
+
+    if (!(val.price > 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "价格必须大于 0",
+        path: ["price"],
+      });
+    }
+  });
 
 export type ListingPackage = z.infer<typeof listingPackageSchema>;
 

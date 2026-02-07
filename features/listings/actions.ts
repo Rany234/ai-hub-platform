@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { createListingSchema } from "./schemas";
@@ -19,13 +20,21 @@ export async function createListing(
         ? JSON.parse(rawPackages)
         : undefined;
 
-    const input = createListingSchema.parse({
+    let input;
+    try {
+      input = createListingSchema.parse({
       title: formData.get("title"),
       description: formData.get("description") || undefined,
       category: formData.get("category") || undefined,
       previewUrl: formData.get("previewUrl") || undefined,
       packages: parsedPackages,
     });
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      return { success: false, error: e.errors[0].message };
+    }
+    throw e;
+  }
 
     const supabase = await createSupabaseServerClient();
     const {

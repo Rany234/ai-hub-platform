@@ -490,7 +490,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                 })}
               </div>
             </div>
-            <ListingCard listing={previewListing} />
+            <ListingCard key={previewTier} listing={previewListing} />
           </div>
         </div>
       </div>
