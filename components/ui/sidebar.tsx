@@ -547,14 +547,14 @@ const SidebarMenuButton = React.forwardRef<
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), "relative", className)}
-        {...props}
-      >
-        {isActive && (
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-primary rounded-full" />
+        className={cn(
+          sidebarMenuButtonVariants({ variant, size }),
+          isActive && "before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-4 before:bg-primary before:rounded-full",
+          "relative",
+          className
         )}
-        {props.children}
-      </Comp>
+        {...props}
+      />
     )
 
     if (!tooltip) {
