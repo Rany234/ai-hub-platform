@@ -58,6 +58,7 @@ export function CreateJobForm() {
     } catch (e) {
       console.error(e);
       setError("发布失败，请稍后再试");
+    } finally {
       setIsSubmitting(false);
     }
   };
