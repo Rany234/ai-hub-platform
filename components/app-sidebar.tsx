@@ -9,6 +9,7 @@ import {
   MessageCircle,
   LayoutDashboard,
   Briefcase,
+  User,
 } from "lucide-react"
 
 import {
@@ -69,6 +70,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Link href="/dashboard/my-jobs">
                     <Briefcase className="size-4" />
                     <span>我的工作台</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/profile/me" || pathname.startsWith("/dashboard/profile/")}>
+                  <Link href="/dashboard/profile/me">
+                    <User className="size-4" />
+                    <span>个人主页</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
