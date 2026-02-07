@@ -1,10 +1,12 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createSupabaseAdminClient } from "@/features/auth/supabase/admin";
 
-export const dynamic = "force-dynamic";
-
-const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" as any })
+  : null;
 
 export async function POST(req: NextRequest) {
   if (!stripe) {
