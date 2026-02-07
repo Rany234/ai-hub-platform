@@ -11,6 +11,7 @@ import {
   Briefcase,
   User,
   ArrowLeftCircle,
+  Package,
 } from "lucide-react"
 
 import {
@@ -80,6 +81,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Link href="/dashboard/profile/me">
                     <User className="size-4" />
                     <span>个人主页</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/services"}>
+                  <Link href="/dashboard/services">
+                    <Package className="size-4" />
+                    <span>我的服务</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
