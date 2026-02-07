@@ -5,6 +5,7 @@ import { CalendarClock, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { ServiceOperations } from "./ServiceOperations";
 
 export default async function MyServicesPage() {
   const supabase = await createSupabaseServerClient();
@@ -18,7 +19,7 @@ export default async function MyServicesPage() {
 
   const { data: services, error } = await supabase
     .from("listings")
-    .select("id,title,description,price,delivery_days,created_at")
+    .select("id,title,description,packages,created_at")
     .eq("seller_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -57,10 +58,13 @@ export default async function MyServicesPage() {
           {services.map((service: any) => (
             <Card key={service.id} className="rounded-2xl shadow-sm hover:shadow-md transition-shadow border-slate-100 overflow-hidden flex flex-col">
               <CardHeader className="bg-slate-50/50 pb-4">
-                <CardTitle className="text-base line-clamp-1 flex items-center gap-2">
-                  <Package className="size-4 text-blue-600" />
-                  {service.title}
-                </CardTitle>
+                <div className="flex items-start justify-between gap-3">
+                  <CardTitle className="text-base line-clamp-1 flex items-center gap-2">
+                    <Package className="size-4 text-blue-600" />
+                    {service.title}
+                  </CardTitle>
+                  <ServiceOperations serviceId={service.id} />
+                </div>
               </CardHeader>
               <CardContent className="p-4 flex-1 flex flex-col justify-between gap-4">
                 <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
@@ -68,11 +72,11 @@ export default async function MyServicesPage() {
                 </p>
                 <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-50">
                   <div className="text-blue-600 font-bold">
-                    ¥{Number(service.price).toLocaleString()}
+                    ¥{Number(service.packages?.basic?.price ?? 0).toLocaleString()}
                   </div>
                   <div className="text-[10px] text-muted-foreground flex items-center gap-1">
                     <CalendarClock className="size-3" />
-                    {service.delivery_days} 天交付
+                    {service.packages?.basic?.delivery_days ?? "-"} 天交付
                   </div>
                 </div>
               </CardContent>

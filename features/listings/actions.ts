@@ -49,7 +49,7 @@ export async function createListing(
       const { data, error } = await supabase
         .from("listings")
         .insert({
-          creator_id: user.id,
+          seller_id: user.id,
           title: input.title,
           description: input.description ?? null,
           packages: input.packages,
@@ -122,7 +122,7 @@ export async function updateListing(
           preview_url: input.previewUrl ?? null,
         })
         .eq("id", id)
-        .eq("creator_id", user.id); // RLS guard
+        .eq("seller_id", user.id); // RLS guard
 
       if (error) return { success: false, error: mapDbErrorToChinese(error.message) };
 
@@ -140,5 +140,32 @@ export async function updateListing(
       success: false,
       error: e instanceof Error ? e.message : "更新失败，请稍后重试",
     };
+  }
+}
+
+export async function deleteListing(id: string): Promise<ActionResult<null>> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) return { success: false, error: "未登录或权限不足" };
+
+    const { error } = await supabase
+      .from("listings")
+      .delete()
+      .eq("id", id)
+      .eq("seller_id", user.id);
+
+    if (error) return { success: false, error: "删除失败，请稍后重试" };
+
+    revalidatePath("/dashboard/services");
+    revalidatePath("/");
+
+    return { success: true, data: null };
+  } catch (e) {
+    return { success: false, error: "删除操作发生异常" };
   }
 }

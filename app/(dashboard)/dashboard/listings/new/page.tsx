@@ -4,7 +4,12 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { ListingForm } from "@/features/listings/components/ListingForm";
 
-export default async function NewListingPage() {
+export default async function NewListingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>;
+}) {
+  const { id } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -12,6 +17,17 @@ export default async function NewListingPage() {
 
   if (!user) {
     redirect("/login?redirectedFrom=/dashboard/listings/new");
+  }
+
+  let initialData = null;
+  if (id) {
+    const { data } = await supabase
+      .from("listings")
+      .select("*")
+      .eq("id", id)
+      .eq("seller_id", user.id)
+      .single();
+    initialData = data;
   }
 
   return (
@@ -27,12 +43,14 @@ export default async function NewListingPage() {
               <Link href="/dashboard/services" className="hover:text-foreground">我的服务</Link>
             </li>
             <li>/</li>
-            <li className="text-foreground font-medium">发布新服务</li>
+            <li className="text-foreground font-medium">
+              {id ? "编辑服务" : "发布新服务"}
+            </li>
           </ol>
         </nav>
       </div>
 
-      <ListingForm />
+      <ListingForm mode={id ? "edit" : "create"} initialData={initialData} />
     </div>
   );
 }
