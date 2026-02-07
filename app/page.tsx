@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { BentoCard } from "@/components/BentoCard";
@@ -9,10 +8,6 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (user) {
-    redirect("/dashboard");
-  }
 
   const { data: listings, error } = await supabase
     .from("listings")
@@ -77,9 +72,15 @@ export default async function HomePage() {
       <section className="mx-auto max-w-6xl px-6 py-12">
         <div className="flex items-baseline justify-between gap-4 mb-8">
           <h2 className="text-2xl font-semibold">精选作品</h2>
-          <Link className="text-sm underline" href="/dashboard/listings/new">
-            发布作品
-          </Link>
+          {user ? (
+            <Link className="text-sm underline" href="/dashboard">
+              进入控制台
+            </Link>
+          ) : (
+            <Link className="text-sm underline" href="/login">
+              登录 / 注册
+            </Link>
+          )}
         </div>
 
         {!hasListings ? (
