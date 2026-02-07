@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createListing, updateListing } from "@/features/listings/actions";
 import { ListingCard, type Listing } from "@/features/listings/components/ListingCard";
@@ -337,14 +338,19 @@ export function ListingForm({ mode = "create", initialData }: Props) {
             </div>
           </div>
 
-          <button
+          <Button
             type="button"
-            className="w-full rounded-md border px-3 py-2"
-            onClick={() => setPreviewTier(key)}
+            variant="outline"
+            className="w-full"
+            onClick={(e) => {
+              e.preventDefault();
+              console.log("Switching to tier:", key);
+              setPreviewTier(key);
+            }}
             disabled={!t.enabled}
           >
             预览此套餐
-          </button>
+          </Button>
         </div>
       </div>
     );

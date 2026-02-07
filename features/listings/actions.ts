@@ -7,15 +7,6 @@ import { createListingSchema } from "./schemas";
 
 type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
 
-function mapDbErrorToChinese(message: string): string {
-  const m = message.toLowerCase();
-
-  if (m.includes("foreign key") || m.includes("23503")) {
-    return "用户档案缺失，请联系管理员或尝试重新登录";
-  }
-
-  return "发布失败，请稍后重试";
-}
 
 export async function createListing(
   _prevState: unknown,
@@ -42,7 +33,7 @@ export async function createListing(
       error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError) return { success: false, error: "发布失败，请稍后重试" };
+    if (userError) return { success: false, error: userError.message };
     if (!user) return { success: false, error: "未登录" };
 
     try {
@@ -60,20 +51,21 @@ export async function createListing(
         .select("id")
         .single();
 
-      if (error) return { success: false, error: mapDbErrorToChinese(error.message) };
+      if (error) return { success: false, error: error.message };
 
       revalidatePath("/");
       revalidatePath("/dashboard");
 
       return { success: true, data: { id: data.id } };
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "";
-      return { success: false, error: mapDbErrorToChinese(msg) };
+      console.error("SERVER_ACTION_ERROR:", e);
+      return { success: false, error: e instanceof Error ? e.message : String(e) };
     }
   } catch (e) {
+    console.error("SERVER_ACTION_ERROR:", e);
     return {
       success: false,
-      error: e instanceof Error ? e.message : "发布失败，请稍后重试",
+      error: e instanceof Error ? e.message : String(e),
     };
   }
 }
@@ -108,7 +100,7 @@ export async function updateListing(
       error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError) return { success: false, error: "更新失败，请稍后重试" };
+    if (userError) return { success: false, error: userError.message };
     if (!user) return { success: false, error: "未登录" };
 
     try {
@@ -124,7 +116,7 @@ export async function updateListing(
         .eq("id", id)
         .eq("seller_id", user.id); // RLS guard
 
-      if (error) return { success: false, error: mapDbErrorToChinese(error.message) };
+      if (error) return { success: false, error: error.message };
 
       revalidatePath("/");
       revalidatePath("/dashboard");
@@ -132,13 +124,12 @@ export async function updateListing(
 
       return { success: true, data: null };
     } catch (e) {
-      const msg = e instanceof Error ? e.message : "";
-      return { success: false, error: mapDbErrorToChinese(msg) };
+      return { success: false, error: e instanceof Error ? e.message : String(e) };
     }
   } catch (e) {
     return {
       success: false,
-      error: e instanceof Error ? e.message : "更新失败，请稍后重试",
+      error: e instanceof Error ? e.message : String(e),
     };
   }
 }
