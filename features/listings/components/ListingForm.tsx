@@ -147,6 +147,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
     if (result.success) {
       toast.success(mode === "edit" ? "更新成功！" : "服务发布成功！");
+      router.refresh();
       router.push("/dashboard/services");
     } else {
       setPending(false);
@@ -214,7 +215,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       description: description || null,
       price: Number.isFinite(Number(tier.price)) ? Number(tier.price) : 0,
       category: category ?? null,
-      metadata: { delivery_days: tier.delivery_days } as unknown as Listing["metadata"],
+      metadata: { delivery_days: tier.delivery_days, packages } as unknown as Listing["metadata"],
       preview_url: previewUrl || null,
       options: [],
       status: "active",

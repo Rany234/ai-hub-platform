@@ -20,9 +20,13 @@ export function ListingCard({ listing }: { listing: Listing }) {
   const sellerAvatarUrl = metadata?.seller_avatar_url;
   const avgRating = typeof metadata?.avg_rating === "number" ? metadata.avg_rating : null;
 
+  // 提取预览模式下的套餐功能点
+  const packages = (metadata as any)?.packages;
+  const previewFeatures = packages ? (Object.values(packages) as any[]).find(p => p.price === listing.price)?.features : null;
+
   return (
     <Link href={`/listings/${listing.id}`} className="block">
-      <div className="relative border rounded-lg p-4 flex flex-col gap-2 hover:border-gray-400 transition-colors">
+      <div className="relative border rounded-lg p-4 flex flex-col gap-2 hover:border-gray-400 transition-colors bg-white">
         {avgRating !== null ? (
           <div className="absolute right-3 top-3 rounded-full border bg-white px-2 py-1 text-xs flex items-center gap-1">
             <Star className="h-3.5 w-3.5 fill-black" />
@@ -32,7 +36,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
 
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold leading-tight">{listing.title}</h3>
-          <div className="text-sm font-medium">${listing.price}</div>
+          <div className="text-sm font-medium">¥{listing.price}</div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -48,8 +52,18 @@ export function ListingCard({ listing }: { listing: Listing }) {
         </div>
 
         {listing.description ? (
-          <p className="text-sm text-muted-foreground line-clamp-3">{listing.description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{listing.description}</p>
         ) : null}
+
+        {previewFeatures && previewFeatures.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {previewFeatures.map((f: string, i: number) => (
+              <span key={i} className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                ✓ {f}
+              </span>
+            ))}
+          </div>
+        )}
 
         {listing.preview_url ? (
           // eslint-disable-next-line @next/next/no-img-element

@@ -17,9 +17,9 @@ export default async function MyServicesPage() {
   }
 
   const { data: services, error } = await supabase
-    .from("services")
+    .from("listings")
     .select("id,title,description,price,delivery_days,created_at")
-    .eq("worker_id", user.id)
+    .eq("seller_id", user.id)
     .order("created_at", { ascending: false });
 
   return (
