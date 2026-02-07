@@ -3,10 +3,16 @@ import Stripe from "stripe";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+export const dynamic = "force-dynamic";
+
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json({ error: "Stripe is not configured" }, { status: 500 });
+    }
+
     const { orderId } = (await req.json()) as { orderId?: unknown };
 
     if (typeof orderId !== "string" || orderId.length === 0) {
