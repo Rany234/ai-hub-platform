@@ -23,8 +23,6 @@ type Profile = {
   bio: string | null;
   website: string | null;
   avatar_url: string | null;
-  email?: string | null;
-  wechat_id?: string | null;
 };
 
 export function SettingsFormClient({
@@ -51,14 +49,11 @@ export function SettingsFormClient({
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.set("full_name", fullName);
-      formData.set("bio", bio);
-      formData.set("email", email);
-      formData.set("wechat_id", wechatId);
-      formData.set("avatar_url", avatarUrl);
-
-      const result = await updateProfile(formData);
+      const result = await updateProfile({
+        title: fullName.trim() || null,
+        bio: bio.trim() || null,
+        skills: null,
+      });
       if (!result?.success) {
         throw new Error(result?.error ?? "保存失败");
       }

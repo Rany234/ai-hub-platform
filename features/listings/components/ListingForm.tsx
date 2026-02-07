@@ -143,6 +143,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       category: category ?? null,
       metadata: { delivery_days: deliveryDays } as unknown as Listing["metadata"],
       preview_url: previewUrl || null,
+      options: [],
       status: "active",
     };
     return listing;

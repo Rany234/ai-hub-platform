@@ -51,10 +51,9 @@ export function CreateJobForm() {
       const result = await createJob(values as CreateJobInput);
       if (result.success) {
         toast.success("操作成功！");
-        router.push("/dashboard");
-      } else {"}
+        router.push("/dashboard/jobs");
+      } else {
         setError(result.error);
-        setIsSubmitting(false);
       }
     } catch (e) {
       console.error(e);

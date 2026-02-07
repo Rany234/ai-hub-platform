@@ -132,7 +132,7 @@ export async function sendOffer(
 
   const content = `发起了一份聘书: ${normalizedAmount}`;
 
-  const { error } = await supabase
+  const { error } = await (supabase
     .from("messages")
     .insert({
       conversation_id: conversationId,
@@ -145,7 +145,7 @@ export async function sendOffer(
         description: (description ?? "").toString(),
         jobId: jobId.trim(),
       },
-    });
+    } as any) as any);
 
   if (error) throw error;
 
@@ -166,11 +166,11 @@ export async function handleOffer(
   const status = action === "accept" ? "accepted" : "rejected";
 
   // Step B: Get message and validate payload
-  const { data: message, error: readError } = await adminClient
+  const { data: message, error: readError } = await (adminClient
     .from("messages")
     .select("payload")
     .eq("id", messageId)
-    .single();
+    .single() as any);
 
   if (readError || !message) throw new Error(`Failed to read message: ${readError?.message}`);
   
@@ -186,12 +186,13 @@ export async function handleOffer(
       throw new Error("Job ID missing in offer payload");
     }
 
-    const { error: jobError } = await adminClient
-      .from("jobs")
-      .update({ 
-        status: "in_progress", 
-        worker_id: user.id 
-      } as any)
+    const jobsQuery: any = adminClient.from("jobs");
+
+    const { error: jobError } = await jobsQuery
+      .update({
+        status: "in_progress",
+        worker_id: user.id,
+      })
       .eq("id", jobId);
 
     if (jobError) throw new Error(`Job update failed: ${jobError.message}`);
@@ -203,8 +204,9 @@ export async function handleOffer(
     status,
   };
 
-  const { error: msgUpdateError } = await adminClient
-    .from("messages")
+  const messagesQuery: any = adminClient.from("messages");
+
+  const { error: msgUpdateError } = await messagesQuery
     .update({
       payload: nextPayload,
     })

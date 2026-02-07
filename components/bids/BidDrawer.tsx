@@ -31,7 +31,10 @@ import {
 } from "@/components/ui/select";
 
 const BidFormSchema = z.object({
-  amount: z.coerce.number().int().positive("报价必须是正整数"),
+  amount: z.preprocess(
+    (val) => Number(val),
+    z.number().int({ message: "报价必须是正整数" }).positive({ message: "报价必须是正整数" })
+  ),
   deliveryTime: z.string().min(1, "请选择交付周期"),
   proposal: z.string().min(20, "投标方案至少 20 字"),
 });
@@ -49,7 +52,7 @@ export function BidDrawer({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<BidFormValues>({
-    resolver: zodResolver(BidFormSchema),
+    resolver: zodResolver(BidFormSchema as any) as any,
     mode: "onChange",
     defaultValues: {
       amount: 0,

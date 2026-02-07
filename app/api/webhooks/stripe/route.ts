@@ -39,11 +39,11 @@ export async function POST(req: NextRequest) {
     const supabase = createSupabaseAdminClient();
 
     // First, fetch the order to see if it's a job order
-    const { data: order, error: fetchError } = await supabase
+    const { data: order, error: fetchError } = await (supabase
       .from("orders")
       .select("id, type, job_id, proposal_id")
       .eq("id", orderId)
-      .single();
+      .single() as any);
 
     if (fetchError || !order) {
       console.error("[Stripe Webhook] Failed to fetch order", fetchError);
@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Update order status
-    const { error: updateError } = await supabase
-      .from("orders")
+    const ordersQuery: any = supabase.from("orders");
+    const { error: updateError } = await ordersQuery
       .update({
         status: "paid",
         escrow_status: "held",
@@ -67,8 +67,8 @@ export async function POST(req: NextRequest) {
     // If this is a job order, update job and proposals
     if (order.type === "job" && order.job_id && order.proposal_id) {
       // Update job status to in_progress
-      const { error: jobUpdateError } = await supabase
-        .from("jobs")
+      const jobsQuery: any = supabase.from("jobs");
+      const { error: jobUpdateError } = await jobsQuery
         .update({ status: "in_progress" })
         .eq("id", order.job_id);
 
@@ -77,8 +77,8 @@ export async function POST(req: NextRequest) {
       }
 
       // Update the accepted proposal status to accepted (if not already)
-      const { error: proposalAcceptError } = await supabase
-        .from("proposals")
+      const proposalsQuery: any = supabase.from("proposals");
+      const { error: proposalAcceptError } = await proposalsQuery
         .update({ status: "accepted" })
         .eq("id", order.proposal_id);
 
@@ -87,8 +87,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Reject all other proposals for this job
-      const { error: otherProposalsError } = await supabase
-        .from("proposals")
+      const { error: otherProposalsError } = await proposalsQuery
         .update({ status: "rejected" })
         .eq("job_id", order.job_id)
         .neq("id", order.proposal_id);
