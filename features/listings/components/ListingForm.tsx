@@ -150,6 +150,8 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       router.refresh();
       router.push("/dashboard/services");
     } else {
+      console.error("Listing submission failed:", result.error);
+      toast.error(result.error || "发布失败，请检查数据库字段");
       setPending(false);
     }
   };
