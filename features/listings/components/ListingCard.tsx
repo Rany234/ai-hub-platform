@@ -34,7 +34,6 @@ export function ListingCard({ listing }: { listing: Listing }) {
   const avgRating = typeof metadata?.avg_rating === "number" ? metadata.avg_rating : null;
 
   // 提取预览模式下的套餐功能点
-  const packages = (metadata as any)?.packages;
   const previewFeatures = packages ? (Object.values(packages) as any[]).find(p => p.price === listing.price)?.features : null;
 
   return (
