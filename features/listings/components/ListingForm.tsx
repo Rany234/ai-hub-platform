@@ -451,7 +451,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                     <span>{mode === "edit" ? "更新中..." : "发布中..."}</span>
                   </>
                 ) : mode === "edit" ? (
-                  "更新服务"
+                  "保存修改"
                 ) : (
                   "发布服务"
                 )}
