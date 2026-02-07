@@ -149,7 +149,7 @@ export function CreateJobForm() {
               {isSubmitting ? "发布中..." : "发布任务"}
             </Button>
             <Button variant="outline" asChild disabled={isSubmitting}>
-              <Link href="/dashboard">取消</Link>
+              <Link href="/dashboard/jobs">取消</Link>
             </Button>
           </div>
         </form>
