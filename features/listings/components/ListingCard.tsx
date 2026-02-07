@@ -14,6 +14,19 @@ export function ListingCard({ listing }: { listing: Listing }) {
     review_count?: number;
   } | null;
 
+  // 1. 核心逻辑：动态展示“起步价”
+  const packages = (listing as any).packages as any;
+  const basicPrice = packages?.basic?.price;
+  const hasBasicPrice = typeof basicPrice === "number";
+
+  // 3. （可选）高级标签
+  const premiumPrice = packages?.premium?.price;
+  const showPremiumBadge =
+    packages?.premium?.enabled !== false &&
+    typeof premiumPrice === "number" &&
+    premiumPrice > 500 &&
+    (!hasBasicPrice || premiumPrice > basicPrice);
+
   const deliveryDays = metadata?.delivery_days;
   const badge = deliveryDays ? `⚡ ${deliveryDays} 天交付` : "服务";
 
@@ -25,9 +38,13 @@ export function ListingCard({ listing }: { listing: Listing }) {
   const previewFeatures = packages ? (Object.values(packages) as any[]).find(p => p.price === listing.price)?.features : null;
 
   return (
-    <Link href={`/listings/${listing.id}`} className="block">
-      <div className="relative border rounded-lg p-4 flex flex-col gap-2 hover:border-gray-400 transition-colors bg-white">
-        {avgRating !== null ? (
+    <Link href={`/listings/${listing.id}`} className="block group">
+      <div className="relative border rounded-lg p-4 flex flex-col gap-2 bg-white transition-all duration-300 hover:border-gray-400 hover:-translate-y-1 hover:shadow-xl">
+        {showPremiumBadge ? (
+          <div className="absolute right-3 top-3 rounded-full bg-gradient-to-r from-purple-500/90 to-fuchsia-500/90 px-2.5 py-1 text-[10px] font-bold text-white shadow-lg backdrop-blur-sm">
+            Premium
+          </div>
+        ) : avgRating !== null ? (
           <div className="absolute right-3 top-3 rounded-full border bg-white px-2 py-1 text-xs flex items-center gap-1">
             <Star className="h-3.5 w-3.5 fill-black" />
             <span className="font-medium">{avgRating.toFixed(1)}</span>
@@ -36,7 +53,9 @@ export function ListingCard({ listing }: { listing: Listing }) {
 
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold leading-tight">{listing.title}</h3>
-          <div className="text-sm font-medium">¥{listing.price}</div>
+          <div className="text-sm font-bold text-indigo-600">
+            {hasBasicPrice ? `¥${basicPrice} 起` : `¥${listing.price}`}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -66,12 +85,14 @@ export function ListingCard({ listing }: { listing: Listing }) {
         )}
 
         {listing.preview_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt={listing.title}
-            src={listing.preview_url}
-            className="mt-2 w-full h-40 object-cover rounded-md border"
-          />
+          <div className="mt-2 w-full h-40 rounded-md border overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt={listing.title}
+              src={listing.preview_url}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
         ) : null}
 
         <div className="mt-2 text-xs text-muted-foreground">

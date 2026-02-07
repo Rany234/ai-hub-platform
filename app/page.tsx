@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { BentoCard } from "@/components/BentoCard";
 import { HeroExploreButton } from "@/components/HeroExploreButton";
 import { AIDemoComponent } from "@/components/AIDemoComponent";
+import { FeaturedWorkCard } from "@/components/FeaturedWorkCard";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
@@ -106,51 +107,71 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Bento Grid Gallery */}
-      <section className="mx-auto max-w-6xl px-6 py-12">
-        <div className="flex items-baseline justify-between gap-4 mb-8">
-          <h2 className="text-2xl font-semibold">精选作品</h2>
-          {user ? (
-            <Link className="text-sm underline" href="/dashboard">
-              进入控制台
-            </Link>
-          ) : (
-            <Link className="text-sm underline" href="/login">
-              登录 / 注册
-          </Link>
-          )}
-        </div>
-
-        {!hasListings ? (
-          <div className="mt-10 flex items-center justify-center">
-            <div className="w-full max-w-2xl border rounded-xl p-10 text-center">
-              <h2 className="text-2xl font-semibold">市场刚刚开张，还没有作品。</h2>
-              <p className="mt-3 text-sm text-muted-foreground">
-                发布你的第一个作品，让更多人看到你的创作。
+      {/* Featured Works */}
+      <section className="bg-slate-950">
+        <div className="mx-auto max-w-6xl px-6 py-14">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                智汇精选：激发你的 AI 灵感
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm text-slate-400">
+                像艺术画廊一样浏览高质量 AI 作品与 Agent 方案，点击即可直达该服务的 AI 套餐。
               </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {user ? (
+                <Link
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur transition hover:bg-white/10"
+                  href="/dashboard"
+                >
+                  进入控制台
+                </Link>
+              ) : (
+                <Link
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur transition hover:bg-white/10"
+                  href="/login"
+                >
+                  登录 / 注册
+                </Link>
+              )}
+
               <Link
-                className="inline-flex mt-8 items-center justify-center rounded-md bg-black text-white px-6 py-3 text-base"
+                className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-bold text-slate-950 shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-white/90"
                 href="/dashboard/listings/new"
               >
-                成为第一个创作者
+                你也有惊艳的 AI 作品？立即发布服务
               </Link>
             </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[200px] gap-4">
-            {(listings ?? []).map((listing, idx) => {
-              // Feature Card: first 2 items take 2x2 grid
-              const isFeature = idx < 2;
-              return (
-                <BentoCard
-                  key={listing.id}
-                  listing={listing}
-                  featured={isFeature}
-                />
-              );
-            })}
+
+          {!hasListings ? (
+            <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur">
+              <h3 className="text-xl font-bold">市场刚刚开张，还没有作品。</h3>
+              <p className="mt-2 text-sm text-slate-400">
+                发布你的第一个作品，让更多人看到你的创作。
+              </p>
+            </div>
+          ) : (
+            <div className="mt-10 columns-1 gap-6 space-y-6 sm:columns-2 lg:columns-3">
+              {(listings ?? []).slice(0, 12).map((listing, idx) => (
+                <div key={listing.id} className="break-inside-avoid">
+                  <FeaturedWorkCard listing={listing} index={idx} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/dashboard/listings/new"
+              className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur transition hover:bg-white/10"
+            >
+              你也有惊艳的 AI 作品？立即发布服务
+            </Link>
           </div>
-        )}
+        </div>
       </section>
     </div>
   );
