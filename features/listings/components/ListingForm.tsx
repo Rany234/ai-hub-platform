@@ -136,23 +136,30 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
     formData.set("packages", JSON.stringify(payload));
 
-    let result;
-    if (mode === "edit" && initialData?.id) {
-      formData.set("id", initialData.id);
-      result = await updateListing(null, formData);
-      setEditState(result);
-    } else {
-      result = await createListing(null, formData);
-      setCreateState(result);
-    }
+    try {
+      let result;
+      if (mode === "edit" && initialData?.id) {
+        formData.set("id", initialData.id);
+        result = await updateListing(null, formData);
+        setEditState(result);
+      } else {
+        result = await createListing(null, formData);
+        setCreateState(result);
+      }
 
-    if (result.success) {
+      if (!result.success) {
+        console.error("Listing submission failed:", result.error);
+        toast.error(result.error || "发布失败，请检查数据库字段");
+        return;
+      }
+
       toast.success(mode === "edit" ? "更新成功！" : "服务发布成功！");
-      router.refresh();
       router.push("/dashboard/services");
-    } else {
-      console.error("Listing submission failed:", result.error);
-      toast.error(result.error || "发布失败，请检查数据库字段");
+      router.refresh();
+    } catch (err) {
+      console.error("Listing submission exception:", err);
+      toast.error("提交失败，请稍后重试");
+    } finally {
       setPending(false);
     }
   };
