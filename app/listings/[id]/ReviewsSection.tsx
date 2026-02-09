@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 function formatTime(ts: string) {
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return ts;
-  return d.toLocaleString();
+  return d.toISOString();
 }
 
 type ReviewItem = {

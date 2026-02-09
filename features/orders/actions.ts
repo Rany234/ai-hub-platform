@@ -13,7 +13,8 @@ type CreateOrderResult =
 export async function createOrderAction(
   listingId: string,
   requirements: string,
-  selectedOptions: Array<{ label: string; price: number }> = []
+  selectedOptions: Array<{ label: string; price: number }> = [],
+  selectedPackage?: { tier: "basic" | "standard" | "premium"; packageDetails?: unknown }
 ): Promise<CreateOrderResult> {
   try {
     const supabase = await createSupabaseServerClient();
@@ -58,6 +59,7 @@ export async function createOrderAction(
         metadata: {
           requirements,
           selected_options: validated,
+          selected_package: selectedPackage ?? null,
         },
       })
       .select("id")

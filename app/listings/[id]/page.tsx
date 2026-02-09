@@ -124,25 +124,9 @@ export default async function ListingDetailPage({
             </h2>
             <ServiceConfigurator
               listingId={listing.id}
-              basePrice={(() => {
-                const packages = (listing as any).packages as any;
-                const getPackage = (pkgs: any, tier: "basic" | "standard" | "premium") => {
-                  if (!pkgs || typeof pkgs !== "object") return null;
-                  const direct = pkgs[tier];
-                  if (direct && typeof direct === "object") return direct;
-                  const cap = tier.charAt(0).toUpperCase() + tier.slice(1);
-                  const alt = pkgs[cap];
-                  if (alt && typeof alt === "object") return alt;
-                  return null;
-                };
-
-                const basic = getPackage(packages, "basic");
-                const raw = basic?.price;
-                const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw) : NaN;
-                if (Number.isFinite(n)) return n;
-                return listing.price;
-              })()}
+              basePrice={listing.price}
               options={((listing.options as unknown) as ServiceOption[] | null) ?? []}
+              packages={listing.packages}
             />
           </div>
         </div>
