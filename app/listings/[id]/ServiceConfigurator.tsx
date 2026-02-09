@@ -131,7 +131,7 @@ export function ServiceConfigurator({
               className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
                 active
                   ? "bg-white text-indigo-600 shadow-sm scale-[1.02]"
-                  : "text-slate-500 hover:text-slate-700"
+                  : "text-gray-500 hover:text-slate-700"
               }`}
             >
               <div className="text-[10px] uppercase opacity-60 leading-none mb-0.5">
@@ -145,11 +145,13 @@ export function ServiceConfigurator({
 
       {/* 价格与基本信息 */}
       <div className="flex items-baseline justify-between">
-        <div className="text-3xl font-jakarta font-extrabold text-slate-900">¥{formatMoney(basePrice)}</div>
+        <div className="text-3xl font-jakarta font-extrabold text-slate-900" suppressHydrationWarning>
+          ¥{formatMoney(basePrice)}
+        </div>
       </div>
 
       {/* 交付 / 修改次数信息栏 */}
-      <div className="mt-4 bg-slate-50 rounded-lg p-3 flex justify-between items-center">
+      <div className="mt-4 bg-slate-50 rounded-lg p-3 flex justify-between items-center" suppressHydrationWarning>
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Clock className="w-4 h-4 text-indigo-500" />
           <span>{currentPackage.delivery_days} 天交付</span>
