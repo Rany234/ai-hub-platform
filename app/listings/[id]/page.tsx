@@ -53,105 +53,133 @@ export default async function ListingDetailPage({
   const metadata = listing.metadata as unknown as { delivery_days?: number } | null;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold">{listing.title}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-            <div>
-              服务提供方：
-              {creatorProfile?.full_name ||
-                creatorProfile?.username ||
-                creatorProfile?.id ||
-                "未知"}
+    <div className="p-6 max-w-6xl mx-auto font-inter">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-8">
+        <div className="flex-1 w-full">
+          <h1 className="text-4xl font-jakarta font-extrabold text-slate-900 tracking-tight">{listing.title}</h1>
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 font-medium">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">服务提供方：</span>
+              <span className="text-slate-900 font-bold">
+                {creatorProfile?.full_name ||
+                  creatorProfile?.username ||
+                  creatorProfile?.id ||
+                  "未知"}
+              </span>
             </div>
             {avgRating !== null ? (
-              <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-black" />
-                <span className="font-medium text-foreground">{avgRating.toFixed(1)}</span>
-                <span>({reviewCount}条评价)</span>
+              <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                <Star className="h-4 w-4 fill-indigo-500 text-indigo-500" />
+                <span className="font-bold text-slate-900">{avgRating.toFixed(1)}</span>
+                <span className="text-slate-400 text-xs">({reviewCount}条评价)</span>
               </div>
             ) : (
-              <div className="text-xs">暂无评价</div>
+              <div className="text-xs bg-slate-50 px-3 py-1 rounded-full border border-slate-100 italic">暂无评价</div>
             )}
           </div>
         </div>
-        <div className="text-lg font-semibold">¥{listing.price}</div>
+        <div className="text-3xl font-jakarta font-extrabold text-indigo-600 bg-indigo-50 px-6 py-2 rounded-xl border border-indigo-100">
+          ¥{listing.price}
+        </div>
       </div>
 
       {listing.preview_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          alt={listing.title}
-          src={listing.preview_url}
-          className="mt-6 w-full max-h-[420px] object-cover rounded-lg border"
-        />
+        <div className="mt-8 relative aspect-video w-full max-h-[500px] overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+          <img
+            alt={listing.title}
+            src={listing.preview_url}
+            className="w-full h-full object-cover"
+          />
+        </div>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="border rounded-lg p-4">
-          <div className="text-xs text-muted-foreground">分类</div>
-          <div className="mt-1 font-mono">{listing.category ?? "未分类"}</div>
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-5 transition-colors hover:bg-slate-50">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">分类</div>
+          <div className="mt-2 font-jakarta font-bold text-slate-900">{listing.category ?? "未分类"}</div>
         </div>
-        <div className="border rounded-lg p-4">
-          <div className="text-xs text-muted-foreground">预计交付</div>
-          <div className="mt-1 font-mono">
+        <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-5 transition-colors hover:bg-slate-50">
+          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">预计交付</div>
+          <div className="mt-2 font-jakarta font-bold text-slate-900">
             {metadata?.delivery_days ? `${metadata.delivery_days} 天` : "（未填写）"}
           </div>
         </div>
       </div>
 
       {listing.description ? (
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold">服务介绍</h2>
-          <p className="mt-2 whitespace-pre-wrap">{listing.description}</p>
+        <div className="mt-10">
+          <h2 className="text-2xl font-jakarta font-extrabold text-slate-900 tracking-tight">服务介绍</h2>
+          <div className="mt-4 p-6 bg-white border border-slate-100 rounded-xl shadow-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
+            {listing.description}
+          </div>
         </div>
       ) : null}
 
-      <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="border rounded-lg p-4">
-            <div className="text-sm font-semibold">服务配置</div>
-            <div className="mt-4">
-              <ServiceConfigurator
-                listingId={listing.id}
-                basePrice={listing.price}
-                options={((listing.options as unknown) as ServiceOption[] | null) ?? []}
-              />
-            </div>
+          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
+            <h2 className="text-xl font-jakarta font-extrabold text-slate-900 mb-6 flex items-center gap-2">
+              <span className="h-6 w-1.5 bg-indigo-600 rounded-full" />
+              服务配置
+            </h2>
+            <ServiceConfigurator
+              listingId={listing.id}
+              basePrice={(() => {
+                const packages = (listing as any).packages as any;
+                const getPackage = (pkgs: any, tier: "basic" | "standard" | "premium") => {
+                  if (!pkgs || typeof pkgs !== "object") return null;
+                  const direct = pkgs[tier];
+                  if (direct && typeof direct === "object") return direct;
+                  const cap = tier.charAt(0).toUpperCase() + tier.slice(1);
+                  const alt = pkgs[cap];
+                  if (alt && typeof alt === "object") return alt;
+                  return null;
+                };
+
+                const basic = getPackage(packages, "basic");
+                const raw = basic?.price;
+                const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw) : NaN;
+                if (Number.isFinite(n)) return n;
+                return listing.price;
+              })()}
+              options={((listing.options as unknown) as ServiceOption[] | null) ?? []}
+            />
           </div>
         </div>
-        <aside className="border rounded-lg p-4">
-          <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-semibold">卖家信息</div>
-            <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
-          </div>
-          <div className="mt-4 flex items-start gap-3">
-            <div className="h-12 w-12 rounded-full border overflow-hidden bg-white flex items-center justify-center text-xs text-muted-foreground">
-              {creatorProfile?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img alt="avatar" src={creatorProfile.avatar_url} className="h-full w-full object-cover" />
-              ) : (
-                "无"
-              )}
+        <aside className="space-y-6">
+          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <h2 className="text-lg font-jakarta font-extrabold text-slate-900">卖家信息</h2>
+              <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
             </div>
-            <div>
-              <div className="font-medium">
-                {creatorProfile?.full_name || creatorProfile?.username || "未知卖家"}
+            <div className="flex items-start gap-4">
+              <div className="relative h-14 w-14 rounded-xl border-2 border-slate-100 overflow-hidden bg-slate-50 flex-shrink-0">
+                {creatorProfile?.avatar_url ? (
+                  <img alt="avatar" src={creatorProfile.avatar_url} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-300">无</div>
+                )}
               </div>
-              {creatorProfile?.bio ? (
-                <div className="mt-1 text-sm text-muted-foreground whitespace-pre-wrap">
-                  {creatorProfile.bio}
+              <div className="min-w-0">
+                <div className="font-bold text-slate-900 truncate">
+                  {creatorProfile?.full_name || creatorProfile?.username || "未知卖家"}
                 </div>
-              ) : (
-                <div className="mt-1 text-sm text-muted-foreground">暂无简介</div>
-              )}
+                {creatorProfile?.bio ? (
+                  <div className="mt-2 text-sm text-slate-500 line-clamp-3 italic">
+                    “{creatorProfile.bio}”
+                  </div>
+                ) : (
+                  <div className="mt-2 text-sm text-slate-400 italic">暂无简介</div>
+                )}
+              </div>
             </div>
           </div>
         </aside>
       </div>
 
-      <ReviewsSection reviews={(reviews as any) ?? []} />
+      <div className="mt-16">
+        <ReviewsSection reviews={(reviews as any) ?? []} />
+      </div>
     </div>
   );
 }

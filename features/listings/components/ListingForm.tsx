@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createListing, updateListing } from "@/features/listings/actions";
 import { ListingCard, type Listing } from "@/features/listings/components/ListingCard";
+import type { ListingPackages, PackageTierKey as NormalizedTierKey } from "@/types/supabase";
 
 type CreateState =
   | { success?: undefined; data?: undefined; error?: undefined }
@@ -25,7 +26,7 @@ type Props = {
   initialData?: Listing | null;
 };
 
-type PackageTierKey = "basic" | "standard" | "premium";
+type PackageTierKey = NormalizedTierKey;
 
 type ListingPackageDraft = {
   enabled: boolean;
@@ -61,7 +62,14 @@ function clampInt(n: number, min: number) {
 }
 
 function parseExistingPackages(initialData: Listing | null | undefined): ListingPackagesDraft {
-  const raw = (initialData as any)?.packages as any;
+  const rawPackages = (initialData as any)?.packages as any;
+  const raw =
+    rawPackages && typeof rawPackages === "object"
+      ? Object.entries(rawPackages).reduce<Record<string, any>>((acc, [key, value]) => {
+          acc[key.toLowerCase()] = value;
+          return acc;
+        }, {})
+      : rawPackages;
 
   const fallback: ListingPackagesDraft = {
     basic: { enabled: true, price: "", delivery_days: 3, features: [] },
@@ -134,7 +142,12 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       },
     };
 
-    formData.set("packages", JSON.stringify(payload));
+    const normalizedPackages = Object.entries(payload as unknown as Record<string, any>).reduce((acc, [key, value]) => {
+      acc[key.toLowerCase() as PackageTierKey] = value;
+      return acc;
+    }, {} as ListingPackages);
+
+    formData.set("packages", JSON.stringify(normalizedPackages));
 
     try {
       let result;
