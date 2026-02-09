@@ -122,11 +122,12 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
       setConversations(rows);
 
       const otherIds = Array.from(new Set(rows.map((c) => otherParticipant(c, me.id))));
-      if (otherIds.length) {
+      const validOtherIds = otherIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0);
+      if (validOtherIds.length) {
         const { data: profs, error: pErr } = await supabase
           .from("profiles")
           .select("id, username, full_name, avatar_url")
-          .in("id", otherIds);
+          .in("id", validOtherIds);
         if (pErr) throw pErr;
 
         const map: Record<string, Profile> = {};
