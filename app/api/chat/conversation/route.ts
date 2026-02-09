@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
 export async function POST(req: Request) {
+  console.log("🚀 VERSION: FIX_V1_SANITIZED_RUNNING");
   try {
     const supabase = await createSupabaseServerClient();
     const {
@@ -44,13 +45,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Cannot chat with yourself" }, { status: 400 });
     }
 
-    const { data: existing, error: findError } = await supabase
+    let query = supabase
       .from("conversations")
       .select("id")
       .eq("buyer_id", buyerId)
-      .eq("seller_id", sellerId)
-      .eq("order_id", orderId)
-      .maybeSingle();
+      .eq("seller_id", sellerId);
+
+    if (orderId) {
+      query = query.eq("order_id", orderId);
+    } else {
+      query = query.is("order_id", null);
+    }
+
+    const { data: existing, error: findError } = await query.maybeSingle();
 
     if (findError) {
       console.error("Error finding existing conversation:", findError);
