@@ -61,7 +61,7 @@ export default async function HomePage() {
               <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
                 <Link
                   href="/dashboard/listings/new"
-                  className="inline-flex items-center justify-center rounded-full bg-brand-action px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-amber-600"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 px-7 py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(124,58,237,0.3)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(124,58,237,0.5)] active:scale-95"
                 >
                   立即入驻赚钱
                 </Link>
