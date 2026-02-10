@@ -71,9 +71,13 @@ export function AIDemoComponent() {
   }, [phase]);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {/* Prompt */}
+    <div className="group relative rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl shadow-amber-500/10 backdrop-blur-md">
+      <div className="pointer-events-none absolute inset-0 rounded-3xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-3xl bg-white/20" />
+      <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/5" />
+      <div className="relative">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* Prompt */}
         <div className="relative overflow-hidden rounded-xl border border-white/10 bg-slate-950/60 p-4">
           <div className="flex items-center justify-between">
             <div className="text-xs font-medium text-slate-300">Prompt</div>
@@ -201,6 +205,7 @@ export function AIDemoComponent() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

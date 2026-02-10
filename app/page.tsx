@@ -38,6 +38,10 @@ export default async function HomePage() {
       {/* Hero + Search */}
       <section className="relative overflow-hidden bg-slate-950">
         <div className="pointer-events-none absolute inset-0">
+          {/* Noise/Grid Texture Layer */}
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] brightness-100 contrast-150" />
+          <div className="absolute inset-0 bg-grid-white/[0.02]" />
+          
           <div className="absolute inset-0 opacity-90 [background:radial-gradient(1200px_circle_at_20%_20%,rgba(99,102,241,0.35),transparent_55%),radial-gradient(900px_circle_at_80%_30%,rgba(168,85,247,0.35),transparent_55%),radial-gradient(900px_circle_at_50%_80%,rgba(59,130,246,0.22),transparent_55%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(2,6,23,0.55),rgba(2,6,23,0.85))]" />
         </div>
@@ -50,7 +54,7 @@ export default async function HomePage() {
                 AI-Hub 中国版 · 深色商业风
               </div>
 
-              <h1 className="mt-6 text-5xl sm:text-6xl font-extrabold tracking-tight text-white">
+              <h1 className="mt-6 text-5xl sm:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-400">
                 一站式 AI 技能与服务交易平台
               </h1>
 
@@ -61,14 +65,14 @@ export default async function HomePage() {
               <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
                 <Link
                   href="/dashboard/listings/new"
-                  className="inline-flex items-center justify-center rounded-full bg-black border border-amber-500/20 px-7 py-3 text-sm font-bold text-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.1)] transition-all hover:border-amber-500/40 hover:bg-amber-500/5 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95"
+                  className="inline-flex items-center justify-center rounded-full bg-black border border-amber-500/20 px-7 py-3 text-sm font-bold text-amber-500 transition-all hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] active:scale-95"
                 >
                   立即入驻赚钱
                 </Link>
 
                 <Link
                   href="/listings"
-                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-white/10"
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent px-7 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/5 hover:text-white"
                 >
                   寻找 AI 专家
                 </Link>
@@ -80,6 +84,12 @@ export default async function HomePage() {
             </div>
 
             <div className="relative">
+              {/* Ambient Light (behind AIDemoComponent) */}
+              <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <div className="absolute -left-28 -top-24 h-[520px] w-[520px] rounded-full bg-purple-900 opacity-20 blur-[120px] animate-[heroBlobA_14s_ease-in-out_infinite]" />
+                <div className="absolute -right-28 -bottom-24 h-[560px] w-[560px] rounded-full bg-amber-600 opacity-15 blur-[120px] animate-[heroBlobB_18s_ease-in-out_infinite]" />
+              </div>
+
               <AIDemoComponent />
             </div>
           </div>
