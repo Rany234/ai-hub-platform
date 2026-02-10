@@ -34,88 +34,112 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero + Search */}
-      <section className="relative overflow-hidden bg-brand-dark">
-        {/* Atmosphere Background */}
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-black">
+        {/* Noise overlay (static) */}
+        <div
+          className="pointer-events-none fixed inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage:
+              "url(data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E)",
+          }}
+        />
+
+        {/* Grid + vignette */}
         <div className="pointer-events-none absolute inset-0">
-          {/* Subtle grid pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-40" />
-          <div className="absolute inset-0 opacity-40 [background:radial-gradient(1200px_circle_at_20%_20%,rgba(99,102,241,0.35),transparent_55%),radial-gradient(900px_circle_at_80%_30%,rgba(168,85,247,0.35),transparent_55%),radial-gradient(900px_circle_at_50%_80%,rgba(59,130,246,0.22),transparent_55%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(15,23,42,0.1),rgba(15,23,42,0.9))]" />
+          <div className="absolute inset-0 opacity-60 [background:linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:64px_64px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_50%_20%,rgba(255,255,255,0.10),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(1000px_circle_at_50%_90%,rgba(255,255,255,0.06),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.85))]" />
         </div>
 
-        {/* Top-center large fuzzy glow */}
-        <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[800px] rounded-full bg-brand-primary/20 blur-[120px]" />
-
-        <div className="relative mx-auto max-w-6xl px-6 py-20 lg:py-32">
-          <div className="grid grid-cols-1 gap-16 items-center lg:grid-cols-2">
-            <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-200 shadow-sm backdrop-blur">
-                <span className="h-2 w-2 rounded-full bg-brand-glow shadow-[0_0_12px_rgba(56,189,248,0.8)]" />
-                专业的 AI 服务与技能交易平台
-              </div>
-
-              <h1 className="mt-8 text-6xl font-extrabold tracking-tight text-transparent sm:text-7xl lg:text-8xl bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
-                智汇 AI-Hub
-              </h1>
-
-              <p className="mt-6 text-xl text-slate-300 max-w-lg leading-relaxed">
-                汇聚全球智慧，<span className="font-semibold text-white">连接 AI 价值</span>
-              </p>
-              <p className="mt-4 text-base leading-7 text-slate-400 max-w-md">
-                一站式 AI 技能交易市场。无论是寻找 Prompt 工程师，还是出售你的微调模型，这里都是你的最佳起点。
-              </p>
-
-              {/* Glassmorphism Search Bar */}
-              <form className="mt-10 max-w-xl" action="/listings">
-                <div className="flex flex-col gap-4 sm:flex-row">
-                  <div className="relative flex-1">
-                    <input
-                      type="search"
-                      name="q"
-                      placeholder="搜索 AI 服务、提示词、模型..."
-                      className="w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-base text-white placeholder:text-slate-500 shadow-2xl outline-none backdrop-blur-md transition-all focus:border-brand-primary/50 focus:ring-4 focus:ring-brand-primary/10"
-                      aria-label="搜索"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-5 hidden items-center text-slate-500 sm:flex">
-                      <kbd className="font-sans text-xs opacity-50">⌘K</kbd>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="rounded-2xl bg-white text-brand-dark px-8 py-4 font-bold shadow-glow transition-all hover:scale-105 active:scale-95"
-                  >
-                    搜索
-                  </button>
-                </div>
-
-                <div className="mt-5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                  <span className="font-medium">热门：</span>
-                  {["Midjourney 调试", "智能体开发", "数据分析"].map((tag) => (
-                    <span key={tag} className="rounded-full border border-white/5 bg-white/5 px-3 py-1 hover:text-brand-glow transition-colors cursor-pointer">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </form>
-
-              <div className="mt-12 flex items-center gap-4">
-                <HeroExploreButton />
-                <a
-                  href="/dashboard/listings/new"
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-8 py-3.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/10"
-                >
-                  成为创作者
-                </a>
-              </div>
+        <div className="relative mx-auto max-w-6xl px-6 py-20 md:py-28">
+          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_0_40px_rgba(255,255,255,0.06)] backdrop-blur">
+              <span className="text-white">✨</span>
+              <span>New Feature: AI Models Available</span>
             </div>
 
-            <div className="relative group">
-              {/* Decorative Glow behind Demo Card */}
-              <div className="absolute -inset-4 bg-brand-primary/10 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative rounded-3xl border border-white/10 bg-brand-dark/40 backdrop-blur-sm p-2 shadow-glow">
-                <AIDemoComponent />
+            {/* Title */}
+            <h1 className="mt-10 text-6xl font-semibold tracking-tight text-transparent md:text-8xl bg-clip-text bg-gradient-to-b from-white to-white/40">
+              智汇 AI-Hub
+            </h1>
+
+            <p className="mt-6 text-base leading-7 text-white/60 md:text-lg">
+              Build, buy, and ship AI services with a marketplace designed for speed and trust.
+            </p>
+
+            {/* CTA */}
+            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
+              <Link
+                href="/listings"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-black transition hover:bg-white/90"
+              >
+                Explore Marketplace
+              </Link>
+              <Link
+                href="/dashboard/listings/new"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-white/15 bg-transparent px-6 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10 hover:text-white"
+              >
+                Become a Creator
+              </Link>
+            </div>
+
+            {/* Visual anchor */}
+            <div className="mt-14 w-full">
+              <div className="relative mx-auto max-w-4xl">
+                <div className="pointer-events-none absolute -inset-10 rounded-[32px] shadow-[0_0_100px_rgba(255,255,255,0.10)]" />
+
+                <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-2">
+                  <div className="rounded-[22px] bg-black/40 p-6 backdrop-blur">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2.5 w-2.5 rounded-full bg-white/20" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-white/15" />
+                      <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                      <div className="ml-3 h-2.5 w-32 rounded-full bg-white/10" />
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-3">
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                        <div className="text-xs text-white/50">Latency</div>
+                        <div className="mt-2 text-2xl font-semibold text-white">128ms</div>
+                        <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
+                          <div className="h-1.5 w-2/3 rounded-full bg-white/40" />
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                        <div className="text-xs text-white/50">Runs</div>
+                        <div className="mt-2 text-2xl font-semibold text-white">24,302</div>
+                        <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
+                          <div className="h-1.5 w-1/2 rounded-full bg-white/40" />
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                        <div className="text-xs text-white/50">Uptime</div>
+                        <div className="mt-2 text-2xl font-semibold text-white">99.98%</div>
+                        <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
+                          <div className="h-1.5 w-4/5 rounded-full bg-white/40" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                      <div className="text-xs text-white/50">Prompt</div>
+                      <div className="mt-3 space-y-2 font-mono text-sm text-white/70">
+                        <div className="h-3 w-11/12 rounded bg-white/10" />
+                        <div className="h-3 w-10/12 rounded bg-white/10" />
+                        <div className="h-3 w-7/12 rounded bg-white/10" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[320px] w-[640px] rounded-full bg-white/10 blur-[140px]" />
+
+                <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 h-24 w-[80%] bg-black blur-2xl" />
               </div>
             </div>
           </div>
