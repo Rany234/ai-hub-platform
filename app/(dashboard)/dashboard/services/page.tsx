@@ -41,7 +41,7 @@ export default async function MyServicesPage() {
             <h1 className="text-2xl font-semibold">我的服务管理</h1>
             <p className="text-sm text-muted-foreground mt-1">管理你发布的技能服务，持续优化你的报价与交付周期。</p>
           </div>
-          <Button asChild className="bg-blue-600 hover:bg-blue-700">
+          <Button asChild className="bg-white text-black hover:bg-slate-200 font-medium border-none shadow-lg">
             <Link href="/dashboard/listings/new">➕ 发布新服务</Link>
           </Button>
         </div>
@@ -50,31 +50,31 @@ export default async function MyServicesPage() {
       {error ? <p className="text-sm text-red-600">{error.message}</p> : null}
 
       {!services || services.length === 0 ? (
-        <div className="rounded-3xl border border-dashed bg-slate-50 p-12 text-center text-slate-500">
+        <div className="rounded-3xl border border-dashed border-white/10 bg-[#151F32] p-12 text-center text-slate-500">
           你还没有发布任何服务。
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {services.map((service: any) => (
-            <Card key={service.id} className="rounded-2xl shadow-sm hover:shadow-md transition-shadow border-slate-100 overflow-hidden flex flex-col">
-              <CardHeader className="bg-slate-50/50 pb-4">
+            <Card key={service.id} className="rounded-2xl shadow-xl transition-all border-white/10 bg-[#151F32] overflow-hidden flex flex-col group hover:border-brand-action/30">
+              <CardHeader className="pb-4 border-b border-white/5 bg-transparent">
                 <div className="flex items-start justify-between gap-3">
-                  <CardTitle className="text-base line-clamp-1 flex items-center gap-2">
-                    <Package className="size-4 text-blue-600" />
+                  <CardTitle className="text-base line-clamp-1 flex items-center gap-2 text-slate-100">
+                    <Package className="size-4 text-brand-action" />
                     {service.title}
                   </CardTitle>
                   <ServiceOperations serviceId={service.id} />
                 </div>
               </CardHeader>
               <CardContent className="p-4 flex-1 flex flex-col justify-between gap-4">
-                <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
                   {service.description || "(无描述)"}
                 </p>
-                <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-50">
-                  <div className="text-blue-600 font-bold">
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                  <div className="text-brand-action font-bold">
                     ¥{Number(service.packages?.basic?.price ?? 0).toLocaleString()}
                   </div>
-                  <div className="text-[10px] text-muted-foreground flex items-center gap-1">
+                  <div className="text-[10px] text-slate-500 flex items-center gap-1">
                     <CalendarClock className="size-3" />
                     {service.packages?.basic?.delivery_days ?? "-"} 天交付
                   </div>

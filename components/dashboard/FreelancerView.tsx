@@ -20,12 +20,12 @@ export async function FreelancerView() {
   return (
     <div className="p-6 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold">你好，开发者！来看看今天的新机会。</h1>
-        <p className="text-sm text-muted-foreground">浏览任务广场，找到适合你的项目</p>
+        <h1 className="text-2xl font-bold text-white">你好，开发者！来看看今天的新机会。</h1>
+        <p className="text-sm text-slate-400">浏览任务广场，找到适合你的项目</p>
       </div>
 
       <div className="flex justify-center">
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="bg-white text-black hover:bg-slate-200 font-bold border-none shadow-xl">
           <Link href="/dashboard/jobs">浏览任务广场</Link>
         </Button>
       </div>

@@ -50,11 +50,18 @@ export function ProcessSteps() {
 
           return (
             <div key={s.title} className="relative flex flex-col items-center text-center group">
-              <div className="w-16 h-16 rounded-2xl bg-[#151F32] border border-[#334155] flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(56,189,248,0.2)] group-hover:border-sky-400/30">
-                <Icon className={`w-7 h-7 ${s.iconClassName}`} />
+              <div className={cn(
+                "w-16 h-16 rounded-2xl bg-[#151F32] border border-white/10 flex items-center justify-center mb-4 transition-all duration-300",
+                "group-hover:scale-110 group-hover:border-sky-400/30",
+                idx === 0 && "group-hover:text-blue-400 group-hover:shadow-[0_0_20px_rgba(96,165,250,0.3)]",
+                idx === 1 && "group-hover:text-purple-400 group-hover:shadow-[0_0_20px_rgba(192,132,252,0.3)]",
+                idx === 2 && "group-hover:text-emerald-400 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.3)]",
+                idx === 3 && "group-hover:text-amber-400 group-hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]"
+              )}>
+                <Icon className="w-7 h-7 text-slate-400 transition-colors duration-300 group-hover:text-inherit" />
               </div>
 
-              <div className="text-lg font-bold text-slate-100 mb-2">{s.title}</div>
+              <div className="text-lg font-bold text-slate-400 transition-colors duration-300 group-hover:text-slate-100 mb-2">{s.title}</div>
               <div className="text-sm text-slate-400 text-center leading-relaxed">{s.desc}</div>
 
               {!isLast ? (

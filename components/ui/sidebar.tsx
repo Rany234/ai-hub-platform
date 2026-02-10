@@ -497,13 +497,13 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-collapsible=icon]]/menu-item:animated-width group-has-[[data-collapsible=icon]]/menu-item:w-9 group-has-[[data-collapsible=icon]]/menu-item:p-2 [&>span]:last:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-semibold",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding,color] focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 group-has-[[data-collapsible=icon]]/menu-item:animated-width group-has-[[data-collapsible=icon]]/menu-item:w-9 group-has-[[data-collapsible=icon]]/menu-item:p-2 [&>span]:last:truncate [&>svg]:size-4 [&>svg]:shrink-0 hover:bg-white/5 hover:text-sidebar-accent-foreground data-[active=true]:bg-transparent data-[active=true]:text-brand-action data-[active=true]:font-bold",
   {
     variants: {
       variant: {
-        default: "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        default: "hover:bg-white/5 hover:text-sidebar-accent-foreground",
         outline:
-          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
+          "bg-background shadow-[0_0_0_1px_hsl(var(--sidebar-border))] hover:bg-white/5 hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_hsl(var(--sidebar-accent))]",
       },
       size: {
         default: "h-8 text-sm",
@@ -549,7 +549,7 @@ const SidebarMenuButton = React.forwardRef<
         data-active={isActive}
         className={cn(
           sidebarMenuButtonVariants({ variant, size }),
-          isActive && "before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-4 before:bg-primary before:rounded-full",
+          isActive && "before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[2px] before:h-5 before:bg-brand-action",
           "relative",
           className
         )}

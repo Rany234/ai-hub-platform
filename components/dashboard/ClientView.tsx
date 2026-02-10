@@ -25,12 +25,12 @@ export async function ClientView({ userId }: ClientViewProps) {
   return (
     <div className="p-6 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold">你好，雇主！准备好发布任务了吗？</h1>
-        <p className="text-sm text-muted-foreground">管理你发布的任务，并找到合适的开发者</p>
+        <h1 className="text-2xl font-bold text-white">你好，雇主！准备好发布任务了吗？</h1>
+        <p className="text-sm text-slate-400">管理你发布的任务，并找到合适的开发者</p>
       </div>
 
       <div className="flex justify-center">
-        <Button asChild size="lg">
+        <Button asChild size="lg" className="bg-white text-black hover:bg-slate-200 font-bold border-none shadow-xl">
           <Link href="/dashboard/jobs/new">发布新任务</Link>
         </Button>
       </div>
