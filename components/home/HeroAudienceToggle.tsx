@@ -73,7 +73,7 @@ export function HeroAudienceToggle() {
         </div>
       </div>
 
-      <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md shadow-lg">
+      <div className="mt-5 w-full mx-auto flex flex-col items-center text-center rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md shadow-lg">
         <AnimatePresence mode="wait">
           <motion.div
             key={audience}
@@ -81,6 +81,7 @@ export function HeroAudienceToggle() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
+            className="flex flex-col items-center w-full"
           >
             <div className="text-base sm:text-lg font-extrabold tracking-tight text-white">
               {content.headline}
