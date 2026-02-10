@@ -32,7 +32,7 @@ export function HeroAudienceToggle() {
   }, [audience]);
 
   return (
-    <div className="mt-8 w-full max-w-2xl flex flex-col items-center text-center">
+    <div className="mt-8 w-full max-w-2xl flex flex-col items-center justify-center text-center">
       <div className="flex justify-center">
         <div className="relative mx-auto flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur-md shadow-lg">
           <button
@@ -83,11 +83,11 @@ export function HeroAudienceToggle() {
             transition={{ duration: 0.22, ease: "easeOut" }}
             className="flex flex-col items-center w-full"
           >
-            <div className="text-base sm:text-lg font-extrabold tracking-tight text-white">
+            <div className="w-full mx-auto text-center text-base sm:text-lg font-extrabold tracking-tight text-white">
               {content.headline}
             </div>
 
-            <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="mt-4 mx-auto grid w-full place-items-center grid-cols-1 gap-3 sm:grid-cols-3">
               {content.features.map((f) => {
                 const Icon = f.icon;
                 return (
