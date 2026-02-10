@@ -25,7 +25,7 @@ export async function createListing(
       input = createListingSchema.parse({
       title: formData.get("title"),
       description: formData.get("description") || undefined,
-      category: formData.get("category") || undefined,
+      category: formData.get("mainCategory") || undefined,
       previewUrl: formData.get("previewUrl") || undefined,
       packages: parsedPackages,
     });
@@ -49,11 +49,14 @@ export async function createListing(
       const { data, error } = await supabase
         .from("listings")
         .insert({
-          seller_id: user.id,
+          creator_id: user.id,
           title: input.title,
           description: input.description ?? null,
           packages: input.packages,
           category: input.category ?? null,
+          metadata: {
+            sub_category: typeof formData.get("subCategory") === "string" ? formData.get("subCategory") : null,
+          },
           preview_url: input.previewUrl ?? null,
           status: "active",
         })
@@ -93,7 +96,7 @@ export async function updateListing(
     const input = createListingSchema.parse({
       title: formData.get("title"),
       description: formData.get("description") || undefined,
-      category: formData.get("category") || undefined,
+      category: formData.get("mainCategory") || undefined,
       previewUrl: formData.get("previewUrl") || undefined,
       packages: parsedPackages,
     });
@@ -113,6 +116,25 @@ export async function updateListing(
     if (!user) return { success: false, error: "未登录" };
 
     try {
+      const nextSubCategory = formData.get("subCategory");
+      const subCategory = typeof nextSubCategory === "string" ? nextSubCategory : null;
+
+      const { data: currentListing, error: fetchError } = await supabase
+        .from("listings")
+        .select("metadata")
+        .eq("id", id)
+        .eq("creator_id", user.id)
+        .maybeSingle();
+
+      if (fetchError) return { success: false, error: fetchError.message };
+
+      const existingMetadata =
+        currentListing && typeof currentListing.metadata === "object" && currentListing.metadata !== null
+          ? (currentListing.metadata as Record<string, unknown>)
+          : {};
+
+      const mergedMetadata = { ...existingMetadata, sub_category: subCategory };
+
       const { error } = await supabase
         .from("listings")
         .update({
@@ -120,10 +142,11 @@ export async function updateListing(
           description: input.description ?? null,
           packages: input.packages,
           category: input.category ?? null,
+          metadata: mergedMetadata,
           preview_url: input.previewUrl ?? null,
         })
         .eq("id", id)
-        .eq("seller_id", user.id); // RLS guard
+        .eq("creator_id", user.id); // RLS guard
 
       if (error) return { success: false, error: error.message };
 
@@ -157,7 +180,7 @@ export async function deleteListing(id: string): Promise<ActionResult<null>> {
       .from("listings")
       .delete()
       .eq("id", id)
-      .eq("seller_id", user.id);
+      .eq("creator_id", user.id);
 
     if (error) return { success: false, error: "删除失败，请稍后重试" };
 

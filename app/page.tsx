@@ -6,7 +6,9 @@ import { HeroExploreButton } from "@/components/HeroExploreButton";
 import { AIDemoComponent } from "@/components/AIDemoComponent";
 import { FeaturedWorkCard } from "@/components/FeaturedWorkCard";
 import { LiveActivityTicker } from "@/components/LiveActivityTicker";
-import { ProcessSteps } from "@/components/home/ProcessSteps";
+import { HeroAudienceToggle } from "@/components/home/HeroAudienceToggle";
+import { ServiceMatrix } from "@/components/home/ServiceMatrix";
+import { TrustProcess } from "@/components/home/TrustProcess";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
@@ -34,9 +36,9 @@ export default async function HomePage() {
   const hasListings = featuredListings.length > 0;
 
   return (
-    <div>
+    <div className="bg-slate-950">
       {/* Hero + Search */}
-      <section className="relative overflow-hidden bg-slate-950">
+      <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
           {/* Noise/Grid Texture Layer */}
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] brightness-100 contrast-150" />
@@ -98,6 +100,7 @@ export default async function HomePage() {
                 </button>
               </form>
 
+
               <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
                 <Link
                   href="/dashboard/listings/new"
@@ -132,13 +135,37 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <ProcessSteps />
+      <div className="mx-auto max-w-6xl px-6 py-24 space-y-24">
+        <section>
+          <HeroAudienceToggle />
+        </section>
 
-      <LiveActivityTicker />
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            全方位 AI 服务体系
+          </h2>
+          <p className="mt-2 text-sm sm:text-base text-slate-400">
+            从轻量级资产到重量级方案，清晰理解 AI-Hub 的核心业务架构。
+          </p>
+          <div className="mt-10">
+            <ServiceMatrix />
+          </div>
+        </section>
 
-      {/* Featured Works */}
-      <section className="bg-slate-950">
-        <div className="mx-auto max-w-6xl px-6 py-14">
+        <section>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            安全、透明的担保交易机制
+          </h2>
+          <p className="mt-2 text-sm sm:text-base text-slate-400">
+            资金托管、分阶段验收、自动结算，让高客单 AI 服务交易更安心。
+          </p>
+          <div className="mt-10">
+            <TrustProcess />
+          </div>
+        </section>
+
+        {/* Featured Works */}
+        <section>
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
@@ -199,6 +226,10 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section>
+        <LiveActivityTicker />
       </section>
     </div>
   );

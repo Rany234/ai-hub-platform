@@ -109,9 +109,14 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
-  const [category, setCategory] = useState<"prompt" | "workflow" | "image_set">(
-    (initialData?.category as any) ?? "prompt"
+  const [mainCategory, setMainCategory] = useState<"assets" | "services" | "solutions">(
+    ((initialData?.category as any) as "assets" | "services" | "solutions") ?? "assets"
   );
+
+  const [subCategory, setSubCategory] = useState<string>(() => {
+    const fromMeta = (initialData?.metadata as any)?.sub_category;
+    return typeof fromMeta === "string" && fromMeta.length > 0 ? fromMeta : "prompt";
+  });
   const [previewUrl, setPreviewUrl] = useState(initialData?.preview_url ?? "");
 
   const [packages, setPackages] = useState<ListingPackagesDraft>(() => parseExistingPackages(initialData));
@@ -447,21 +452,91 @@ export function ListingForm({ mode = "create", initialData }: Props) {
               <section className="space-y-4">
                 <h2 className="text-sm font-semibold text-muted-foreground">服务分类</h2>
 
-                <div className="space-y-1">
-                  <label className="text-sm" htmlFor="category">
-                    分类
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value as "prompt" | "workflow" | "image_set")}
-                  >
-                    <option value="prompt">定制提示词</option>
-                    <option value="workflow">工作流搭建</option>
-                    <option value="image_set">图集定制</option>
-                  </select>
+                <div className="space-y-3">
+                  <div className="text-sm text-slate-300">主分类</div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <button
+                      type="button"
+                      onClick={() => setMainCategory("assets")}
+                      className={`text-left rounded-2xl border p-4 transition-all backdrop-blur ${
+                        mainCategory === "assets"
+                          ? "border-amber-500/30 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.12)]"
+                          : "border-white/10 bg-white/5 hover:border-white/20"
+                      }`}
+                    >
+                      <div className="text-sm font-extrabold text-white">AI 数字资产</div>
+                      <div className="mt-1 text-xs text-slate-400">适合可下载/可复用的交付物</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMainCategory("services")}
+                      className={`text-left rounded-2xl border p-4 transition-all backdrop-blur ${
+                        mainCategory === "services"
+                          ? "border-amber-500/30 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.12)]"
+                          : "border-white/10 bg-white/5 hover:border-white/20"
+                      }`}
+                    >
+                      <div className="text-sm font-extrabold text-white">定制化服务</div>
+                      <div className="mt-1 text-xs text-slate-400">适合一对一调试、创作与交付</div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMainCategory("solutions")}
+                      className={`text-left rounded-2xl border p-4 transition-all backdrop-blur ${
+                        mainCategory === "solutions"
+                          ? "border-amber-500/30 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.12)]"
+                          : "border-white/10 bg-white/5 hover:border-white/20"
+                      }`}
+                    >
+                      <div className="text-sm font-extrabold text-white">企业级解决方案</div>
+                      <div className="mt-1 text-xs text-slate-400">适合端到端交付与工程化落地</div>
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-slate-300" htmlFor="category">
+                      细分类
+                    </label>
+
+                    <select
+                      id="category"
+                      name="category"
+                      className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
+                      value={subCategory}
+                      onChange={(e) => setSubCategory(e.target.value)}
+                    >
+                      {mainCategory === "assets" ? (
+                        <>
+                          <option value="prompt">Prompt / 提示词</option>
+                          <option value="image_set">Image Set / 图集素材</option>
+                          <option value="workflow">Workflow / 工作流</option>
+                          <option value="lora">LoRA Model / LoRA 模型</option>
+                        </>
+                      ) : null}
+
+                      {mainCategory === "services" ? (
+                        <>
+                          <option value="custom_design">Custom Design / 定制设计</option>
+                          <option value="consulting">Consulting / 咨询服务</option>
+                          <option value="model_training">Model Training / 模型训练</option>
+                        </>
+                      ) : null}
+
+                      {mainCategory === "solutions" ? (
+                        <>
+                          <option value="agent_dev">Agent Development / Agent 开发</option>
+                          <option value="knowledge_base">Knowledge Base / 知识库</option>
+                          <option value="saas_integration">SaaS Integration / 系统集成</option>
+                        </>
+                      ) : null}
+                    </select>
+
+                    <input type="hidden" name="mainCategory" value={mainCategory} />
+                    <input type="hidden" name="subCategory" value={subCategory} />
+                  </div>
                 </div>
               </section>
 

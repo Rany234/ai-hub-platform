@@ -98,7 +98,7 @@ export const createListingSchema = z.object({
     .max(5000, { message: "描述长度不能超过 5000 个字符" })
     .optional(),
   category: z
-    .enum(["prompt", "workflow", "image_set"], {
+    .string({
       message: "请选择有效的分类",
     })
     .optional(),

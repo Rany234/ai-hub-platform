@@ -51,7 +51,17 @@ export default async function ListingsPage({
     .eq("status", "active");
 
   if (category) {
-    query = query.eq("category", category);
+    // 映射高层分类到数据库实际值
+    if (category === "assets") {
+      query = query.in("category", ["prompt", "image_set"]);
+    } else if (category === "services") {
+      query = query.in("category", ["workflow"]);
+    } else if (category === "solutions") {
+      // 暂时映射到空数组或特定值，直到数据库支持
+      query = query.in("category", ["enterprise_solution"]);
+    } else {
+      query = query.eq("category", category);
+    }
   }
 
   if (term) {
@@ -84,6 +94,9 @@ export default async function ListingsPage({
   const total = typeof count === "number" ? count : listings.length;
 
   const categoryLabelMap: Record<string, string> = {
+    assets: "AI 数字资产",
+    services: "定制化服务",
+    solutions: "企业级方案",
     prompt: "定制提示词",
     workflow: "工作流搭建",
     image_set: "图集定制",
@@ -134,9 +147,12 @@ export default async function ListingsPage({
               className="h-11 w-full rounded-xl bg-[#0B1121] border border-[#334155] px-4 text-slate-100 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50"
             >
               <option value="">全部分类</option>
-              <option value="prompt">定制提示词</option>
-              <option value="workflow">工作流搭建</option>
-              <option value="image_set">图集定制</option>
+              <option value="assets">AI 数字资产</option>
+              <option value="services">定制化服务</option>
+              <option value="solutions">企业级解决方案</option>
+              <option value="prompt">定制提示词（旧）</option>
+              <option value="workflow">工作流搭建（旧）</option>
+              <option value="image_set">图集定制（旧）</option>
             </select>
 
             <select
