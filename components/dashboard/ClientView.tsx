@@ -23,16 +23,25 @@ export async function ClientView({ userId }: ClientViewProps) {
   if (!user) return null;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold">你好，雇主！准备好发布任务了吗？</h1>
-        <p className="text-sm text-muted-foreground">管理你发布的任务，并找到合适的开发者</p>
-      </div>
+    <div className="p-6 space-y-8">
+      {/* 紧凑型 Welcome Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-dark to-brand-primary p-8 shadow-lg">
+        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
 
-      <div className="flex justify-center">
-        <Button asChild size="lg">
-          <Link href="/dashboard/jobs/new">发布新任务</Link>
-        </Button>
+        <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center md:text-left">
+            <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
+            <p className="text-blue-100/80 text-sm">管理你发布的任务，并找到合适的开发者</p>
+          </div>
+
+          <Button
+            asChild
+            variant="outline"
+            className="bg-transparent border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm px-8"
+          >
+            <Link href="/dashboard/jobs">View Marketplace</Link>
+          </Button>
+        </div>
       </div>
 
       <Suspense fallback={<StatsSkeleton />}>

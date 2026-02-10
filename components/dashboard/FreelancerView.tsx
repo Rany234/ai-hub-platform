@@ -18,16 +18,26 @@ export async function FreelancerView() {
   if (!user) return null;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold">你好，开发者！来看看今天的新机会。</h1>
-        <p className="text-sm text-muted-foreground">浏览任务广场，找到适合你的项目</p>
-      </div>
-
-      <div className="flex justify-center">
-        <Button asChild size="lg">
-          <Link href="/dashboard/jobs">浏览任务广场</Link>
-        </Button>
+    <div className="p-6 space-y-8">
+      {/* 紧凑型 Welcome Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-dark to-brand-primary p-8 shadow-lg">
+        {/* 背景装饰纹理 */}
+        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
+        
+        <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-1 text-center md:text-left">
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              Welcome back, 开发者！
+            </h1>
+            <p className="text-blue-100/80 text-sm">
+              今天有新的机会在等待着你，去任务广场看看吧。
+            </p>
+          </div>
+          
+          <Button asChild variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm px-8">
+            <Link href="/dashboard/jobs">View Marketplace</Link>
+          </Button>
+        </div>
       </div>
 
       <Suspense fallback={<StatsSkeleton />}>

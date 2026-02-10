@@ -53,116 +53,160 @@ export default async function ListingDetailPage({
   const metadata = listing.metadata as unknown as { delivery_days?: number } | null;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto font-inter">
-      <div className="flex flex-col md:flex-row items-start justify-between gap-8">
-        <div className="flex-1 w-full">
-          <h1 className="text-4xl font-jakarta font-extrabold text-slate-900 tracking-tight">{listing.title}</h1>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 font-medium">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400">服务提供方：</span>
-              <span className="text-slate-900 font-bold">
-                {creatorProfile?.full_name ||
-                  creatorProfile?.username ||
-                  creatorProfile?.id ||
-                  "未知"}
-              </span>
-            </div>
+    <div className="container mx-auto px-4 py-8 font-inter">
+      {/* Breadcrumbs - Placeholder for better UX */}
+      <nav className="flex mb-6 text-sm text-slate-500 gap-2">
+        <a href="/" className="hover:text-brand-primary transition-colors">首页</a>
+        <span>/</span>
+        <a href="/listings" className="hover:text-brand-primary transition-colors">{listing.category ?? "服务"}</a>
+        <span>/</span>
+        <span className="text-slate-900 font-medium truncate">{listing.title}</span>
+      </nav>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* 左侧主要内容 */}
+        <div className="lg:col-span-8">
+          <h1 className="text-4xl font-jakarta font-extrabold text-slate-900 tracking-tight mb-6">
+            {listing.title}
+          </h1>
+
+          {/* 评价简述 */}
+          <div className="flex items-center gap-4 mb-8">
             {avgRating !== null ? (
-              <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-                <Star className="h-4 w-4 fill-indigo-500 text-indigo-500" />
-                <span className="font-bold text-slate-900">{avgRating.toFixed(1)}</span>
-                <span className="text-slate-400 text-xs">({reviewCount}条评价)</span>
+              <div className="flex items-center gap-1.5">
+                <Star className="h-5 w-5 fill-brand-primary text-brand-primary" />
+                <span className="font-bold text-lg text-slate-900">{avgRating.toFixed(1)}</span>
+                <span className="text-slate-500">({reviewCount} 条真实评价)</span>
               </div>
             ) : (
-              <div className="text-xs bg-slate-50 px-3 py-1 rounded-full border border-slate-100 italic">暂无评价</div>
+              <span className="text-slate-400 italic">暂无评价</span>
             )}
-          </div>
-        </div>
-        <div className="text-3xl font-jakarta font-extrabold text-indigo-600 bg-indigo-50 px-6 py-2 rounded-xl border border-indigo-100">
-          ¥{listing.price}
-        </div>
-      </div>
-
-      {listing.preview_url ? (
-        <div className="mt-8 relative aspect-video w-full max-h-[500px] overflow-hidden rounded-xl border border-slate-200 shadow-sm">
-          <img
-            alt={listing.title}
-            src={listing.preview_url}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ) : null}
-
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-5 transition-colors hover:bg-slate-50">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">分类</div>
-          <div className="mt-2 font-jakarta font-bold text-slate-900">{listing.category ?? "未分类"}</div>
-        </div>
-        <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-5 transition-colors hover:bg-slate-50">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">预计交付</div>
-          <div className="mt-2 font-jakarta font-bold text-slate-900">
-            {metadata?.delivery_days ? `${metadata.delivery_days} 天` : "（未填写）"}
-          </div>
-        </div>
-      </div>
-
-      {listing.description ? (
-        <div className="mt-10">
-          <h2 className="text-2xl font-jakarta font-extrabold text-slate-900 tracking-tight">服务介绍</h2>
-          <div className="mt-4 p-6 bg-white border border-slate-100 rounded-xl shadow-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
-            {listing.description}
-          </div>
-        </div>
-      ) : null}
-
-      <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
-            <h2 className="text-xl font-jakarta font-extrabold text-slate-900 mb-6 flex items-center gap-2">
-              <span className="h-6 w-1.5 bg-indigo-600 rounded-full" />
-              服务配置
-            </h2>
-            <ServiceConfigurator
-              listingId={listing.id}
-              basePrice={listing.price}
-              options={((listing.options as unknown) as ServiceOption[] | null) ?? []}
-              packages={listing.packages}
-            />
-          </div>
-        </div>
-        <aside className="space-y-6">
-          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-4 mb-6">
-              <h2 className="text-lg font-jakarta font-extrabold text-slate-900">卖家信息</h2>
-              <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
+            <span className="text-slate-300">|</span>
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 font-medium">服务商：</span>
+              <span className="text-brand-primary font-bold hover:underline cursor-pointer">
+                {creatorProfile?.full_name || creatorProfile?.username || "未知"}
+              </span>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="relative h-14 w-14 rounded-xl border-2 border-slate-100 overflow-hidden bg-slate-50 flex-shrink-0">
-                {creatorProfile?.avatar_url ? (
-                  <img alt="avatar" src={creatorProfile.avatar_url} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-300">无</div>
-                )}
-              </div>
-              <div className="min-w-0">
-                <div className="font-bold text-slate-900 truncate">
-                  {creatorProfile?.full_name || creatorProfile?.username || "未知卖家"}
+          </div>
+
+          {/* 图片预览 */}
+          {listing.preview_url ? (
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-slate-200 shadow-sm mb-10 group">
+              <img
+                alt={listing.title}
+                src={listing.preview_url}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            </div>
+          ) : (
+            <div className="aspect-video w-full bg-slate-100 rounded-2xl flex items-center justify-center mb-10">
+              <span className="text-slate-400">暂无预览图</span>
+            </div>
+          )}
+
+          {/* 描述区域 */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-jakarta font-extrabold text-slate-900 tracking-tight mb-6 flex items-center gap-3">
+              <span className="w-1.5 h-8 bg-brand-primary rounded-full"></span>
+              服务详情
+            </h2>
+            <div className="prose prose-slate max-w-none p-8 bg-white dark:bg-brand-dark/50 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm leading-relaxed text-slate-600 dark:text-slate-300 whitespace-pre-wrap">
+              {listing.description || "暂无详细介绍"}
+            </div>
+          </div>
+
+          {/* 评价区域 */}
+          <div className="mt-16">
+            <ReviewsSection reviews={(reviews as any) ?? []} />
+          </div>
+        </div>
+
+        {/* 右侧侧边栏 - 吸顶 */}
+        <aside className="lg:col-span-4 space-y-8">
+          <div className="sticky top-24 h-fit space-y-6">
+            {/* Pricing Card */}
+            <div className="bg-white dark:bg-brand-dark border border-indigo-100/20 dark:border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+              {/* 装饰性背景 */}
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-brand-primary/5 rounded-full blur-3xl"></div>
+              
+              <div className="relative">
+                <div className="flex items-baseline gap-2 mb-6">
+                  <span className="text-3xl font-bold text-brand-primary">¥{listing.price}</span>
+                  <span className="text-slate-400 text-sm font-medium">起</span>
                 </div>
-                {creatorProfile?.bio ? (
-                  <div className="mt-2 text-sm text-slate-500 line-clamp-3 italic">
-                    “{creatorProfile.bio}”
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center justify-between text-sm py-2 border-b border-slate-50 dark:border-slate-800/50">
+                    <span className="text-slate-500">预计交付时间</span>
+                    <span className="text-slate-900 dark:text-slate-200 font-bold">
+                      {metadata?.delivery_days ? `${metadata.delivery_days} 天` : "商议确定"}
+                    </span>
                   </div>
-                ) : (
-                  <div className="mt-2 text-sm text-slate-400 italic">暂无简介</div>
-                )}
+                  <div className="flex items-center justify-between text-sm py-2 border-b border-slate-50 dark:border-slate-800/50">
+                    <span className="text-slate-500">服务分类</span>
+                    <span className="text-slate-900 dark:text-slate-200 font-bold">{listing.category ?? "AI 服务"}</span>
+                  </div>
+                </div>
+
+                {/* 服务配置器 - 下单逻辑核心 */}
+                <ServiceConfigurator
+                  listingId={listing.id}
+                  basePrice={listing.price}
+                  options={((listing.options as unknown) as ServiceOption[] | null) ?? []}
+                  packages={listing.packages}
+                />
+                
+                <p className="mt-4 text-center text-xs text-slate-400">
+                  下单后即可在工作台与卖家开始沟通
+                </p>
               </div>
+            </div>
+
+            {/* Seller Card */}
+            <div className="bg-slate-50/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-bold text-slate-900 dark:text-white text-lg">关于卖家</h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="inline-flex items-center justify-center rounded-xl border border-slate-200/80 dark:border-slate-700 bg-transparent px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-white/70 dark:hover:bg-white/10 transition-colors"
+                  >
+                    Contact Me
+                  </button>
+                  <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4 mb-4">
+                <div className="relative h-16 w-16 rounded-2xl border-2 border-white dark:border-slate-800 shadow-sm overflow-hidden bg-white">
+                  {creatorProfile?.avatar_url ? (
+                    <img alt="avatar" src={creatorProfile.avatar_url} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400 font-bold">
+                      {creatorProfile?.full_name?.[0] || "?"}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white truncate max-w-[180px]">
+                    {creatorProfile?.full_name || creatorProfile?.username || "匿名卖家"}
+                  </div>
+                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                    在线
+                  </div>
+                </div>
+              </div>
+              
+              {creatorProfile?.bio && (
+                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed bg-white/50 dark:bg-white/5 p-3 rounded-xl italic">
+                  “{creatorProfile.bio}”
+                </p>
+              )}
             </div>
           </div>
         </aside>
-      </div>
-
-      <div className="mt-16">
-        <ReviewsSection reviews={(reviews as any) ?? []} />
       </div>
     </div>
   );
