@@ -51,22 +51,27 @@ export function ListingCard({ listing }: { listing: Listing }) {
         ) : null}
 
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold leading-tight">{listing.title}</h3>
-          <div className="text-sm font-bold text-brand-action">
+          <h3 className="font-semibold leading-tight text-slate-100 group-hover:text-brand-action transition-colors">{listing.title}</h3>
+          <div className="text-xl font-black text-brand-action">
             {hasBasicPrice ? `¥${basicPrice} 起` : `¥${listing.price}`}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-full border border-white/10 overflow-hidden bg-slate-800 flex items-center justify-center text-[10px] text-slate-400">
-            {sellerAvatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img alt="seller avatar" src={sellerAvatarUrl} className="h-full w-full object-cover" />
-            ) : (
-              "无"
-            )}
+        <div className="flex items-center justify-between mt-1">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-full border border-white/10 overflow-hidden bg-slate-800 flex items-center justify-center text-[10px] text-slate-400">
+              {sellerAvatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img alt="seller avatar" src={sellerAvatarUrl} className="h-full w-full object-cover" />
+              ) : (
+                "无"
+              )}
+            </div>
+            <div className="text-xs text-slate-500">卖家</div>
           </div>
-          <div className="text-xs text-muted-foreground">卖家</div>
+          <div className="text-[10px] font-medium text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded-md border border-white/5">
+            已售 {(listing as any).sales_count ?? 0}
+          </div>
         </div>
 
         {listing.description ? (

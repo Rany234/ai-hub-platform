@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${fontSans.variable} ${fontDisplay.variable} antialiased`}>
+      <body className="antialiased font-sans">
         <Navbar />
         {children}
         <Toaster position="top-center" richColors />

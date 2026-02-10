@@ -137,11 +137,9 @@ export default async function HomePage() {
               </p>
             </div>
           ) : (
-            <div className="mt-10 columns-1 gap-6 space-y-6 sm:columns-2 lg:columns-3">
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {featuredListings.map((listing, idx) => (
-                <div key={listing.id} className="break-inside-avoid">
-                  <FeaturedWorkCard listing={listing} index={idx} />
-                </div>
+                <FeaturedWorkCard key={listing.id} listing={listing} index={idx} />
               ))}
             </div>
           )}

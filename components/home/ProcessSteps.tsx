@@ -39,6 +39,10 @@ const steps: Step[] = [
 export function ProcessSteps() {
   return (
     <section className="w-full bg-[#1E293B]/50 backdrop-blur-sm border-y border-white/5 py-12">
+      <div className="container mx-auto px-4 mb-10 text-center">
+        <h2 className="text-2xl font-bold text-white mb-2">4 步开启您的 AI 变现之旅</h2>
+        <p className="text-slate-400 text-sm">专业、透明、安全的交易流程</p>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 container mx-auto px-4">
         {steps.map((s, idx) => {
           const Icon = s.icon;
