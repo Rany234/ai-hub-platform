@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { BentoCard } from "@/components/BentoCard";
@@ -35,7 +36,7 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-black">
+      <section className="relative overflow-hidden min-h-[60vh] bg-[#0B1120]">
         {/* Noise overlay (static) */}
         <div
           className="pointer-events-none fixed inset-0 opacity-[0.03]"
@@ -53,101 +54,56 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.25),rgba(0,0,0,0.85))]" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-20 md:py-28">
-          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_0_40px_rgba(255,255,255,0.06)] backdrop-blur">
-              <span className="text-white">✨</span>
-              <span>New Feature: AI Models Available</span>
-            </div>
+        <div className="relative mx-auto max-w-6xl px-6 py-20 md:py-28 flex flex-col items-center text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 shadow-[0_0_40px_rgba(255,255,255,0.06)] backdrop-blur">
+            <span className="text-white text-sm">🚀</span>
+            <span>Trusted by 500+ Enterprises</span>
+          </div>
 
-            {/* Title */}
-            <h1
-              className="mt-10 font-black tracking-tight text-6xl md:text-8xl text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-[length:200%_auto] animate-text drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]"
-              style={{ fontFamily: "var(--font-orbitron)" }}
-            >
-              智汇 AI-Hub
-            </h1>
+          {/* Title */}
+          <h1 className="mt-8 text-5xl md:text-7xl font-bold tracking-tight text-white leading-tight">
+            Find the perfect AI Expert <br className="hidden md:block" /> for your business
+          </h1>
 
-            <p className="mt-6 text-sm md:text-base font-normal text-gray-400">
-              汇聚全球智慧，连接 AI 价值
-            </p>
+          <p className="mt-4 text-lg md:text-xl text-slate-400 max-w-2xl">
+            Marketplace for Prompts, Models, and AI Workflow.
+          </p>
 
-            <p className="mt-4 text-base leading-7 text-white/60 md:text-lg">
-              Build, buy, and ship AI services with a marketplace designed for speed and trust.
-            </p>
-
-            {/* CTA */}
-            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-              <Link
-                href="/listings"
-                className="inline-flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-black transition hover:bg-white/90"
-              >
-                Explore Marketplace
-              </Link>
-              <Link
-                href="/dashboard/listings/new"
-                className="inline-flex h-11 items-center justify-center rounded-full border border-white/15 bg-transparent px-6 text-sm font-semibold text-white/90 backdrop-blur transition hover:bg-white/10 hover:text-white"
-              >
-                Become a Creator
-              </Link>
-            </div>
-
-            {/* Visual anchor */}
-            <div className="mt-14 w-full">
-              <div className="relative mx-auto max-w-4xl">
-                <div className="pointer-events-none absolute -inset-10 rounded-[32px] shadow-[0_0_100px_rgba(255,255,255,0.10)]" />
-
-                <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] p-2">
-                  <div className="rounded-[22px] bg-black/40 p-6 backdrop-blur">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2.5 w-2.5 rounded-full bg-white/20" />
-                      <div className="h-2.5 w-2.5 rounded-full bg-white/15" />
-                      <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
-                      <div className="ml-3 h-2.5 w-32 rounded-full bg-white/10" />
-                    </div>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-3">
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                        <div className="text-xs text-white/50">Latency</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">128ms</div>
-                        <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
-                          <div className="h-1.5 w-2/3 rounded-full bg-white/40" />
-                        </div>
-                      </div>
-
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                        <div className="text-xs text-white/50">Runs</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">24,302</div>
-                        <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
-                          <div className="h-1.5 w-1/2 rounded-full bg-white/40" />
-                        </div>
-                      </div>
-
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                        <div className="text-xs text-white/50">Uptime</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">99.98%</div>
-                        <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
-                          <div className="h-1.5 w-4/5 rounded-full bg-white/40" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                      <div className="text-xs text-white/50">Prompt</div>
-                      <div className="mt-3 space-y-2 font-mono text-sm text-white/70">
-                        <div className="h-3 w-11/12 rounded bg-white/10" />
-                        <div className="h-3 w-10/12 rounded bg-white/10" />
-                        <div className="h-3 w-7/12 rounded bg-white/10" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 h-[320px] w-[640px] rounded-full bg-white/10 blur-[140px]" />
-
-                <div className="pointer-events-none absolute -bottom-12 left-1/2 -translate-x-1/2 h-24 w-[80%] bg-black blur-2xl" />
+          {/* Super Search Bar */}
+          <form className="mt-12 w-full max-w-3xl" action="/listings">
+            <div className="relative group">
+              <div className="absolute -inset-1 rounded-full bg-indigo-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_20px_rgba(99,102,241,0.3)]" />
+              <div className="relative flex items-center h-16 bg-[#151F32]/80 border border-[#334155] backdrop-blur-md rounded-full px-2 overflow-hidden focus-within:border-indigo-500/50 transition-colors shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+                <Search className="ml-4 h-6 w-6 text-slate-400" />
+                <input
+                  type="search"
+                  name="q"
+                  placeholder="Search for AI experts, prompts, or agents..."
+                  className="flex-1 bg-transparent border-none outline-none px-4 text-white placeholder:text-slate-500 text-lg"
+                  aria-label="Search"
+                />
+                <button
+                  type="submit"
+                  className="h-12 px-8 rounded-full bg-brand-primary text-white font-bold hover:brightness-110 transition-all active:scale-95 shadow-lg"
+                >
+                  Search
+                </button>
               </div>
+            </div>
+          </form>
+
+          {/* Trust Bar */}
+          <div className="mt-16 flex flex-col items-center gap-6">
+            <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">
+              Trusted by industry leaders
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-40 grayscale contrast-125">
+              <span className="text-xl font-bold text-white tracking-tighter">Microsoft</span>
+              <span className="text-xl font-bold text-white tracking-tighter italic">OpenAI</span>
+              <span className="text-xl font-bold text-white tracking-tighter">Google</span>
+              <span className="text-xl font-bold text-white tracking-tighter font-serif">Meta</span>
+              <span className="text-xl font-bold text-white tracking-tighter">ANTHROPIC</span>
             </div>
           </div>
         </div>
