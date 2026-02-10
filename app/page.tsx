@@ -62,7 +62,43 @@ export default async function HomePage() {
                 连接 500+ 企业需求，让你的 Prompt 与模型产生被动收入。
               </h2>
 
-              <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
+              <form
+                action="/listings"
+                className="mt-8 w-full max-w-2xl flex items-center bg-white/5 border border-white/10 rounded-full p-2 backdrop-blur-md shadow-lg"
+              >
+                <div className="flex-1 flex items-center gap-3 px-4">
+                  <span className="text-slate-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                      aria-hidden="true"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </span>
+                  <input
+                    name="q"
+                    placeholder="搜索 AI 提示词、模型、服务..."
+                    className="flex-1 bg-transparent border-none text-white placeholder:text-slate-400 focus:ring-0 px-0 h-12 outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center rounded-full bg-brand-action px-6 h-12 text-sm font-bold text-black shadow-[0_0_18px_rgba(245,158,11,0.25)] transition hover:bg-amber-500"
+                >
+                  搜索
+                </button>
+              </form>
+
+              <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-3">
                 <Link
                   href="/dashboard/listings/new"
                   className="inline-flex items-center justify-center rounded-full bg-black border border-amber-500/20 px-7 py-3 text-sm font-bold text-amber-500 transition-all hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] active:scale-95"

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { UserDropdown } from "./UserDropdown";
+import { NavLinks } from "./NavLinks";
 
 export async function Navbar() {
   const supabase = await createSupabaseServerClient();
@@ -19,23 +20,13 @@ export async function Navbar() {
     : null;
 
   return (
-    <header className="border-b">
+    <header className="sticky top-0 z-50 border-b bg-slate-950/80 backdrop-blur-md">
       <div className="mx-auto max-w-6xl px-6 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-semibold">
+          <Link href="/" className="font-semibold text-white">
             智汇 AI-Hub
           </Link>
-          <nav className="flex items-center gap-3 text-sm">
-            <Link className="underline-offset-4 hover:underline" href="/">
-              市场
-            </Link>
-            <Link className="underline-offset-4 hover:underline" href="/dashboard/jobs">
-              任务大厅
-            </Link>
-            <Link className="underline-offset-4 hover:underline" href="/dashboard">
-              控制台
-            </Link>
-          </nav>
+          <NavLinks />
         </div>
 
         <div className="flex items-center gap-2 text-sm">
