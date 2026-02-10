@@ -166,7 +166,8 @@ export default async function HomePage() {
 
         {/* Featured Works */}
         <section>
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
                 智汇精选：激发你的 AI 灵感
@@ -226,6 +227,7 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
+      </div>
       </section>
 
       <section>
