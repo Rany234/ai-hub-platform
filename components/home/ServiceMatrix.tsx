@@ -156,12 +156,12 @@ export function ServiceMatrix() {
                         <div className="p-4 font-mono text-[11px] leading-5 text-slate-300">
                           <div>
                             <span className="text-sky-300">export</span> <span className="text-indigo-200">async</span> <span className="text-slate-100">function</span>{" "}
-                            <span className="text-amber-200">deliver</span>() {{
+                            <span className="text-amber-200">deliver</span>() {"{"}
                           </div>
                           <div className="pl-4 text-slate-300">
                             <span className="text-purple-200">return</span> <span className="text-slate-100">"Agent + 私有化部署"</span>;
                           </div>
-                          <div className="text-slate-300">}}</div>
+                          <div className="text-slate-300">{"}"}{"}"}</div>
                         </div>
                       </div>
                       <div className="absolute -left-10 -bottom-10 h-56 w-56 rounded-full bg-sky-500/10 blur-[90px]" />
