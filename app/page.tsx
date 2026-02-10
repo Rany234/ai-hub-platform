@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 
 import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { BentoCard } from "@/components/BentoCard";
@@ -63,19 +62,18 @@ export default async function HomePage() {
             </div>
 
             {/* Title */}
-            <div className="relative mt-10">
-              <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-500/20 blur-[80px] rounded-full -z-10" />
-              <Image
-                src="/hero-title.png"
-                alt="智汇 AI-Hub - 专业 AI 服务交易平台"
-                width={800}
-                height={200}
-                priority
-                className="w-full max-w-[600px] h-auto object-contain mx-auto"
-              />
-            </div>
+            <h1
+              className="mt-10 font-black tracking-tight text-6xl md:text-8xl text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-[length:200%_auto] animate-text drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]"
+              style={{ fontFamily: "var(--font-orbitron)" }}
+            >
+              智汇 AI-Hub
+            </h1>
 
-            <p className="mt-12 text-base leading-7 text-white/60 md:text-lg">
+            <p className="mt-6 text-sm md:text-base font-normal text-gray-400">
+              汇聚全球智慧，连接 AI 价值
+            </p>
+
+            <p className="mt-4 text-base leading-7 text-white/60 md:text-lg">
               Build, buy, and ship AI services with a marketplace designed for speed and trust.
             </p>
 
