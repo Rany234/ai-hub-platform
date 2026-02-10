@@ -1,12 +1,13 @@
 import type React from "react";
-
 import { ChevronRight, Coins, Layers, Lock, ShieldCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Step = {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   title: string;
   desc: string;
-  iconClassName: string;
+  colorClassName: string;
+  glowClassName: string;
 };
 
 const steps: Step[] = [
@@ -14,25 +15,33 @@ const steps: Step[] = [
     icon: ShieldCheck,
     title: "实名签约入驻",
     desc: "0 门槛开店，身份核验保障交易安全。",
-    iconClassName: "text-sky-400",
+    colorClassName: "group-hover:text-amber-300",
+    glowClassName:
+      "group-hover:shadow-[0_0_18px_rgba(245,158,11,0.18)] group-hover:border-amber-500/25",
   },
   {
     icon: Layers,
     title: "上架数字权益",
     desc: "支持 Prompt 包 (8%服务费) 与定制服务 (12%服务费)。",
-    iconClassName: "text-sky-400",
+    colorClassName: "group-hover:text-amber-300",
+    glowClassName:
+      "group-hover:shadow-[0_0_18px_rgba(245,158,11,0.18)] group-hover:border-amber-500/25",
   },
   {
     icon: Lock,
     title: "资金担保交易",
     desc: "买家付款平台托管，验收无误后放款。",
-    iconClassName: "text-sky-400",
+    colorClassName: "group-hover:text-amber-300",
+    glowClassName:
+      "group-hover:shadow-[0_0_18px_rgba(245,158,11,0.18)] group-hover:border-amber-500/25",
   },
   {
     icon: Coins,
     title: "T+14 自动结算",
     desc: "交易完成后 T+14 结算，部分收益注入社区共建基金。",
-    iconClassName: "text-sky-400",
+    colorClassName: "group-hover:text-amber-300",
+    glowClassName:
+      "group-hover:shadow-[0_0_18px_rgba(245,158,11,0.18)] group-hover:border-amber-500/25",
   },
 ];
 
@@ -52,16 +61,14 @@ export function ProcessSteps() {
             <div key={s.title} className="relative flex flex-col items-center text-center group">
               <div className={cn(
                 "w-16 h-16 rounded-2xl bg-[#151F32] border border-white/10 flex items-center justify-center mb-4 transition-all duration-300",
-                "group-hover:scale-110 group-hover:border-sky-400/30",
-                idx === 0 && "group-hover:text-blue-400 group-hover:shadow-[0_0_20px_rgba(96,165,250,0.3)]",
-                idx === 1 && "group-hover:text-purple-400 group-hover:shadow-[0_0_20px_rgba(192,132,252,0.3)]",
-                idx === 2 && "group-hover:text-emerald-400 group-hover:shadow-[0_0_20px_rgba(52,211,153,0.3)]",
-                idx === 3 && "group-hover:text-amber-400 group-hover:shadow-[0_0_20px_rgba(251,191,36,0.3)]"
+                "group-hover:scale-110",
+                s.glowClassName,
+                s.colorClassName
               )}>
-                <Icon className="w-7 h-7 text-slate-400 transition-colors duration-300 group-hover:text-inherit" />
+                <Icon className="w-7 h-7 text-slate-500 transition-colors duration-300 group-hover:text-inherit" />
               </div>
 
-              <div className="text-lg font-bold text-slate-400 transition-colors duration-300 group-hover:text-slate-100 mb-2">{s.title}</div>
+              <div className="text-lg font-bold text-slate-500 transition-colors duration-300 group-hover:text-slate-100 mb-2">{s.title}</div>
               <div className="text-sm text-slate-400 text-center leading-relaxed">{s.desc}</div>
 
               {!isLast ? (

@@ -61,14 +61,14 @@ export default async function HomePage() {
               <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
                 <Link
                   href="/dashboard/listings/new"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-b from-amber-400 to-amber-600 px-7 py-3 text-sm font-bold text-black shadow-[0_0_15px_rgba(245,158,11,0.4)] transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] active:scale-95"
+                  className="inline-flex items-center justify-center rounded-full bg-black border border-amber-500/20 px-7 py-3 text-sm font-bold text-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.1)] transition-all hover:border-amber-500/40 hover:bg-amber-500/5 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95"
                 >
                   立即入驻赚钱
                 </Link>
 
                 <Link
                   href="/listings"
-                  className="inline-flex items-center justify-center rounded-full border border-white/20 bg-transparent px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.35)] transition hover:bg-white/5"
+                  className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-white/10"
                 >
                   寻找 AI 专家
                 </Link>
