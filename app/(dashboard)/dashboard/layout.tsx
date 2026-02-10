@@ -46,7 +46,7 @@ export default function DashboardLayout({
             <BellWrapper />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 bg-transparent">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {children}
         </div>
       </SidebarInset>

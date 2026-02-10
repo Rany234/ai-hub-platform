@@ -91,7 +91,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
   return (
     <Card 
       onClick={() => j.id && router.push(`/dashboard/jobs/${j.id}`)}
-      className="group cursor-pointer border-indigo-100/20 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-sm transition-all duration-300 hover:border-brand-primary/30 hover:bg-gray-50 dark:hover:bg-white/5 hover:shadow-glow hover:-translate-y-1"
+      className="group cursor-pointer border-white/10 bg-white/50 transition-all duration-300 hover:border-indigo-500/30 hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5"
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
@@ -127,7 +127,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
           </div>
 
           <div className="text-right">
-            <div className="text-lg font-bold text-indigo-600 group-hover:text-brand-primary transition-colors">
+            <div className="text-lg font-bold text-indigo-600">
               ¥{typeof j.budget === "number" ? j.budget.toLocaleString() : j.budget}
             </div>
             <div className="text-[10px] text-slate-400 font-medium">任务预算</div>

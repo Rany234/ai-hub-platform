@@ -119,7 +119,7 @@ export function ServiceConfigurator({
   };
 
   return (
-    <div className="border border-indigo-100/20 rounded-2xl p-5 bg-white dark:bg-brand-dark shadow-lg font-inter">
+    <div className="border border-indigo-100 rounded-xl p-5 bg-white shadow-lg font-inter">
       {/* 套餐切换器 */}
       <div className="mb-6 flex p-1 bg-slate-100 rounded-xl">
         {enabledTiers.map((tier) => {
@@ -130,8 +130,8 @@ export function ServiceConfigurator({
               onClick={() => setSelectedTier(tier)}
               className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
                 active
-                  ? "bg-white dark:bg-white/10 text-brand-primary shadow-sm scale-[1.02]"
-                  : "text-gray-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  ? "bg-white text-indigo-600 shadow-sm scale-[1.02]"
+                  : "text-gray-500 hover:text-slate-700"
               }`}
             >
               <div className="text-[10px] uppercase opacity-60 leading-none mb-0.5">
@@ -211,7 +211,7 @@ export function ServiceConfigurator({
       ) : null}
 
       {/* 总计与下单 */}
-      <div className="mt-8 pt-6 border-t border-slate-100/60 dark:border-slate-800 flex items-center justify-between">
+      <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
         <div>
           <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">总计预计</div>
           <div className="text-2xl font-jakarta font-extrabold text-indigo-600">¥{formatMoney(total)}</div>
@@ -219,7 +219,7 @@ export function ServiceConfigurator({
 
         <button
           type="button"
-          className="rounded-xl bg-brand-primary hover:brightness-110 active:scale-95 transition-all text-white px-6 py-3 font-bold shadow-glow"
+          className="rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all text-white px-6 py-3 font-bold shadow-md shadow-indigo-200"
           onClick={() => setOpen(true)}
         >
           立即下单

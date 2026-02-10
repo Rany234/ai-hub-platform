@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans, Orbitron } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import "./globals.css";
 
@@ -16,11 +16,6 @@ const fontDisplay = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-const fontOrbitron = Orbitron({
-  variable: "--font-orbitron",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: "智汇 AI-Hub - 专业的 AI 服务与技能交易平台",
   description:
@@ -34,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={`${fontSans.variable} ${fontDisplay.variable} ${fontOrbitron.variable} antialiased`}>
+      <body className={`${fontSans.variable} ${fontDisplay.variable} antialiased`}>
         <Navbar />
         {children}
         <Toaster position="top-center" richColors />
