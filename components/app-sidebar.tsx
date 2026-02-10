@@ -31,15 +31,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} className="bg-brand-dark text-gray-400">
       <SidebarHeader>
         <Link href="/dashboard" className="flex items-center gap-2 px-2 py-2 hover:opacity-80 transition-opacity">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-blue-600 text-white">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-brand-primary text-white shadow-glow">
             <LayoutDashboard className="size-4" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">AI Hub</span>
-            <span className="truncate text-xs text-muted-foreground">Platform</span>
+            <span className="truncate font-semibold text-white">AI Hub</span>
+            <span className="truncate text-xs text-gray-400">Platform</span>
           </div>
         </Link>
       </SidebarHeader>
