@@ -19,9 +19,9 @@ export function OrderStepper({ currentStatus }: { currentStatus: string }) {
   return (
     <div className="relative">
       {/* 连接线 */}
-      <div className="absolute left-0 top-5 h-0.5 w-full bg-gray-200" />
+      <div className="absolute left-0 top-5 h-0.5 w-full bg-slate-700" />
       <div
-        className="absolute left-0 top-5 h-0.5 bg-black transition-all"
+        className="absolute left-0 top-5 h-0.5 bg-emerald-500 transition-all duration-500"
         style={{ width: `${(activeIndex / (STEPS.length - 1)) * 100}%` }}
       />
 
@@ -30,18 +30,22 @@ export function OrderStepper({ currentStatus }: { currentStatus: string }) {
         {STEPS.map((step, idx) => {
           const isCompleted = idx < activeIndex;
           const isCurrent = idx === activeIndex;
-          const isFuture = idx > activeIndex;
+
+          let containerClasses = "border-slate-700 bg-slate-800 text-slate-600";
+          let textClasses = "text-slate-600";
+
+          if (isCompleted) {
+            containerClasses = "border-emerald-400/20 bg-emerald-400/10 text-emerald-400";
+            textClasses = "text-emerald-400";
+          } else if (isCurrent) {
+            containerClasses = "border-amber-400/20 bg-amber-400/10 text-amber-400 animate-pulse";
+            textClasses = "text-amber-400 font-bold";
+          }
 
           return (
             <div key={step.key} className="flex flex-col items-center gap-2">
               <div
-                className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${
-                  isCompleted
-                    ? "border-black bg-black text-white"
-                    : isCurrent
-                    ? "border-black bg-white text-black"
-                    : "border-gray-300 bg-white text-gray-400"
-                }`}
+                className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300 ${containerClasses}`}
               >
                 {isCompleted ? (
                   <Check className="h-5 w-5" />
@@ -50,11 +54,7 @@ export function OrderStepper({ currentStatus }: { currentStatus: string }) {
                 )}
               </div>
               <div className="text-center">
-                <div
-                  className={`text-xs font-medium ${
-                    isCompleted || isCurrent ? "text-black" : "text-gray-400"
-                  }`}
-                >
+                <div className={`text-xs font-medium transition-colors duration-300 ${textClasses}`}>
                   {step.label}
                 </div>
               </div>

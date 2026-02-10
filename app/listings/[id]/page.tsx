@@ -53,14 +53,14 @@ export default async function ListingDetailPage({
   const metadata = listing.metadata as unknown as { delivery_days?: number } | null;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto font-inter">
+    <div className="p-6 max-w-6xl mx-auto font-sans">
       <div className="flex flex-col md:flex-row items-start justify-between gap-8">
         <div className="flex-1 w-full">
-          <h1 className="text-4xl font-jakarta font-extrabold text-slate-900 tracking-tight">{listing.title}</h1>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500 font-medium">
+          <h1 className="text-4xl font-extrabold text-white tracking-tight">{listing.title}</h1>
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-400 font-medium">
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">服务提供方：</span>
-              <span className="text-slate-900 font-bold">
+              <span className="text-slate-500">服务提供方：</span>
+              <span className="text-slate-200 font-bold">
                 {creatorProfile?.full_name ||
                   creatorProfile?.username ||
                   creatorProfile?.id ||
@@ -68,23 +68,23 @@ export default async function ListingDetailPage({
               </span>
             </div>
             {avgRating !== null ? (
-              <div className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-                <Star className="h-4 w-4 fill-indigo-500 text-indigo-500" />
-                <span className="font-bold text-slate-900">{avgRating.toFixed(1)}</span>
-                <span className="text-slate-400 text-xs">({reviewCount}条评价)</span>
+              <div className="flex items-center gap-1.5 bg-brand-surface px-3 py-1 rounded-full border border-brand-border">
+                <Star className="h-4 w-4 fill-brand-action text-brand-action" />
+                <span className="font-bold text-slate-100">{avgRating.toFixed(1)}</span>
+                <span className="text-slate-500 text-xs">({reviewCount}条评价)</span>
               </div>
             ) : (
-              <div className="text-xs bg-slate-50 px-3 py-1 rounded-full border border-slate-100 italic">暂无评价</div>
+              <div className="text-xs bg-brand-surface px-3 py-1 rounded-full border border-brand-border text-slate-400 italic">暂无评价</div>
             )}
           </div>
         </div>
-        <div className="text-3xl font-jakarta font-extrabold text-indigo-600 bg-indigo-50 px-6 py-2 rounded-xl border border-indigo-100">
+        <div className="text-3xl font-extrabold text-brand-action bg-brand-action/10 px-6 py-2 rounded-xl border border-brand-action/20">
           ¥{listing.price}
         </div>
       </div>
 
       {listing.preview_url ? (
-        <div className="mt-8 relative aspect-video w-full max-h-[500px] overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+        <div className="mt-8 relative aspect-video w-full max-h-[500px] overflow-hidden rounded-xl border border-brand-border shadow-2xl shadow-black/50">
           <img
             alt={listing.title}
             src={listing.preview_url}
@@ -94,13 +94,13 @@ export default async function ListingDetailPage({
       ) : null}
 
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-5 transition-colors hover:bg-slate-50">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">分类</div>
-          <div className="mt-2 font-jakarta font-bold text-slate-900">{listing.category ?? "未分类"}</div>
+        <div className="border border-brand-border bg-brand-surface rounded-xl p-5 transition-colors hover:bg-white/5">
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">分类</div>
+          <div className="mt-2 font-bold text-slate-200">{listing.category ?? "未分类"}</div>
         </div>
-        <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-5 transition-colors hover:bg-slate-50">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">预计交付</div>
-          <div className="mt-2 font-jakarta font-bold text-slate-900">
+        <div className="border border-brand-border bg-brand-surface rounded-xl p-5 transition-colors hover:bg-white/5">
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">预计交付</div>
+          <div className="mt-2 font-bold text-slate-200">
             {metadata?.delivery_days ? `${metadata.delivery_days} 天` : "（未填写）"}
           </div>
         </div>
@@ -108,8 +108,8 @@ export default async function ListingDetailPage({
 
       {listing.description ? (
         <div className="mt-10">
-          <h2 className="text-2xl font-jakarta font-extrabold text-slate-900 tracking-tight">服务介绍</h2>
-          <div className="mt-4 p-6 bg-white border border-slate-100 rounded-xl shadow-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
+          <h2 className="text-2xl font-extrabold text-white tracking-tight">服务介绍</h2>
+          <div className="mt-4 p-6 bg-brand-surface border border-brand-border rounded-xl leading-relaxed text-slate-300 whitespace-pre-wrap shadow-inner shadow-black/20">
             {listing.description}
           </div>
         </div>
@@ -117,9 +117,9 @@ export default async function ListingDetailPage({
 
       <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
-            <h2 className="text-xl font-jakarta font-extrabold text-slate-900 mb-6 flex items-center gap-2">
-              <span className="h-6 w-1.5 bg-indigo-600 rounded-full" />
+          <div className="bg-brand-surface border border-brand-border rounded-xl p-6 shadow-xl">
+            <h2 className="text-xl font-extrabold text-white mb-6 flex items-center gap-2">
+              <span className="h-6 w-1.5 bg-brand-action rounded-full" />
               服务配置
             </h2>
             <ServiceConfigurator
@@ -131,29 +131,29 @@ export default async function ListingDetailPage({
           </div>
         </div>
         <aside className="space-y-6">
-          <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-sm">
+          <div className="bg-brand-surface border border-brand-border rounded-xl p-6 shadow-xl">
             <div className="flex items-center justify-between gap-4 mb-6">
-              <h2 className="text-lg font-jakarta font-extrabold text-slate-900">卖家信息</h2>
+              <h2 className="text-lg font-extrabold text-white">卖家信息</h2>
               <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
             </div>
             <div className="flex items-start gap-4">
-              <div className="relative h-14 w-14 rounded-xl border-2 border-slate-100 overflow-hidden bg-slate-50 flex-shrink-0">
+              <div className="relative h-14 w-14 rounded-xl border border-brand-border overflow-hidden bg-black/20 flex-shrink-0">
                 {creatorProfile?.avatar_url ? (
                   <img alt="avatar" src={creatorProfile.avatar_url} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-300">无</div>
+                  <div className="w-full h-full flex items-center justify-center text-slate-600">无</div>
                 )}
               </div>
               <div className="min-w-0">
-                <div className="font-bold text-slate-900 truncate">
+                <div className="font-bold text-slate-100 truncate">
                   {creatorProfile?.full_name || creatorProfile?.username || "未知卖家"}
                 </div>
                 {creatorProfile?.bio ? (
-                  <div className="mt-2 text-sm text-slate-500 line-clamp-3 italic">
+                  <div className="mt-2 text-sm text-slate-400 line-clamp-3 italic">
                     “{creatorProfile.bio}”
                   </div>
                 ) : (
-                  <div className="mt-2 text-sm text-slate-400 italic">暂无简介</div>
+                  <div className="mt-2 text-sm text-slate-500 italic">暂无简介</div>
                 )}
               </div>
             </div>

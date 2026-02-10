@@ -255,7 +255,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     const meta = TIER_META.find((x) => x.key === key)!;
 
     return (
-      <div className={`border rounded-xl p-4 bg-white ${!t.enabled ? "opacity-60" : ""}`}>
+      <div className={`border border-[#334155] rounded-xl p-4 bg-[#151F32] ${!t.enabled ? "opacity-60" : ""}`}>
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="font-semibold">{meta.title}</div>
@@ -293,7 +293,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
               step="0.01"
               min={0}
               disabled={!t.enabled}
-              className="w-full border rounded-md px-3 py-2"
+              className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
               value={t.price}
               onChange={(e) => {
                 const value = e.target.value;
@@ -315,7 +315,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
               min={1}
               step={1}
               disabled={!t.enabled}
-              className="w-full border rounded-md px-3 py-2"
+              className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
               value={t.delivery_days}
               onChange={(e) => {
                 const value = clampInt(Number(e.target.value), 1);
@@ -382,7 +382,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     <div className="w-full max-w-6xl mx-auto min-h-[calc(100vh-8rem)]">
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3">
-          <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <div className="bg-[#151F32] border border-[#334155] rounded-2xl p-6 shadow-2xl">
             <h1 className="text-2xl font-semibold">{mode === "edit" ? "编辑服务" : "发布服务"}</h1>
 
             {state.success === false ? <p className="mt-2 text-sm text-red-600">{state.error}</p> : null}
@@ -399,7 +399,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                     id="title"
                     name="title"
                     required
-                    className="w-full border rounded-md px-3 py-2"
+                    className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                   />
@@ -424,14 +424,14 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
 
                   <div
-                    className="border rounded-lg p-6 text-center cursor-pointer select-none"
+                    className="border-2 border-dashed border-slate-600 bg-transparent rounded-xl p-8 text-center cursor-pointer select-none hover:border-brand-action/50 hover:bg-white/5 transition-all"
                     onClick={onPickFile}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onDrop}
                     role="button"
                     tabIndex={0}
                   >
-                    <p className="text-sm">{isUploading ? "上传中..." : "点击或拖拽上传服务封面"}</p>
+                    <p className="text-sm text-slate-400">{isUploading ? "上传中..." : "点击或拖拽上传服务封面"}</p>
                   </div>
 
                   <input type="hidden" name="previewUrl" value={previewUrl} />
@@ -454,7 +454,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                   <select
                     id="category"
                     name="category"
-                    className="w-full border rounded-md px-3 py-2"
+                    className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
                     value={category}
                     onChange={(e) => setCategory(e.target.value as "prompt" | "workflow" | "image_set")}
                   >
@@ -468,7 +468,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
               <button
                 type="submit"
                 disabled={pending || isUploading}
-                className="w-full rounded-md bg-black text-white py-2 disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white py-3 font-bold shadow-lg shadow-amber-900/20 disabled:opacity-60 flex items-center justify-center gap-2 hover:from-amber-400 hover:to-orange-500 transition-colors"
               >
                 {isUploading ? (
                   <>
@@ -502,7 +502,9 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                     <button
                       key={`preview_${t.key}`}
                       type="button"
-                      className={`rounded-md border px-2 py-1 text-xs ${active ? "bg-black text-white" : "bg-white"} ${!enabled ? "opacity-50" : ""}`}
+                      className={`rounded-md border border-[#334155] px-2 py-1 text-xs transition-colors ${
+                        active ? "bg-brand-action text-white border-brand-action/30" : "bg-[#151F32] text-slate-300 hover:bg-white/5"
+                      } ${!enabled ? "opacity-50" : ""}`}
                       onClick={() => setPreviewTier(t.key)}
                       disabled={!enabled}
                     >

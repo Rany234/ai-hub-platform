@@ -6,7 +6,7 @@ export function StatsSkeleton() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {Array.from({ length: 3 }).map((_, i) => (
         // eslint-disable-next-line react/no-array-index-key
-        <Card key={i} className="rounded-2xl shadow-sm border-white/10 bg-white/50 backdrop-blur-sm">
+        <Card key={i} className="rounded-2xl shadow-none border-[#334155] bg-white/5 backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <Skeleton className="h-4 w-20" />
             <Skeleton className="h-4 w-4 rounded" />

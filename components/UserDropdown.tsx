@@ -31,7 +31,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
     <div className="relative" ref={containerRef}>
       <button
         type="button"
-        className="h-9 w-9 rounded-full border overflow-hidden bg-white flex items-center justify-center text-xs text-muted-foreground hover:border-gray-400"
+        className="h-9 w-9 rounded-full border border-white/10 overflow-hidden bg-slate-800 flex items-center justify-center text-xs text-slate-300 hover:border-brand-action/60 transition-colors"
         onClick={() => setOpen((v) => !v)}
         aria-label="用户菜单"
       >
@@ -49,13 +49,13 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             className="fixed inset-0 z-40"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border bg-white p-1 shadow-lg z-50">
-            <div className="px-3 py-2 text-sm font-medium border-b">
+          <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-brand-border bg-brand-surface p-1 shadow-2xl z-50">
+            <div className="px-3 py-2 text-sm font-medium border-b border-brand-border text-slate-100">
               {displayName}
             </div>
 
             <Link
-              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/settings"
               onClick={() => setOpen(false)}
             >
@@ -63,7 +63,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             </Link>
 
             <Link
-              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/chat"
               onClick={() => setOpen(false)}
             >
@@ -71,7 +71,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             </Link>
 
             <Link
-              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/wallet"
               onClick={() => setOpen(false)}
               title="⌘B"
@@ -80,7 +80,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             </Link>
 
             <Link
-              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/orders"
               onClick={() => setOpen(false)}
             >
@@ -88,7 +88,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             </Link>
 
             <Link
-              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/sales"
               onClick={() => setOpen(false)}
             >
@@ -96,7 +96,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             </Link>
 
             <Link
-              className="block px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/listings"
               onClick={() => setOpen(false)}
             >
@@ -108,7 +108,7 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
             <form onSubmit={handleLogout}>
               <button
                 type="submit"
-                className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 rounded-md"
+                className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               >
                 退出登录
               </button>

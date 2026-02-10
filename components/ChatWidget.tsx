@@ -276,17 +276,17 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
         <button
           type="button"
           onClick={() => setOpenState(!open)}
-          className="rounded-full bg-black text-white px-4 py-3 shadow"
+          className="rounded-full bg-brand-action text-white px-4 py-3 shadow-lg shadow-black/30 hover:bg-amber-600 transition-colors"
         >
           {open ? "关闭消息" : "消息"}
         </button>
       </div>
 
       {open ? (
-        <div className="fixed bottom-20 right-5 z-50 w-[92vw] max-w-4xl h-[70vh] bg-white border shadow-lg rounded-lg overflow-hidden">
+        <div className="fixed bottom-20 right-5 z-50 w-[92vw] max-w-4xl h-[70vh] bg-brand-surface border border-brand-border shadow-2xl rounded-lg overflow-hidden">
           <div className="h-full grid grid-cols-1 md:grid-cols-[320px_1fr]">
-            <div className="border-r h-full overflow-y-auto">
-              <div className="px-4 py-3 font-medium border-b">对话</div>
+            <div className="border-r border-brand-border h-full overflow-y-auto bg-black/20">
+              <div className="px-4 py-3 font-medium border-b border-brand-border text-slate-100">对话</div>
               {loadingConversations ? (
                 <div className="p-4 text-sm text-muted-foreground">加载中...</div>
               ) : conversations.length === 0 ? (
@@ -302,8 +302,8 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
                         key={c.id}
                         type="button"
                         onClick={() => setActiveConversationId(c.id)}
-                        className={`w-full text-left px-4 py-3 hover:bg-muted/40 ${
-                          c.id === activeConversationId ? "bg-muted/40" : ""
+                        className={`w-full text-left px-4 py-3 hover:bg-white/5 transition-colors ${
+                          c.id === activeConversationId ? "bg-white/5" : ""
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -327,14 +327,14 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
               )}
             </div>
 
-            <div className="h-full flex flex-col">
-              <div className="px-4 py-3 border-b flex items-center justify-between">
-                <div className="text-sm font-medium truncate">
+            <div className="h-full flex flex-col bg-brand-surface">
+              <div className="px-4 py-3 border-b border-brand-border flex items-center justify-between bg-black/10">
+                <div className="text-sm font-medium truncate text-slate-100">
                   {activeOtherProfile ? displayName(activeOtherProfile) : "选择一个对话"}
                 </div>
                 <button
                   type="button"
-                  className="text-xs underline text-muted-foreground"
+                  className="text-xs underline text-slate-400 hover:text-slate-200 transition-colors"
                   onClick={() => setOpenState(false)}
                 >
                   收起
@@ -352,8 +352,8 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
                     return (
                       <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                         <div
-                          className={`max-w-[75%] rounded-lg px-3 py-2 text-sm border ${
-                            mine ? "bg-black text-white" : "bg-white"
+                          className={`max-w-[75%] rounded-lg px-3 py-2 text-sm border border-white/10 ${
+                            mine ? "bg-brand-action/15 text-slate-100" : "bg-black/20 text-slate-100"
                           }`}
                         >
                           {m.image_url ? (
@@ -369,12 +369,12 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
                 <div ref={bottomRef} />
               </div>
 
-              <div className="border-t p-3">
+              <div className="border-t border-brand-border p-3 bg-black/10">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={pickImage}
-                    className="rounded-md border px-3 py-2 text-sm"
+                    className="rounded-md border border-brand-border bg-white/5 px-3 py-2 text-sm text-slate-200 hover:bg-white/10 transition-colors"
                     disabled={!activeConversationId || uploadingImage}
                   >
                     {uploadingImage ? "上传中..." : "发图"}
@@ -391,7 +391,7 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
                     placeholder={activeConversationId ? "输入消息..." : "先选择对话"}
-                    className="flex-1 rounded-md border px-3 py-2 text-sm"
+                    className="flex-1 rounded-md border border-brand-border bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 outline-none focus:ring-2 focus:ring-brand-action/30"
                     disabled={!activeConversationId}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") void sendText();
@@ -400,7 +400,7 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
                   <button
                     type="button"
                     onClick={() => void sendText()}
-                    className="rounded-md bg-black text-white px-4 py-2 text-sm disabled:opacity-50"
+                    className="rounded-md bg-brand-action text-white px-4 py-2 text-sm font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50"
                     disabled={!activeConversationId || sending}
                   >
                     发送

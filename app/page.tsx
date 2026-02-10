@@ -6,6 +6,7 @@ import { HeroExploreButton } from "@/components/HeroExploreButton";
 import { AIDemoComponent } from "@/components/AIDemoComponent";
 import { FeaturedWorkCard } from "@/components/FeaturedWorkCard";
 import { LiveActivityTicker } from "@/components/LiveActivityTicker";
+import { ProcessSteps } from "@/components/home/ProcessSteps";
 
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
@@ -45,61 +46,36 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 gap-12 items-center lg:grid-cols-2">
             <div className="relative">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-200 shadow-sm backdrop-blur">
-                <span className="h-2 w-2 rounded-full bg-indigo-400 shadow-[0_0_18px_rgba(99,102,241,0.65)]" />
-                专业的 AI 服务与技能交易平台
+                <span className="h-2 w-2 rounded-full bg-brand-action shadow-[0_0_18px_rgba(245,158,11,0.55)]" />
+                AI-Hub 中国版 · 深色商业风
               </div>
 
-              <h1 className="mt-6 text-5xl font-extrabold tracking-tight text-transparent sm:text-6xl bg-clip-text bg-gradient-to-r from-indigo-200 via-sky-200 to-fuchsia-200">
-                智汇 AI-Hub
+              <h1 className="mt-6 text-5xl sm:text-6xl font-extrabold tracking-tight text-white">
+                一站式 AI 技能与服务交易平台
               </h1>
 
-              <p className="mt-5 text-lg text-slate-300">
-                汇聚全球智慧，<span className="font-semibold text-slate-100">连接 AI 价值</span>
-              </p>
-              <p className="mt-3 text-sm leading-6 text-slate-400">
-                一站式 AI 技能交易市场。无论是寻找 Prompt 工程师，还是出售你的微调模型，这里都是你的最佳起点。
-              </p>
+              <h2 className="mt-5 text-lg sm:text-xl text-slate-300">
+                连接 500+ 企业需求，让你的 Prompt 与模型产生被动收入。
+              </h2>
 
-              <form className="mt-8" action="/listings">
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <div className="relative flex-1">
-                    <input
-                      type="search"
-                      name="q"
-                      placeholder="搜索 AI 服务、提示词、模型..."
-                      className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 text-base text-slate-100 placeholder:text-slate-400 shadow-[0_18px_60px_rgba(0,0,0,0.55)] outline-none ring-1 ring-white/5 backdrop-blur transition focus:border-white/20 focus:ring-2 focus:ring-indigo-500/40"
-                      aria-label="搜索"
-                    />
-                    <div className="pointer-events-none absolute inset-y-0 right-4 hidden items-center text-slate-400 sm:flex">
-                      ⌘K
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="rounded-full bg-white text-slate-950 px-7 py-3 font-semibold shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-white/90"
-                  >
-                    搜索
-                  </button>
-                </div>
-
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                  <span className="text-slate-500">热门：</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur">Midjourney 调试</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur">智能体开发</span>
-                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 backdrop-blur">数据分析</span>
-                </div>
-              </form>
-
-              <div className="mt-10 flex items-center gap-3">
-                <HeroExploreButton />
-
-                <a
+              <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
+                <Link
                   href="/dashboard/listings/new"
-                  className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-950 shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-white/90"
+                  className="inline-flex items-center justify-center rounded-full bg-brand-action px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-amber-600"
                 >
-                  成为创作者
-                </a>
+                  立即入驻赚钱
+                </Link>
+
+                <Link
+                  href="/listings"
+                  className="inline-flex items-center justify-center rounded-full border border-white/20 bg-transparent px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.35)] transition hover:bg-white/5"
+                >
+                  寻找 AI 专家
+                </Link>
+              </div>
+
+              <div className="mt-10 text-sm text-slate-400">
+                支持主流模型生态: <span className="text-slate-300">OpenAI</span> / <span className="text-slate-300">Midjourney</span> / <span className="text-slate-300">Claude</span>
               </div>
             </div>
 
@@ -109,6 +85,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <ProcessSteps />
 
       <LiveActivityTicker />
 
@@ -143,7 +121,7 @@ export default async function HomePage() {
               )}
 
               <Link
-                className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-bold text-slate-950 shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-white/90"
+                className="inline-flex items-center justify-center rounded-full bg-brand-action px-5 py-2 text-sm font-bold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)] transition hover:bg-amber-600"
                 href="/dashboard/listings/new"
               >
                 你也有惊艳的 AI 作品？立即发布服务

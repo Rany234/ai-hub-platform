@@ -148,19 +148,19 @@ export function DeliveryPanelClient({
 
   return (
     <div>
-      <div className="text-sm font-semibold">交付记录</div>
+      <div className="text-sm font-semibold text-white">交付记录</div>
 
       {deliveries.length === 0 ? (
-        <p className="mt-3 text-sm text-muted-foreground">暂无交付记录。</p>
+        <p className="mt-3 text-sm text-slate-400">暂无交付记录。</p>
       ) : (
         <div className="mt-4 space-y-4">
           {deliveries.map((d, idx) => (
             <div key={d.id} className="relative pl-6">
-              <div className="absolute left-0 top-2 h-3 w-3 rounded-full bg-gray-400" />
-              <div className="rounded-lg border p-4">
+              <div className="absolute left-0 top-2 h-3 w-3 rounded-full bg-brand-border" />
+              <div className="rounded-lg border border-brand-border bg-brand-surface p-4">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="text-sm font-semibold">V{deliveries.length - idx} 交付</div>
-                  <div className="text-xs text-muted-foreground">{formatTime(d.created_at)}</div>
+                  <div className="text-sm font-semibold text-slate-100">V{deliveries.length - idx} 交付</div>
+                  <div className="text-xs text-slate-500">{formatTime(d.created_at)}</div>
                 </div>
                 <div className="mt-2 whitespace-pre-wrap text-sm">{d.content}</div>
 
@@ -185,7 +185,7 @@ export function DeliveryPanelClient({
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      className="rounded-md bg-black text-white px-4 py-2"
+                      className="rounded-md bg-brand-action text-white px-4 py-2 font-semibold shadow-lg shadow-black/20 hover:bg-amber-600 transition-colors"
                       disabled={!canReview || pending}
                       onClick={approve}
                     >
@@ -193,7 +193,7 @@ export function DeliveryPanelClient({
                     </button>
                     <button
                       type="button"
-                      className="rounded-md border px-4 py-2"
+                      className="rounded-md border border-brand-border px-4 py-2 text-slate-300 hover:bg-white/5 transition-colors"
                       disabled={!canReview || pending}
                       onClick={() => setOpenFeedback(true)}
                     >
@@ -208,21 +208,21 @@ export function DeliveryPanelClient({
       )}
 
       {error ? (
-        <div className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="mt-3 rounded-md border border-red-900/50 bg-red-900/20 px-3 py-2 text-sm text-red-400">
           {error}
         </div>
       ) : null}
 
       {/* Delivery form moved to bottom fold */}
       {isSeller && orderStatus !== "completed" ? (
-        <details className="mt-8 border rounded-lg p-4">
+        <details className="mt-8 border border-brand-border bg-brand-surface rounded-lg p-4">
           <summary className="cursor-pointer select-none text-sm font-semibold">
             新建交付
           </summary>
 
           <div className="mt-4">
             {lastFeedback ? (
-              <div className="rounded-md border border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-800">
+              <div className="rounded-md border border-yellow-900/50 bg-yellow-900/20 px-3 py-2 text-sm text-yellow-400">
                 买家上次修改意见：{lastFeedback}
               </div>
             ) : null}
@@ -233,7 +233,7 @@ export function DeliveryPanelClient({
               </label>
               <textarea
                 id="delivery_content_v"
-                className="w-full border rounded-md px-3 py-2 min-h-28"
+                className="w-full border border-brand-border bg-black/20 rounded-md px-3 py-2 min-h-28 text-slate-200 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="本次交付/更新说明..."
@@ -262,7 +262,7 @@ export function DeliveryPanelClient({
               type="button"
               onClick={sendDelivery}
               disabled={pending || uploading || content.trim().length === 0}
-              className="mt-4 rounded-md bg-black text-white px-4 py-2 disabled:opacity-60"
+              className="mt-4 rounded-md bg-brand-action text-white px-4 py-2 font-semibold shadow-lg shadow-black/20 hover:bg-amber-600 disabled:opacity-60 transition-colors"
             >
               {pending ? "发送中..." : "发送交付"}
             </button>
@@ -276,14 +276,14 @@ export function DeliveryPanelClient({
             className="absolute inset-0 bg-black/50"
             onClick={() => (pending ? null : setOpenFeedback(false))}
           />
-          <div className="relative w-full max-w-lg rounded-xl border bg-white p-6">
+          <div className="relative w-full max-w-lg rounded-xl border border-brand-border bg-brand-surface p-6 shadow-2xl">
             <div className="text-lg font-semibold">申请修改</div>
             <div className="mt-2 text-sm text-muted-foreground">
               请清晰描述需要修改的点，越具体越好。
             </div>
 
             <textarea
-              className="mt-4 w-full border rounded-md px-3 py-2 min-h-28"
+              className="mt-4 w-full border border-brand-border bg-black/20 rounded-md px-3 py-2 min-h-28 text-slate-200 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               placeholder="请输入修改意见..."
@@ -292,7 +292,7 @@ export function DeliveryPanelClient({
             <div className="mt-4 flex items-center justify-end gap-3">
               <button
                 type="button"
-                className="rounded-md border px-4 py-2"
+                className="rounded-md border border-brand-border px-4 py-2 text-slate-300 hover:bg-white/5 transition-colors"
                 disabled={pending}
                 onClick={() => setOpenFeedback(false)}
               >
@@ -300,7 +300,7 @@ export function DeliveryPanelClient({
               </button>
               <button
                 type="button"
-                className="rounded-md bg-black text-white px-4 py-2 disabled:opacity-60"
+                className="rounded-md bg-brand-action text-white px-4 py-2 font-semibold shadow-lg shadow-black/20 hover:bg-amber-600 disabled:opacity-60 transition-colors"
                 disabled={pending || feedback.trim().length === 0}
                 onClick={requestChanges}
               >

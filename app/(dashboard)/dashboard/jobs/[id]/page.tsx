@@ -125,7 +125,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-4">
-            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight break-words">
+            <h1 className="text-4xl font-extrabold text-white tracking-tight break-words">
               {job?.title ?? "未命名任务"}
             </h1>
             <div className="flex flex-wrap items-center gap-2">
@@ -145,7 +145,7 @@ export default async function JobDetailPage({ params }: { params: { id: string }
             </div>
           </div>
 
-          <div className="bg-white/50 p-8 rounded-3xl border border-slate-100">
+          <div className="bg-brand-surface p-8 rounded-3xl border border-brand-border shadow-xl">
             <div className="prose prose-blue prose-lg max-w-none prose-headings:mt-8 prose-p:leading-relaxed dark:prose-invert">
               {typeof description === "string" ? (
                 <ReactMarkdown>{description.trim() ? description : "暂无描述"}</ReactMarkdown>

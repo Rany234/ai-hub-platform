@@ -63,7 +63,7 @@ function ContactDeveloperDialog({
           💬 联系 TA
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-[#151F32] border-[#334155] text-slate-100 shadow-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>联系开发者</AlertDialogTitle>
           <AlertDialogDescription>
@@ -72,12 +72,12 @@ function ContactDeveloperDialog({
         </AlertDialogHeader>
 
         <div className="space-y-4">
-          <div className="rounded-xl border border-slate-100 bg-white p-4">
-            <div className="text-sm font-medium text-slate-700 mb-2">邮箱</div>
+          <div className="rounded-xl border border-[#334155] bg-[#151F32] p-4">
+            <div className="text-sm font-medium text-slate-200 mb-2">邮箱</div>
             <div className="flex items-center justify-between gap-2">
               {normalizedEmail ? (
                 <>
-                  <span className="font-mono text-sm text-blue-600">{normalizedEmail}</span>
+                  <span className="font-mono text-sm text-brand-action">{normalizedEmail}</span>
                   <Button
                     size="sm"
                     variant="outline"
@@ -88,17 +88,17 @@ function ContactDeveloperDialog({
                   </Button>
                 </>
               ) : (
-                <span className="text-sm text-muted-foreground">该用户未公开联系方式</span>
+                <span className="text-sm text-slate-500">该用户未公开联系方式</span>
               )}
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-100 bg-white p-4">
-            <div className="text-sm font-medium text-slate-700 mb-2">微信</div>
+          <div className="rounded-xl border border-[#334155] bg-[#151F32] p-4">
+            <div className="text-sm font-medium text-slate-200 mb-2">微信</div>
             <div className="flex items-center justify-between gap-2">
               {normalizedWechatId ? (
                 <>
-                  <span className="font-mono text-sm text-green-600">{normalizedWechatId}</span>
+                  <span className="font-mono text-sm text-emerald-400">{normalizedWechatId}</span>
                   <Button
                     size="sm"
                     variant="outline"
@@ -109,7 +109,7 @@ function ContactDeveloperDialog({
                   </Button>
                 </>
               ) : (
-                <span className="text-sm text-muted-foreground">该用户未公开联系方式</span>
+                <span className="text-sm text-slate-500">该用户未公开联系方式</span>
               )}
             </div>
           </div>
@@ -184,7 +184,7 @@ export function BidList({
 
   if (!isEmployer) {
     return (
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 text-sm text-muted-foreground">
+      <div className="rounded-2xl border border-[#334155] bg-[#151F32] p-6 text-sm text-slate-400">
         已收到投标：{bids?.length ?? 0}
       </div>
     );
@@ -192,7 +192,7 @@ export function BidList({
 
   if (!bids || bids.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-100 bg-white p-6 text-sm text-muted-foreground">
+      <div className="rounded-2xl border border-[#334155] bg-[#151F32] p-6 text-sm text-slate-400">
         暂无投标
       </div>
     );
@@ -221,7 +221,7 @@ export function BidList({
         return (
           <div
             key={bid.id}
-            className={`bg-white border border-slate-100 rounded-2xl p-6 mb-4 ${isDimmed ? "opacity-50" : ""}`}
+            className={`bg-[#151F32] border border-[#334155] rounded-2xl p-6 mb-4 shadow-2xl ${isDimmed ? "opacity-50" : ""}`}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
@@ -233,11 +233,11 @@ export function BidList({
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="font-medium truncate">{developerName}</div>
                     {bid?.avg_rating !== null && bid?.avg_rating !== undefined ? (
-                      <div className="inline-flex items-center gap-1 text-xs text-slate-700">
-                        <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+                      <div className="inline-flex items-center gap-1 text-xs text-slate-300">
+                        <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
                         <span>{Number(bid.avg_rating).toFixed(1)}</span>
                         {bid?.review_count ? (
-                          <span className="text-muted-foreground">({bid.review_count})</span>
+                          <span className="text-slate-500">({bid.review_count})</span>
                         ) : null}
                       </div>
                     ) : null}
@@ -247,22 +247,22 @@ export function BidList({
                       <Badge variant="secondary">未选中</Badge>
                     ) : null}
                   </div>
-                  <div className="text-xs text-muted-foreground">{formatDateTime(bid.created_at)}</div>
+                  <div className="text-xs text-slate-500">{formatDateTime(bid.created_at)}</div>
                 </div>
               </div>
 
               <div className="text-right shrink-0">
-                <div className="font-mono text-xl text-blue-600">{amountLabel}</div>
-                <div className="text-xs text-muted-foreground">交付周期：{formatDeliveryTime(bid.delivery_time)}</div>
+                <div className="font-mono text-xl text-brand-action">{amountLabel}</div>
+                <div className="text-xs text-slate-500">交付周期：{formatDeliveryTime(bid.delivery_time)}</div>
               </div>
             </div>
 
             {bid?.proposal ? (
-              <div className="mt-4 text-sm text-slate-700 whitespace-pre-wrap break-words">
+              <div className="mt-4 text-sm text-slate-200 whitespace-pre-wrap break-words">
                 {bid.proposal}
               </div>
             ) : (
-              <div className="mt-4 text-sm text-muted-foreground">（未填写方案）</div>
+              <div className="mt-4 text-sm text-slate-500">（未填写方案）</div>
             )}
 
             <div className="mt-5 flex justify-end gap-2">

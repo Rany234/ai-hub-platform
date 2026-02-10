@@ -69,12 +69,12 @@ export function AcceptBidModal({
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className="rounded-xl border border-slate-100 bg-white p-4 text-sm">
-          <div className="text-slate-700">
-            开发者：<span className="font-medium text-slate-900">{developerName}</span>
+        <div className="rounded-xl border border-[#334155] bg-[#151F32] p-4 text-sm">
+          <div className="text-slate-300">
+            开发者：<span className="font-medium text-white">{developerName}</span>
           </div>
-          <div className="mt-2 text-slate-700">
-            最终报价：<span className="font-mono text-base text-blue-600">{amountLabel}</span>
+          <div className="mt-2 text-slate-300">
+            最终报价：<span className="font-mono text-base text-brand-action">{amountLabel}</span>
           </div>
         </div>
 

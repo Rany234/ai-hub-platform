@@ -41,7 +41,7 @@ function StarsInput({
             className="p-1"
             aria-label={`Rate ${n} star${n === 1 ? "" : "s"}`}
           >
-            <Star className={active ? "h-5 w-5 fill-yellow-400 text-yellow-400" : "h-5 w-5 text-muted-foreground"} />
+            <Star className={active ? "h-5 w-5 fill-amber-400 text-amber-400" : "h-5 w-5 text-slate-600"} />
           </button>
         );
       })}
@@ -51,8 +51,8 @@ function StarsInput({
 
 function ReviewCard({ title, review }: { title: string; review: ReviewRow }) {
   return (
-    <div className="rounded-xl border bg-white p-4 space-y-2">
-      <div className="font-semibold">{title}</div>
+    <div className="rounded-xl border border-[#334155] bg-[#151F32] p-4 space-y-2 shadow-xl">
+      <div className="font-semibold text-slate-100">{title}</div>
       <div className="flex items-center gap-1">
         {Array.from({ length: 5 }).map((_, i) => {
           const n = i + 1;
@@ -60,16 +60,16 @@ function ReviewCard({ title, review }: { title: string; review: ReviewRow }) {
           return (
             <Star
               key={n}
-              className={active ? "h-4 w-4 fill-yellow-400 text-yellow-400" : "h-4 w-4 text-muted-foreground"}
+              className={active ? "h-4 w-4 fill-amber-400 text-amber-400" : "h-4 w-4 text-slate-600"}
             />
           );
         })}
-        <span className="ml-2 text-sm text-muted-foreground">{review.rating}/5</span>
+        <span className="ml-2 text-sm text-slate-400">{review.rating}/5</span>
       </div>
       {review.comment ? (
-        <div className="text-sm whitespace-pre-wrap break-words">{review.comment}</div>
+        <div className="text-sm text-slate-200 whitespace-pre-wrap break-words">{review.comment}</div>
       ) : (
-        <div className="text-sm text-muted-foreground">(无文字评价)</div>
+        <div className="text-sm text-slate-500">(无文字评价)</div>
       )}
     </div>
   );
@@ -117,16 +117,16 @@ export function JobReviews({
   if (!isCompleted) return null;
 
   return (
-    <div className="rounded-2xl border bg-white p-6 space-y-6">
+    <div className="rounded-2xl border border-[#334155] bg-[#151F32] p-6 space-y-6 shadow-xl">
       <div>
-        <div className="text-lg font-semibold">评价</div>
-        <div className="text-sm text-muted-foreground">任务完成后，双方可互相评价（每人每单一次）</div>
+        <div className="text-lg font-semibold text-slate-100">评价</div>
+        <div className="text-sm text-slate-400">任务完成后，双方可互相评价（每人每单一次）</div>
       </div>
 
       {canReview ? (
         myReview ? (
           <div className="rounded-xl border bg-muted/10 p-4 space-y-2">
-            <div className="font-semibold text-blue-600">你已评价</div>
+            <div className="font-semibold text-amber-400">你已评价</div>
             <div className="flex items-center gap-1">
               {Array.from({ length: 5 }).map((_, i) => {
                 const n = i + 1;
@@ -134,16 +134,16 @@ export function JobReviews({
                 return (
                   <Star
                     key={n}
-                    className={active ? "h-4 w-4 fill-yellow-400 text-yellow-400" : "h-4 w-4 text-muted-foreground"}
+                    className={active ? "h-4 w-4 fill-amber-400 text-amber-400" : "h-4 w-4 text-slate-600"}
                   />
                 );
               })}
-              <span className="ml-2 text-sm text-muted-foreground">{myReview.rating}/5</span>
+              <span className="ml-2 text-sm text-slate-400">{myReview.rating}/5</span>
             </div>
             <div className="text-sm whitespace-pre-wrap break-words">{myReview.comment ?? "(无文字评价)"}</div>
           </div>
         ) : (
-          <div className="rounded-xl border p-4 space-y-3 shadow-sm bg-slate-50/50">
+          <div className="rounded-xl border border-[#334155] bg-black/20 p-4 space-y-3 shadow-sm">
             <div className="font-semibold">提交评价</div>
             <StarsInput value={rating} onChange={setRating} disabled={isPending} />
             <Textarea
@@ -151,9 +151,9 @@ export function JobReviews({
               onChange={(e) => setComment(e.target.value)}
               placeholder="写下你的评价（可选）"
               disabled={isPending}
-              className="bg-white"
+              className="bg-black/20 border-[#334155] text-slate-200 placeholder:text-slate-500 focus:ring-amber-400/20 focus:border-amber-400/50"
             />
-            {error ? <div className="text-sm text-red-600">{error}</div> : null}
+            {error ? <div className="text-sm text-red-400 bg-red-900/20 border border-red-900/50 p-3 rounded-lg">{error}</div> : null}
             <Button
               onClick={() => {
                 setError(null);
@@ -165,14 +165,14 @@ export function JobReviews({
                 });
               }}
               disabled={isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-brand-action hover:bg-amber-600 text-white font-bold"
             >
               提交评价
             </Button>
           </div>
         )
       ) : (
-        <div className="text-sm text-muted-foreground italic">任务参与者在完成后即可进行评价。</div>
+        <div className="text-sm text-slate-500 italic">任务参与者在完成后即可进行评价。</div>
       )}
 
       {otherReviews.length > 0 && (

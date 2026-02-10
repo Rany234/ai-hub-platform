@@ -135,7 +135,7 @@ export function BidDrawer({
           <div className="space-y-2">
             <Label htmlFor="amount">报价（元）</Label>
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
                 ￥
               </span>
               <Input

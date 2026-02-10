@@ -18,14 +18,14 @@ type JobRow = {
 };
 
 function statusLabel(status: string) {
-  if (status === "open") return { text: "Open", cls: "bg-green-50 text-green-700 border-green-200" };
+  if (status === "open") return { text: "Open", cls: "bg-green-500/10 text-green-400 border-green-900/50" };
   if (status === "in_progress")
-    return { text: "In Progress", cls: "bg-yellow-50 text-yellow-700 border-yellow-200" };
+    return { text: "In Progress", cls: "bg-brand-action/10 text-brand-action border-brand-action/20" };
   if (status === "completed")
-    return { text: "Completed", cls: "bg-gray-50 text-gray-700 border-gray-200" };
+    return { text: "Completed", cls: "bg-white/5 text-slate-300 border-brand-border" };
   if (status === "cancelled")
-    return { text: "Cancelled", cls: "bg-red-50 text-red-700 border-red-200" };
-  return { text: status, cls: "bg-gray-50 text-gray-700 border-gray-200" };
+    return { text: "Cancelled", cls: "bg-red-500/10 text-red-400 border-red-900/50" };
+  return { text: status, cls: "bg-white/5 text-slate-300 border-brand-border" };
 }
 
 export function JobsClient({ jobs }: { jobs: JobRow[] }) {
@@ -56,7 +56,7 @@ export function JobsClient({ jobs }: { jobs: JobRow[] }) {
         const tag = statusLabel(job.status);
 
         return (
-          <div key={job.id} className="border rounded-lg p-4 flex items-start justify-between gap-4">
+          <div key={job.id} className="border border-brand-border bg-brand-surface rounded-lg p-4 flex items-start justify-between gap-4 shadow-xl">
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <div className="font-semibold">{job.title}</div>

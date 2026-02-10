@@ -9,7 +9,7 @@ export function JobListSkeleton({ rows = 5 }: JobListSkeletonProps) {
   return (
     <div className="space-y-4">
       {Array.from({ length: rows }).map((_, i) => (
-        <Card key={i} className="border-white/10 bg-white/50">
+        <Card key={i} className="border-[#334155] bg-white/5 shadow-none">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 space-y-3">

@@ -38,27 +38,27 @@ export function ListingCard({ listing }: { listing: Listing }) {
 
   return (
     <Link href={`/listings/${listing.id}`} className="block group">
-      <div className="relative border rounded-lg p-4 flex flex-col gap-2 bg-white transition-all duration-300 hover:border-gray-400 hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative border border-brand-border rounded-lg p-4 flex flex-col gap-2 bg-brand-surface transition-all duration-300 hover:border-brand-action/50 hover:-translate-y-1 hover:shadow-xl">
         {showPremiumBadge ? (
           <div className="absolute right-3 top-3 rounded-full bg-gradient-to-r from-purple-500/90 to-fuchsia-500/90 px-2.5 py-1 text-[10px] font-bold text-white shadow-lg backdrop-blur-sm">
             Premium
           </div>
         ) : avgRating !== null ? (
-          <div className="absolute right-3 top-3 rounded-full border bg-white px-2 py-1 text-xs flex items-center gap-1">
-            <Star className="h-3.5 w-3.5 fill-black" />
+          <div className="absolute right-3 top-3 rounded-full border border-white/10 bg-black/40 backdrop-blur px-2 py-1 text-xs flex items-center gap-1 text-slate-100">
+            <Star className="h-3.5 w-3.5 fill-brand-action text-brand-action" />
             <span className="font-medium">{avgRating.toFixed(1)}</span>
           </div>
         ) : null}
 
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold leading-tight">{listing.title}</h3>
-          <div className="text-sm font-bold text-indigo-600">
+          <div className="text-sm font-bold text-brand-action">
             {hasBasicPrice ? `¥${basicPrice} 起` : `¥${listing.price}`}
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-full border overflow-hidden bg-white flex items-center justify-center text-[10px] text-muted-foreground">
+          <div className="h-6 w-6 rounded-full border border-white/10 overflow-hidden bg-slate-800 flex items-center justify-center text-[10px] text-slate-400">
             {sellerAvatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img alt="seller avatar" src={sellerAvatarUrl} className="h-full w-full object-cover" />
@@ -76,7 +76,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
         {previewFeatures && previewFeatures.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {previewFeatures.map((f: string, i: number) => (
-              <span key={i} className="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+              <span key={i} className="text-[10px] bg-black/30 text-slate-200 px-1.5 py-0.5 rounded border border-white/10">
                 ✓ {f}
               </span>
             ))}

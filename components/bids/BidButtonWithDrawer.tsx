@@ -86,7 +86,7 @@ export function BidButtonWithDrawer({
   // 2b) Under review + winner -> show waiting state
   if (jobStatus === "under_review" && isWinner) {
     return (
-      <Button size="lg" disabled className="w-full rounded-2xl bg-amber-500 text-white">
+      <Button size="lg" disabled className="w-full rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
         <PackageCheck className="mr-2 h-5 w-5" />
         等待雇主审核
       </Button>
@@ -102,19 +102,19 @@ export function BidButtonWithDrawer({
         <Button
           size="lg"
           disabled
-          className="w-full rounded-2xl bg-slate-200 text-slate-700"
+          className="w-full rounded-2xl bg-slate-800 text-slate-400 border border-slate-700"
         >
           查看交付结果
         </Button>
 
         {hasDelivery ? (
-          <div className="rounded-2xl border border-slate-100 bg-white p-4 space-y-3">
+          <div className="rounded-2xl border border-[#334155] bg-[#151F32] p-4 space-y-3 shadow-xl">
             {deliveryUrl ? (
               <a
                 href={deliveryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                className="inline-flex items-center gap-2 text-sm text-brand-action hover:underline"
               >
                 <ExternalLink className="h-4 w-4" />
                 交付链接
@@ -122,7 +122,7 @@ export function BidButtonWithDrawer({
             ) : null}
 
             {deliveryNote ? (
-              <div className="text-sm text-slate-700 whitespace-pre-wrap break-words bg-slate-50 rounded-xl p-3">
+              <div className="text-sm text-slate-300 whitespace-pre-wrap break-words bg-black/20 border border-[#334155] rounded-xl p-3">
                 {deliveryNote}
               </div>
             ) : null}
@@ -132,7 +132,7 @@ export function BidButtonWithDrawer({
         {/* Review button for owner when job is completed */}
         {isOwner && revieweeId && (
           hasReviewed ? (
-            <Button size="lg" disabled className="w-full rounded-2xl border border-green-200 bg-green-50 text-green-700">
+            <Button size="lg" disabled className="w-full rounded-2xl border border-emerald-900/30 bg-emerald-500/10 text-emerald-400">
               ✅ 已完成评价
             </Button>
           ) : (

@@ -76,27 +76,27 @@ function OfferCard({
   };
 
   return (
-    <div className={`flex flex-col gap-3 min-w-[240px] p-4 rounded-xl border bg-white shadow-sm ${isMe ? "border-blue-200" : "border-slate-200"}`}>
-      <div className="flex items-center justify-between border-b pb-2">
-        <div className="flex items-center gap-2 font-semibold text-slate-700">
-          <FileText className="size-4 text-blue-500" />
+    <div className={`flex flex-col gap-3 min-w-[240px] p-4 rounded-xl border bg-brand-surface shadow-xl ${isMe ? "border-brand-action/30" : "border-brand-border"}`}>
+      <div className="flex items-center justify-between border-b border-brand-border pb-2">
+        <div className="flex items-center gap-2 font-semibold text-slate-100">
+          <FileText className="size-4 text-brand-action" />
           <span>聘书详情</span>
         </div>
         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-          payload.status === "accepted" ? "bg-green-100 text-green-700" :
-          payload.status === "rejected" ? "bg-red-100 text-red-700" :
-          "bg-blue-50 text-blue-700"
+          payload.status === "accepted" ? "bg-green-500/10 text-green-400" :
+          payload.status === "rejected" ? "bg-red-500/10 text-red-400" :
+          "bg-brand-action/10 text-brand-action"
         }`}>
           {statusLabels[payload.status]}
         </span>
       </div>
       
       <div className="space-y-1">
-        <div className="text-2xl font-bold text-blue-600">
+        <div className="text-2xl font-bold text-brand-action">
           ¥{payload.amount.toLocaleString()}
         </div>
         {payload.description && (
-          <div className="text-xs text-muted-foreground italic line-clamp-2">
+          <div className="text-xs text-slate-400 italic line-clamp-2">
             “{payload.description}”
           </div>
         )}
@@ -106,7 +106,7 @@ function OfferCard({
         <div className="flex gap-2 pt-1">
           <Button 
             size="sm" 
-            className="flex-1 bg-green-600 hover:bg-green-700 h-8 gap-1"
+            className="flex-1 bg-green-600 hover:bg-green-700 h-8 gap-1 text-white"
             onClick={() => onAction(msg.id, "accept")}
           >
             <Check className="size-3" /> 接受
@@ -114,7 +114,7 @@ function OfferCard({
           <Button 
             size="sm" 
             variant="outline"
-            className="flex-1 text-red-600 border-red-200 hover:bg-red-50 h-8 gap-1"
+            className="flex-1 text-red-400 border-red-900/50 hover:bg-red-900/20 h-8 gap-1"
             onClick={() => onAction(msg.id, "decline")}
           >
             <X className="size-3" /> 拒绝
@@ -372,7 +372,7 @@ export default function ChatClient({
       </div>
 
       {/* Right: message area */}
-      <div className="flex-1 flex flex-col bg-slate-50/30">
+      <div className="flex-1 flex flex-col bg-black/20">
         <div className="h-14 border-b flex items-center px-4 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
           <div className="flex items-center gap-3">
             {activeConversation && (
@@ -412,7 +412,7 @@ export default function ChatClient({
                         "max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm " +
                         (isMe
                           ? "bg-blue-600 text-white rounded-br-none"
-                          : "bg-white border border-slate-100 text-slate-800 rounded-bl-none")
+                          : "bg-brand-surface border border-brand-border text-slate-100 rounded-bl-none")
                       }
                     >
                       <div className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</div>
@@ -437,7 +437,7 @@ export default function ChatClient({
           <div className="flex items-center gap-2 max-w-4xl mx-auto">
             <Popover open={isOfferOpen} onOpenChange={setIsOfferOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" size="icon" className="shrink-0 rounded-full h-10 w-10 border-slate-200">
+                <Button variant="outline" size="icon" className="shrink-0 rounded-full h-10 w-10 border-brand-border bg-white/5 hover:bg-white/10">
                   <Plus className="h-5 w-5 text-slate-500" />
                 </Button>
               </PopoverTrigger>

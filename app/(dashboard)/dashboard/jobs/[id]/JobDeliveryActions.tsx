@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -75,39 +76,46 @@ export function JobDeliveryActions({
   // Case A: in_progress + worker
   if (status === "in_progress" && isWorker) {
     return (
-      <div className="rounded-2xl border bg-white p-4 space-y-3">
-        <div className="font-semibold">交付与验收</div>
-        <div className="text-sm text-muted-foreground">
-          任务进行中。完成后请提交交付链接/备注，进入雇主验收。
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-4 space-y-3 shadow-xl">
+        <div className="font-semibold text-white">交付与验收</div>
+        <div className="text-sm text-slate-400">
+          任务进行中。完成后请提交交付成果，进入雇主验收。
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button disabled={isPending} className="bg-blue-600 hover:bg-blue-700">
+            <Button disabled={isPending} className="bg-brand-action hover:bg-amber-600 text-white font-bold w-full shadow-lg shadow-amber-900/20 transition-all">
               📤 提交成果
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-brand-surface border-brand-border text-slate-100 shadow-2xl">
             <DialogHeader>
-              <DialogTitle>提交成果</DialogTitle>
-              <DialogDescription>填写交付链接、仓库地址或备注说明。</DialogDescription>
+              <DialogTitle className="text-white">提交成果</DialogTitle>
+              <DialogDescription className="text-slate-400">填写交付链接、仓库地址或备注说明。</DialogDescription>
             </DialogHeader>
 
-            <Textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="例如：https://github.com/... 或者线上链接 + 说明"
-              className="min-h-[120px]"
-              disabled={isPending}
-            />
+            <div className="space-y-4 py-4">
+              <div className="rounded-xl border-2 border-dashed border-slate-600 bg-transparent p-8 flex flex-col items-center justify-center text-center hover:border-brand-action/50 hover:bg-white/5 transition-all cursor-pointer">
+                <div className="text-slate-400 text-sm">点击或拖拽文件到此处上传附件</div>
+                <div className="text-slate-500 text-xs mt-1">支持 ZIP, PDF, 图像等 (最大 50MB)</div>
+              </div>
 
-            {error ? <div className="text-sm text-red-600">{error}</div> : null}
+              <Textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="例如：交付物链接、代码仓库或具体的交付说明..."
+                className="min-h-[120px] bg-black/20 border-brand-border text-slate-200 placeholder:text-slate-600 focus:ring-brand-action/20 focus:border-brand-action/50"
+                disabled={isPending}
+              />
+            </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
+            {error ? <div className="text-sm text-red-400 bg-red-900/20 border border-red-900/50 p-3 rounded-lg">{error}</div> : null}
+
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending} className="border-brand-border text-slate-300 hover:bg-white/5">
                 取消
               </Button>
-              <Button onClick={onSubmit} disabled={isPending || !content.trim()}>
+              <Button onClick={onSubmit} disabled={isPending || !content.trim()} className="bg-brand-action hover:bg-amber-600 text-white font-bold">
                 确认提交
               </Button>
             </DialogFooter>
@@ -120,22 +128,22 @@ export function JobDeliveryActions({
   // Case B: in_review + employer
   if (status === "in_review" && isOwner) {
     return (
-      <div className="rounded-2xl border bg-white p-4 space-y-3">
-        <div className="font-semibold">验收成果</div>
-        <div className="text-sm text-muted-foreground">
+      <div className="rounded-2xl border border-brand-border bg-brand-surface p-4 space-y-3 shadow-xl">
+        <div className="font-semibold text-white">验收成果</div>
+        <div className="text-sm text-slate-400">
           开发者已提交成果：
         </div>
-        <div className="rounded-lg border bg-muted/20 p-3 text-sm whitespace-pre-wrap break-words">
+        <div className="rounded-lg border border-brand-border bg-black/20 p-3 text-sm text-slate-200 whitespace-pre-wrap break-words">
           {deliverables?.trim() ? deliverables : "(未填写)"}
         </div>
 
-        {error ? <div className="text-sm text-red-600">{error}</div> : null}
+        {error ? <div className="text-sm text-red-400 bg-red-900/20 border border-red-900/50 p-3 rounded-lg">{error}</div> : null}
 
         <div className="flex gap-2">
           <Button
             onClick={onApprove}
             disabled={isPending}
-            className="bg-green-600 hover:bg-green-700"
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-900/20"
           >
             ✅ 验收通过
           </Button>
@@ -143,7 +151,7 @@ export function JobDeliveryActions({
             onClick={onReject}
             disabled={isPending}
             variant="outline"
-            className="border-red-200 text-red-600 hover:bg-red-50"
+            className="flex-1 border-red-900/50 text-red-400 bg-red-900/10 hover:bg-red-900/20 transition-colors"
           >
             ❌ 驳回
           </Button>
@@ -155,8 +163,9 @@ export function JobDeliveryActions({
   // Case C: completed
   if (status === "completed") {
     return (
-      <div className="rounded-2xl border bg-green-50 p-4 text-green-800 font-semibold">
-        ✅ 任务已完成
+      <div className="rounded-2xl border border-emerald-900/30 bg-emerald-500/10 p-4 text-emerald-400 font-bold flex items-center gap-2 shadow-inner">
+        <Check className="size-5" />
+        任务已完成，资金已释放
       </div>
     );
   }

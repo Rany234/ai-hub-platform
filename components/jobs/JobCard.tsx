@@ -91,7 +91,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
   return (
     <Card 
       onClick={() => j.id && router.push(`/dashboard/jobs/${j.id}`)}
-      className="group cursor-pointer border-white/10 bg-white/50 transition-all duration-300 hover:border-indigo-500/30 hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5"
+      className="group cursor-pointer border-brand-border bg-brand-surface transition-all duration-300 hover:border-brand-action/50 hover:shadow-lg hover:shadow-brand-action/5"
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
@@ -101,48 +101,48 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
                 {getStatusLabel(j.status)}
               </Badge>
               {j.bid_count !== undefined && j.bid_count > 0 && (
-                <span className="flex items-center gap-1 text-xs font-medium text-orange-600">
-                  <Flame className="h-3 w-3 fill-orange-600" />
+                <span className="flex items-center gap-1 text-xs font-medium text-brand-action">
+                  <Flame className="h-3 w-3 fill-brand-action" />
                   {j.bid_count} 人已投标
                 </span>
               )}
             </div>
             
-            <h3 className="text-lg font-bold tracking-tight text-slate-900 group-hover:text-indigo-600 transition-colors">
+            <h3 className="text-lg font-bold tracking-tight text-slate-100 group-hover:text-brand-action transition-colors">
               {displayTitle}
             </h3>
 
             {/* 卖家预览 */}
             <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6 border border-white/20">
+              <Avatar className="h-6 w-6 border border-white/10">
                 <AvatarImage src={j.profiles?.avatar_url ?? undefined} />
-                <AvatarFallback className="bg-slate-100 text-[10px]">
+                <AvatarFallback className="bg-slate-800 text-[10px]">
                   <User className="h-3 w-3" />
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs text-slate-500">{j.profiles?.username ?? "匿名发布者"}</span>
-              <span className="text-slate-300">•</span>
-              <span className="text-xs text-slate-400">{createdAtText}</span>
+              <span className="text-xs text-slate-400">{j.profiles?.username ?? "匿名发布者"}</span>
+              <span className="text-slate-500">•</span>
+              <span className="text-xs text-slate-500">{createdAtText}</span>
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-lg font-bold text-indigo-600">
+            <div className="text-lg font-bold text-brand-action">
               ¥{typeof j.budget === "number" ? j.budget.toLocaleString() : j.budget}
             </div>
-            <div className="text-[10px] text-slate-400 font-medium">任务预算</div>
+            <div className="text-[10px] text-slate-500 font-medium">任务预算</div>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="pb-4">
-        <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-400">
           {j.description?.trim() ? j.description : "暂无详细需求描述"}
         </p>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between border-t border-slate-50 pt-4 bg-slate-50/30">
-        <div className="flex items-center gap-1 text-xs text-slate-400">
+      <CardFooter className="flex items-center justify-between border-t border-brand-border pt-4 bg-black/20">
+        <div className="flex items-center gap-1 text-xs text-slate-500">
           <Clock className="h-3.5 w-3.5" />
           <span>发布于 {createdAtText}</span>
         </div>
@@ -153,7 +153,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 text-xs hover:bg-white"
+                className="h-8 text-xs hover:bg-white/10 text-slate-300"
                 onClick={(e) => {
                   e.stopPropagation();
                   j.id && router.push(`/dashboard/jobs/${j.id}/edit`);
@@ -164,7 +164,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 text-xs text-red-500 hover:bg-red-50 hover:text-red-600" 
+                className="h-8 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-400" 
                 onClick={handleDelete}
               >
                 删除
@@ -175,7 +175,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
               <Button 
                 variant="ghost"
                 size="sm" 
-                className="h-8 px-4 text-xs font-medium"
+                className="h-8 px-4 text-xs font-medium text-slate-300 hover:bg-white/10"
               >
                 详情
               </Button>
@@ -187,7 +187,7 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
                     trigger={
                       <Button 
                         size="sm" 
-                        className="h-8 px-4 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm"
+                        className="h-8 px-4 text-xs font-bold bg-brand-action hover:bg-amber-600 text-white shadow-sm"
                       >
                         立即投标
                       </Button>

@@ -47,7 +47,7 @@ export async function DashboardStats({ userId }: DashboardStatsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="rounded-2xl shadow-sm border-white/10 bg-white/50 backdrop-blur-sm">
+      <Card className="rounded-2xl shadow-sm border-brand-border bg-brand-surface">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">总收入</CardTitle>
           <DollarSign className="h-4 w-4 text-emerald-500" />
@@ -58,7 +58,7 @@ export async function DashboardStats({ userId }: DashboardStatsProps) {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl shadow-sm border-white/10 bg-white/50 backdrop-blur-sm">
+      <Card className="rounded-2xl shadow-sm border-brand-border bg-brand-surface">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">活跃竞标</CardTitle>
           <Gavel className="h-4 w-4 text-blue-500" />
@@ -69,7 +69,7 @@ export async function DashboardStats({ userId }: DashboardStatsProps) {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl shadow-sm border-white/10 bg-white/50 backdrop-blur-sm">
+      <Card className="rounded-2xl shadow-sm border-brand-border bg-brand-surface">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">已发布服务</CardTitle>
           <Package className="h-4 w-4 text-purple-500" />

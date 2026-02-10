@@ -24,10 +24,10 @@ type Props = {
 };
 
 function statusBadge(status: string) {
-  if (status === "active") return { text: "Active", cls: "bg-green-50 text-green-700 border-green-200" };
-  if (status === "banned") return { text: "Banned", cls: "bg-red-50 text-red-700 border-red-200" };
-  if (status === "archived") return { text: "Archived", cls: "bg-gray-50 text-gray-700 border-gray-200" };
-  return { text: status, cls: "bg-gray-50 text-gray-700 border-gray-200" };
+  if (status === "active") return { text: "Active", cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" };
+  if (status === "banned") return { text: "Banned", cls: "bg-red-500/10 text-red-400 border-red-500/20" };
+  if (status === "archived") return { text: "Archived", cls: "bg-slate-800 text-slate-400 border-slate-700" };
+  return { text: status, cls: "bg-slate-800 text-slate-400 border-slate-700" };
 }
 
 export function AdminListingRow({ listing }: Props) {
@@ -79,7 +79,7 @@ export function AdminListingRow({ listing }: Props) {
       </td>
       <td className="p-3">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-full border overflow-hidden bg-white flex items-center justify-center text-xs text-muted-foreground">
+          <div className="h-6 w-6 rounded-full border border-white/10 overflow-hidden bg-slate-800 flex items-center justify-center text-xs text-slate-300">
             {creator?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img alt="avatar" src={creator.avatar_url} className="h-full w-full object-cover" />
