@@ -32,9 +32,9 @@ export function HeroAudienceToggle() {
   }, [audience]);
 
   return (
-    <div className="mt-8 w-full max-w-2xl">
+    <div className="mt-8 w-full max-w-2xl flex flex-col items-center text-center">
       <div className="flex justify-center">
-        <div className="relative flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur-md shadow-lg">
+        <div className="relative mx-auto flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 backdrop-blur-md shadow-lg">
           <button
             type="button"
             onClick={() => setAudience("employer")}
@@ -86,13 +86,13 @@ export function HeroAudienceToggle() {
               {content.headline}
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
               {content.features.map((f) => {
                 const Icon = f.icon;
                 return (
                   <div
                     key={f.text}
-                    className="flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200"
+                    className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-sm text-slate-200"
                   >
                     <Icon className="h-4 w-4 text-brand-action" />
                     <span className="leading-5">{f.text}</span>
