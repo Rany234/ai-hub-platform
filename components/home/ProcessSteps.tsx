@@ -52,7 +52,7 @@ export function ProcessSteps() {
         <h2 className="text-2xl font-bold text-white mb-2">4 步开启您的 AI 变现之旅</h2>
         <p className="text-slate-400 text-sm">专业、透明、安全的交易流程</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 container mx-auto px-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mx-auto w-full max-w-5xl px-4">
         {steps.map((s, idx) => {
           const Icon = s.icon;
           const isLast = idx === steps.length - 1;
@@ -69,7 +69,7 @@ export function ProcessSteps() {
               </div>
 
               <div className="text-lg font-bold text-slate-500 transition-colors duration-300 group-hover:text-slate-100 mb-2">{s.title}</div>
-              <div className="text-sm text-slate-400 text-center leading-relaxed">{s.desc}</div>
+              <div className="text-sm text-slate-400 text-center leading-relaxed max-w-[200px] mx-auto">{s.desc}</div>
 
               {!isLast ? (
                 <div className="hidden md:block absolute top-8 -right-6">
