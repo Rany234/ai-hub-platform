@@ -121,10 +121,6 @@ export default async function HomePage() {
               <div className="mt-10 text-sm text-slate-400">
                 支持主流模型生态: <span className="text-slate-300">OpenAI</span> / <span className="text-slate-300">Midjourney</span> / <span className="text-slate-300">Claude</span>
               </div>
-
-              <div className="mt-6">
-                <HeroAudienceToggle />
-              </div>
             </div>
 
             <div className="relative">
@@ -137,10 +133,15 @@ export default async function HomePage() {
               <AIDemoComponent />
             </div>
           </div>
+
+          {/* Cross-column "Function Island" */}
+          <div className="mt-20">
+            <HeroAudienceToggle />
+          </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-6 py-24 space-y-24">
+      <div className="mx-auto max-w-6xl px-6 py-16 space-y-16">
         <section>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
             全方位 AI 服务体系
