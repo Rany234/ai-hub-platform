@@ -141,9 +141,6 @@ export default async function HomePage() {
       </section>
 
       <div className="mx-auto max-w-6xl px-6 py-24 space-y-24">
-        <section>
-          <HeroAudienceToggle />
-        </section>
 
         <section>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
