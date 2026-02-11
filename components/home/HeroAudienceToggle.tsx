@@ -36,37 +36,37 @@ export function HeroAudienceToggle() {
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 rounded-3xl border border-white/10 bg-[#151F32]/50 p-6 backdrop-blur-xl shadow-2xl">
         <div className="flex flex-col gap-4 w-full md:w-auto">
           <div className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 p-1 w-fit">
-            <button
-              type="button"
-              onClick={() => setAudience("employer")}
+          <button
+            type="button"
+            onClick={() => setAudience("employer")}
               className="relative z-10 px-4 h-9 rounded-full text-xs font-bold transition-colors text-slate-200"
-            >
-              我是雇主
-              {audience === "employer" ? (
-                <motion.div
-                  layoutId="heroAudiencePill"
+          >
+            我是雇主
+            {audience === "employer" ? (
+              <motion.div
+                layoutId="heroAudiencePill"
                   className="absolute inset-0 -z-10 rounded-full bg-amber-500/20 border border-amber-500/20"
-                  transition={{ type: "spring", stiffness: 420, damping: 36 }}
-                />
-              ) : null}
-            </button>
+                transition={{ type: "spring", stiffness: 420, damping: 36 }}
+              />
+            ) : null}
+          </button>
 
-            <button
-              type="button"
+          <button
+            type="button"
               onClick={() => setAudience("creator")}
               className="relative z-10 px-4 h-9 rounded-full text-xs font-bold transition-colors text-slate-200"
-            >
-              我是创作者
+          >
+            我是创作者
               {audience === "creator" ? (
-                <motion.div
-                  layoutId="heroAudiencePill"
+              <motion.div
+                layoutId="heroAudiencePill"
                   className="absolute inset-0 -z-10 rounded-full bg-amber-500/20 border border-amber-500/20"
-                  transition={{ type: "spring", stiffness: 420, damping: 36 }}
-                />
-              ) : null}
-            </button>
-          </div>
-          
+                transition={{ type: "spring", stiffness: 420, damping: 36 }}
+              />
+            ) : null}
+          </button>
+      </div>
+
           <div className="space-y-1">
             <h3 className="text-lg font-bold text-white tracking-tight">
               {content.headline}
@@ -75,26 +75,26 @@ export function HeroAudienceToggle() {
               {audience === "employer" ? "连接全球顶尖 AI 专家" : "让你的 AI 技能产生被动收入"}
             </p>
           </div>
-        </div>
+            </div>
 
         <div className="h-px w-full md:h-12 md:w-px bg-white/10" />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1 w-full">
-          {content.features.map((f) => {
-            const Icon = f.icon;
-            return (
-              <div
-                key={f.text}
+              {content.features.map((f) => {
+                const Icon = f.icon;
+                return (
+                  <div
+                    key={f.text}
                 className="flex items-center gap-3 group"
               >
                 <div className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/20 group-hover:bg-amber-500/20 transition-colors">
                   <Icon className="h-4 w-4 text-amber-500" />
                 </div>
                 <span className="text-sm font-medium text-slate-300 group-hover:text-white transition-colors">{f.text}</span>
-              </div>
-            );
-          })}
-        </div>
+                  </div>
+                );
+              })}
+            </div>
       </div>
     </div>
   );
