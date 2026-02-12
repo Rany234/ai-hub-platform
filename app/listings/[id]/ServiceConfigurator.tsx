@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Clock, RefreshCcw } from "lucide-react";
+import { Check, Clock, RefreshCcw, HelpCircle } from "lucide-react";
 
 const FALLBACK_PACKAGE = {
   enabled: true,
@@ -241,6 +241,46 @@ export function ServiceConfigurator({
               {activeOptions.length > 0 && ` + ${activeOptions.length} 个增值选项`}
               ，总价 <span className="text-brand-action font-bold">¥{formatMoney(total)}</span>
             </div>
+
+            {(() => {
+              const itemPrice = Number(total);
+              const platformFee = Math.round(itemPrice * 0.08 * 100) / 100;
+              const openSourceFund = Math.round(itemPrice * 0.04 * 100) / 100;
+              const fmt = (n: number) => `¥${n.toFixed(2)}`;
+
+              return (
+                <div className="mt-5 rounded-xl border border-white/10 bg-black/30 p-4">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500">共生账单 (Symbiosis Receipt)</div>
+
+                  <div className="mt-3 space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">商品价格 (Item Price)</span>
+                      <span className="font-mono text-slate-200">{fmt(itemPrice)}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">平台服务费 (Service Fee)</span>
+                      <span className="font-mono text-slate-200">{fmt(platformFee)}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg bg-amber-500/10 px-2 py-1">
+                      <div className="flex items-center gap-2 text-amber-200">
+                        <span className="text-slate-400">开源共建基金 (Open Source Fund)</span>
+                        <span className="relative inline-flex items-center" title="用于回馈开源社区 (沙盒模拟)">
+                          <HelpCircle className="h-4 w-4 text-amber-500/90" />
+                        </span>
+                      </div>
+                      <span className="font-mono font-semibold text-amber-500">{fmt(openSourceFund)}</span>
+                    </div>
+
+                    <div className="pt-2 mt-2 border-t border-white/10 flex items-baseline justify-between">
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-500">合计 (Total)</span>
+                      <span className="text-base font-extrabold text-brand-action">¥{formatMoney(total)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             <textarea
               className="mt-5 w-full border border-brand-border bg-black/20 rounded-xl px-4 py-3 min-h-32 text-slate-200 placeholder:text-slate-600 focus:border-brand-action/50 focus:ring-2 focus:ring-brand-action/20 outline-none transition-all"
