@@ -268,6 +268,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
   const previewListing = useMemo(() => {
     const tier = packages[previewTier];
+    const categoryValue = mainCategory ?? null;
 
     const listing: Listing = {
       id: "preview",
@@ -276,7 +277,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       title: title || "（未填写服务标题）",
       description: description || null,
       price: Number.isFinite(Number(tier.price)) ? Number(tier.price) : 0,
-      category: category ?? null,
+      category: categoryValue,
       metadata: { delivery_days: tier.delivery_days } as unknown as Listing["metadata"],
       preview_url: previewUrl || null,
       options: [],
