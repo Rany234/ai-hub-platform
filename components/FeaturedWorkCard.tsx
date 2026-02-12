@@ -47,7 +47,7 @@ export function FeaturedWorkCard({ listing, index }: FeaturedWorkCardProps) {
       )}
 
       {/* 渐变遮罩 */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0B1121] via-[#0B1121]/20 to-transparent opacity-60 transition-opacity duration-500 group-hover:opacity-80" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
       {/* 内容区域 */}
       <div className="absolute inset-0 flex flex-col justify-end p-6">

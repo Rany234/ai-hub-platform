@@ -62,7 +62,7 @@ export default async function HomePage() {
               </h1>
 
               <h2 className="mt-5 text-lg sm:text-xl text-slate-300">
-                连接 500+ 企业需求，让你的 Prompt 与模型产生被动收入。
+                连接企业与开发者需求，让你的 AI 技能产生价值。
               </h2>
 
               <form

@@ -19,6 +19,9 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="antialiased font-sans">
+        <div className="bg-amber-950/30 border-b border-amber-500/20 text-amber-400 text-xs font-medium py-2 text-center">
+          🚀 技术预览版 (Technical Preview)：为验证《共生纪元》价值分配逻辑，当前交易处于沙盒模拟模式。不涉及真实资金流转。
+        </div>
         <Navbar />
         {children}
         <Toaster position="top-center" richColors />
