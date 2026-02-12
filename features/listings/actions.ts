@@ -45,6 +45,18 @@ export async function createListing(
     if (userError) return { success: false, error: userError.message };
     if (!user) return { success: false, error: "未登录" };
 
+    // --- 共生门禁：后端硬校验 ---
+    const { data: signature } = await supabase
+      .from("manifesto_signatures")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!signature) {
+      return { success: false, error: "Unauthorized: Please sign the manifesto first." };
+    }
+    // -------------------------
+
     try {
       const { data, error } = await supabase
         .from("listings")
@@ -114,6 +126,18 @@ export async function updateListing(
 
     if (userError) return { success: false, error: userError.message };
     if (!user) return { success: false, error: "未登录" };
+
+    // --- 共生门禁：后端硬校验 ---
+    const { data: signature } = await supabase
+      .from("manifesto_signatures")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!signature) {
+      return { success: false, error: "Unauthorized: Please sign the manifesto first." };
+    }
+    // -------------------------
 
     try {
       const nextSubCategory = formData.get("subCategory");

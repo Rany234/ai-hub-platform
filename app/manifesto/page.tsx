@@ -1,7 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { motion } from "framer-motion";
+import { getSignatureCount, getSignatureStatus, signManifesto } from "./actions";
+import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const MANIFESTO_MD = `
 > **共生纪元宣言**
@@ -28,7 +31,7 @@ const MANIFESTO_MD = `
 - 对敏感数据的访问应可追溯、可审计，并具有撤回权。
 - 在任何情况下，个体尊严高于算法效率。
 
-## 四、关于风险与边界
+## 五、关于风险与边界
 
 - 我们反对滥用 AI 进行欺骗、操纵与压迫。
 - 我们主张对高风险场景进行多层安全审查与人工复核。
@@ -42,23 +45,90 @@ const MANIFESTO_MD = `
 const MANIFESTO_HASH = "7a9f4c9a1e2b5f6d8c3e1a9b7d4f2c6e8a9b1c3d5e7f9a0b1c2d3e4f5a6b7c8";
 
 export default function ManifestoPage() {
-  const [signed, setSigned] = useState(false);
-  const [fingerprint] = useState(() =>
-    Math.floor(1000 + Math.random() * 8000)
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0B1121] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent" />
+      </div>
+    }>
+      <ManifestoContent />
+    </Suspense>
   );
+}
+
+function ManifestoContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+
+  const [signed, setSigned] = useState(false);
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [signing, setSigning] = useState(false);
+
+  useEffect(() => {
+    async function init() {
+      try {
+        const [status, total] = await Promise.all([
+          getSignatureStatus(),
+          getSignatureCount()
+        ]);
+        setSigned(status.signed);
+        setCount(total);
+      } catch (err) {
+        console.error("Failed to load manifesto status", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    init();
+  }, []);
+
+  const handleSign = async () => {
+    setSigning(true);
+    try {
+      await signManifesto(MANIFESTO_HASH);
+      setSigned(true);
+      const newCount = await getSignatureCount();
+      setCount(newCount);
+      toast.success("签署成功，欢迎加入共生者行列！");
+
+      // Success Logic: 跳转回流
+      if (from === "publish") {
+        setTimeout(() => {
+          router.push("/dashboard/listings/new");
+        }, 1500);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "签署失败，请检查登录状态");
+      if (err.message.includes("登录")) {
+        router.push("/login?redirectedFrom=/manifesto");
+      }
+    } finally {
+      setSigning(false);
+    }
+  };
 
   const buttonLabel = signed
     ? "已签署 (Signed)"
-    : "签署共生契约 (Sign the Manifesto)";
+    : signing ? "签署中..." : "签署共生契约 (Sign the Manifesto)";
 
   const toastText = useMemo(
     () =>
-      `您是第 ${fingerprint} 位共生者。契约哈希已记录：${MANIFESTO_HASH.slice(
+      `您是第 ${count} 位共生者。契约哈希已记录：${MANIFESTO_HASH.slice(
         0,
         16
       )}...`,
-    [fingerprint]
+    [count]
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0B1121] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0B1121] text-slate-100">
@@ -69,6 +139,22 @@ export default function ManifestoPage() {
       </div>
 
       <main className="relative mx-auto flex min-h-screen max-w-4xl flex-col px-6 py-16">
+        {/* Context Alert Banner */}
+        {from === "publish" && !signed && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 shadow-[0_0_30px_rgba(245,158,11,0.05)] backdrop-blur-sm"
+          >
+            <div className="flex items-center gap-3 text-sm text-amber-200">
+              <span className="text-lg">✨</span>
+              <p>
+                您距离发布服务仅剩一步：请完成下方共生契约的签署，完成后即可立即解锁发布权限。
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         <header className="mb-10">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-400/80">
             MANIFESTO
@@ -82,7 +168,6 @@ export default function ManifestoPage() {
         </header>
 
         <section className="prose prose-invert prose-sm sm:prose-base max-w-none text-slate-300">
-          {/* 简易 Markdown 渲染：当前直接渲染文本段落，可后续替换为真正的 MD 解析器 */}
           {MANIFESTO_MD.split("\n\n").map((block, idx) => {
             const isQuote = block.trim().startsWith(">");
 
@@ -127,10 +212,10 @@ export default function ManifestoPage() {
         <section className="mt-12 mb-8 flex flex-col items-center gap-4">
           <motion.button
             whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: signed ? 1 : 1.02 }}
+            whileHover={{ scale: signed || signing ? 1 : 1.02 }}
             type="button"
-            onClick={() => setSigned(true)}
-            disabled={signed}
+            onClick={handleSign}
+            disabled={signed || signing}
             className="inline-flex items-center justify-center rounded-full px-10 py-4 text-sm sm:text-base font-bold shadow-[0_0_30px_rgba(248,250,252,0.12)] border border-white/10 bg-white text-black disabled:cursor-default disabled:bg-emerald-500 disabled:text-white disabled:border-emerald-400 disabled:shadow-[0_0_35px_rgba(16,185,129,0.45)] transition-colors"
           >
             {buttonLabel}
@@ -150,7 +235,7 @@ export default function ManifestoPage() {
             </motion.div>
           ) : (
             <p className="text-[11px] sm:text-xs text-slate-500">
-              此操作仅为前端模拟，不会写入链上或服务器。
+              您的签署将记录在《共生纪元》共建者名录中。
             </p>
           )}
         </section>

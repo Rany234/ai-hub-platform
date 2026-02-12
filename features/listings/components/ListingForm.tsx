@@ -1,9 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+
+import { getSignatureStatus } from "@/app/manifesto/actions";
 
 import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -117,6 +121,25 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   const [pending, setPending] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isOathed, setIsOathed] = useState(false);
+  const [hasSignedManifesto, setHasSignedManifesto] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const status = await getSignatureStatus();
+        if (!active) return;
+        setHasSignedManifesto(status.signed);
+      } catch (e) {
+        console.error("Failed to load manifesto signature status", e);
+        if (!active) return;
+        setHasSignedManifesto(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
@@ -394,8 +417,41 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     );
   };
 
+  const showManifestoGate = hasSignedManifesto === false;
+
   return (
-    <div className="w-full max-w-6xl mx-auto min-h-[calc(100vh-8rem)]">
+    <div className="w-full max-w-6xl mx-auto min-h-[calc(100vh-8rem)] relative">
+      {showManifestoGate ? (
+        <div
+          className="absolute inset-0 bg-[#0B1121]/60 backdrop-blur-md z-50 flex items-center justify-center rounded-2xl"
+          role="dialog"
+          aria-modal="true"
+          tabIndex={-1}
+        >
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#151F32]/70 p-6 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20">
+                <ShieldCheck className="h-5 w-5 text-amber-500" />
+              </div>
+              <div>
+                <div className="text-lg font-extrabold text-white">签署契约以开启变现之旅</div>
+                <div className="mt-1 text-sm text-slate-400">
+                  根据《共生纪元》契约，所有卖家需完成价值观签署后方可上架服务。这有助于构建一个尊重原创的 AI 生态。
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <Link
+                href="/manifesto?from=publish"
+                className="inline-flex w-full items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(245,158,11,0.18)] hover:bg-amber-400 transition-colors"
+              >
+                前往签署宣言 (Go to Manifesto)
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         <div className="lg:col-span-3">
           <div className="bg-[#151F32] border border-[#334155] rounded-2xl p-6 shadow-2xl">
