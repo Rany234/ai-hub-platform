@@ -46,35 +46,37 @@ export function FeaturedWorkCard({ listing, index }: FeaturedWorkCardProps) {
         <div className="h-full w-full bg-[#0B1121]" />
       )}
 
-      {/* 渐变遮罩 */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+      {/* 轻遮罩（弱化，主要由底部毛玻璃文字容器承担可读性） */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
       {/* 内容区域 */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6">
-        <div className="translate-y-4 transition-transform duration-500 group-hover:translate-y-0">
-          <h3 className="text-lg font-bold text-white line-clamp-1">{listing.title}</h3>
-          
-          <div className="mt-2 flex items-center gap-2">
-            <div className="relative h-6 w-6 overflow-hidden rounded-full border border-white/10 bg-slate-800">
-              {sellerAvatarUrl ? (
-                <Image src={sellerAvatarUrl} alt={sellerName} fill className="object-cover" />
-              ) : (
-                <User className="p-1 text-slate-400" />
-              )}
-            </div>
-            <span className="text-xs text-slate-300">{sellerName}</span>
-          </div>
-        </div>
+      <div className="absolute inset-0 z-20 flex flex-col justify-end p-6">
+        <div className="rounded-2xl border border-white/10 bg-[#151F32]/90 p-6 backdrop-blur-md shadow-2xl shadow-black/30">
+          <div className="translate-y-2 transition-transform duration-500 group-hover:translate-y-0">
+            <h3 className="text-lg font-bold text-white line-clamp-1">{listing.title}</h3>
 
-        {/* Hover 浮现按钮 */}
-        <div className="mt-4 translate-y-8 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-          <Link
-            href={`/listings/${listing.id}`}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-action px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-900/20 transition-transform hover:scale-[1.02] hover:bg-amber-600 active:scale-[0.98]"
-          >
-            查看此服务的 AI 套餐
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="relative h-6 w-6 overflow-hidden rounded-full border border-white/10 bg-slate-800">
+                {sellerAvatarUrl ? (
+                  <Image src={sellerAvatarUrl} alt={sellerName} fill className="object-cover" />
+                ) : (
+                  <User className="p-1 text-slate-400" />
+                )}
+              </div>
+              <span className="text-xs text-slate-300">{sellerName}</span>
+            </div>
+          </div>
+
+          {/* Hover 浮现按钮 */}
+          <div className="mt-4 translate-y-6 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+            <Link
+              href={`/listings/${listing.id}`}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-action px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-900/20 transition-transform hover:scale-[1.02] hover:bg-amber-600 active:scale-[0.98]"
+            >
+              查看此服务的 AI 套餐
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
 
