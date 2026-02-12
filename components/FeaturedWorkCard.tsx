@@ -28,51 +28,59 @@ export function FeaturedWorkCard({ listing, index }: FeaturedWorkCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
-      className={`group relative ${heightClass} overflow-hidden rounded-3xl border border-white/10 bg-[#151F32] shadow-2xl transition-all duration-500 hover:border-brand-action/30`}
+      className={`group relative ${heightClass} overflow-hidden rounded-[2rem] border border-white/10 bg-[#151F32] shadow-2xl transition-all duration-500 hover:shadow-brand-action/10`}
     >
-      {/* 作品图片 - 使用用户提供的深色高质量抽象图 */}
+      {/* 作品图片 */}
       <Image
-        src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        src={
+          listing.preview_url ||
+          "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        }
         alt={listing.title}
         fill
         className="object-cover transition-transform duration-700 group-hover:scale-110"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        priority={index < 2}
+        // 使用简单的透明占位图
+        placeholder="blur"
+        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
       />
 
-      {/* 底部渐变遮罩 - 双重保障 */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      {/* 渐变遮罩 */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-      {/* 内容区域 - 恢复覆盖布局，利用深色背景确保清晰度 */}
-      <div className="absolute inset-0 z-20 flex flex-col justify-end p-6">
-        <div className="translate-y-2 transition-transform duration-500 group-hover:translate-y-0">
-          <h3 className="text-xl font-bold text-white tracking-tight drop-shadow-sm">
-            {listing.title}
-          </h3>
-
-          <div className="mt-3 flex items-center gap-2">
-            <div className="relative h-6 w-6 overflow-hidden rounded-full border border-white/20 bg-slate-800">
+      {/* 内容区域 */}
+      <div className="absolute inset-0 flex flex-col justify-end p-6">
+        <div className="relative z-20 rounded-2xl border border-white/10 bg-[#151F32]/90 p-6 backdrop-blur-md">
+          <div className="translate-y-4 transition-transform duration-500 group-hover:translate-y-0">
+          <h3 className="text-lg font-bold text-white line-clamp-1">{listing.title}</h3>
+          
+          <div className="mt-2 flex items-center gap-2">
+            <div className="relative h-6 w-6 overflow-hidden rounded-full border border-white/10 bg-slate-800">
               {sellerAvatarUrl ? (
                 <Image src={sellerAvatarUrl} alt={sellerName} fill className="object-cover" />
               ) : (
                 <User className="p-1 text-slate-400" />
               )}
             </div>
-            <span className="text-sm text-slate-200 font-medium drop-shadow-sm">{sellerName}</span>
+            <span className="text-xs text-slate-300">{sellerName}</span>
           </div>
         </div>
 
         {/* Hover 浮现按钮 */}
-        <div className="mt-5 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        <div className="mt-4 translate-y-8 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
           <Link
             href={`/listings/${listing.id}`}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-action px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-900/40 transition-all hover:bg-amber-500 active:scale-[0.98]"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-action px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-amber-900/20 transition-transform hover:scale-[1.02] hover:bg-amber-600 active:scale-[0.98]"
           >
-            查看详情
+            查看此服务的 AI 套餐
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
+      </div>
+
+      {/* 边框高光效果 */}
+      <div className="pointer-events-none absolute inset-0 rounded-[2rem] border border-white/5 ring-1 ring-inset ring-white/5 group-hover:ring-white/10" />
     </motion.div>
   );
 }
