@@ -24,6 +24,24 @@ export default function RootLayout({
         </div>
         <Navbar />
         {children}
+        <footer className="border-t border-white/5 bg-[#0B1121] py-8">
+          <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
+            <div className="font-medium text-slate-400">
+              © 2026 智汇 AI-Hub · Symbiosis Era
+            </div>
+            <div className="flex items-center gap-6">
+              <Link href="/manifesto" className="hover:text-amber-500 transition-colors">
+                Manifesto (共生宣言)
+              </Link>
+              <Link href="/listings" className="hover:text-white transition-colors">
+                服务市场
+              </Link>
+              <Link href="/dashboard" className="hover:text-white transition-colors">
+                控制台
+              </Link>
+            </div>
+          </div>
+        </footer>
         <Toaster position="top-center" richColors />
       </body>
     </html>

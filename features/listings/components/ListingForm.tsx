@@ -56,6 +56,16 @@ const DEFAULT_FEATURES = [
   "优先响应",
 ];
 
+const BASE_MODELS = [
+  "GPT-4",
+  "Claude 3.5 Sonnet",
+  "Midjourney v6",
+  "Stable Diffusion XL",
+  "DALL-E 3",
+  "Llama 3",
+  "Other"
+];
+
 function clampInt(n: number, min: number) {
   if (!Number.isFinite(n)) return min;
   return Math.max(min, Math.trunc(n));
@@ -106,6 +116,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
   const [editState, setEditState] = useState<EditState>({});
   const [pending, setPending] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isOathed, setIsOathed] = useState(false);
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
@@ -449,6 +460,45 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{TIER_META.map((t) => renderTierCard(t.key))}</div>
               </section>
 
+              {/* --- 新增：共创信息模块 --- */}
+              <div className="space-y-4 border-t border-white/10 pt-6 mt-6">
+                <h3 className="text-lg font-medium text-slate-200">共创声明 (Co-Creation)</h3>
+                <p className="text-sm text-slate-500">根据《共生纪元》契约，请如实标注 AI 贡献与灵感来源。</p>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm text-slate-300" htmlFor="base_model">
+                      协创模型 (Co-Pilot)
+                    </label>
+                    <select
+                      id="base_model"
+                      name="base_model"
+                      defaultValue={(initialData as any)?.base_model ?? "GPT-4"}
+                      className="w-full bg-[#0B1121] border border-white/10 rounded-xl px-4 py-2.5 text-slate-100 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
+                    >
+                      {BASE_MODELS.map((model) => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-slate-300" htmlFor="credits">
+                      灵感致谢 (Credits)
+                    </label>
+                    <textarea
+                      id="credits"
+                      name="credits"
+                      defaultValue={(initialData as any)?.credits ?? ""}
+                      placeholder="例如：灵感来源于 Github @user 的开源项目..."
+                      className="w-full bg-[#0B1121] border border-white/10 rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all min-h-[80px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <section className="space-y-4">
                 <h2 className="text-sm font-semibold text-muted-foreground">服务分类</h2>
 
@@ -540,9 +590,44 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                 </div>
               </section>
 
+              {/* --- 新增：共生契约宣誓 --- */}
+              <div className="rounded-xl border border-amber-500/20 bg-amber-900/10 p-5 mt-8">
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <div className="relative flex items-center mt-1">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={isOathed}
+                      onChange={(e) => setIsOathed(e.target.checked)}
+                      className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-amber-500/30 bg-black/40 checked:bg-amber-500 checked:border-amber-500 transition-all focus:ring-2 focus:ring-amber-500/20 outline-none"
+                    />
+                    <svg
+                      className="absolute h-3.5 w-3.5 pointer-events-none hidden peer-checked:block left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-black"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <span className="block text-sm font-semibold text-amber-200 group-hover:text-amber-100 transition-colors">
+                      我已阅读并认同《共生纪元》契约
+                    </span>
+                    <p className="text-xs text-amber-500/70 leading-relaxed">
+                      我承诺在此次服务发布中尊重原创、如实标注 AI 贡献，并愿意共同维护公平、透明的共生交易生态。
+                    </p>
+                  </div>
+                </label>
+              </div>
+
               <button
                 type="submit"
-                disabled={pending || isUploading}
+                disabled={pending || isUploading || !isOathed}
                 className="w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white py-3 font-bold shadow-lg shadow-amber-900/20 disabled:opacity-60 flex items-center justify-center gap-2 hover:from-amber-400 hover:to-orange-500 transition-colors"
               >
                 {isUploading ? (

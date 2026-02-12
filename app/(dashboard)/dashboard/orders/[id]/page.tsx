@@ -6,6 +6,7 @@ import { PayButtonClient } from "@/features/orders/components/PayButtonClient";
 import { StatusBadge } from "@/components/StatusBadge";
 import { DeliveryPanelClient } from "./DeliveryPanelClient";
 import { LeaveReviewClient } from "./LeaveReviewClient";
+import { HelpCircle } from "lucide-react";
 
 function formatFundStatus(orderStatus: string | null | undefined) {
   if (!orderStatus) return "未知";
@@ -97,8 +98,14 @@ export default async function OrderCheckoutPage({
   return (
     <div className="p-6 max-w-2xl mx-auto">
       {success ? (
-        <div className="mb-4 rounded-md border border-green-900/50 bg-green-900/20 px-4 py-3 text-sm text-green-400">
-          支付成功！资金已安全托管，请等待卖家交付。
+        <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-4 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+          <div className="flex items-center gap-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-[10px] font-bold">✓</div>
+            <div>
+              <div className="font-bold">支付成功！</div>
+              <div className="mt-0.5 text-xs text-emerald-400/80">资金已安全托管，本次交易已为您积累 <span className="font-bold text-emerald-300 underline decoration-emerald-500/40 underline-offset-4">12 点共生值 (Symbiosis Points)</span>。</div>
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -156,10 +163,51 @@ export default async function OrderCheckoutPage({
             <div className="mt-1 text-slate-200 font-semibold">{listing?.title ?? order.listing_id}</div>
           </div>
 
-          <div className="pt-4 border-t border-brand-border flex items-baseline justify-between">
-            <div className="text-sm font-bold text-slate-500 uppercase tracking-wider">合计</div>
-            <div className="text-2xl font-bold text-brand-action">¥{order.amount}</div>
-          </div>
+          {(() => {
+            const total = Number(order.amount);
+            const itemPrice = Number.isFinite(total) ? total : 0;
+            const serviceFee = Math.round(itemPrice * 0.08 * 100) / 100;
+            const openSourceFund = Math.round(itemPrice * 0.04 * 100) / 100;
+
+            const fmt = (n: number) => `¥${n.toFixed(2)}`;
+
+            return (
+              <div className="pt-4 border-t border-brand-border">
+                <div className="text-sm font-bold text-slate-500 uppercase tracking-wider">Receipt</div>
+
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">商品价格 (Item Price)</span>
+                    <span className="font-mono text-slate-200">{fmt(itemPrice)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-400">平台服务费 (Service Fee)</span>
+                    <span className="font-mono text-slate-200">{fmt(serviceFee)}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <span>开源共建基金 (Open Source Fund)</span>
+                      <span className="relative inline-flex items-center group">
+                        <HelpCircle className="h-4 w-4 text-slate-500 cursor-help" />
+                        <span className="pointer-events-none absolute left-1/2 bottom-full z-10 mb-2 w-[320px] -translate-x-1/2 rounded-xl border border-white/10 bg-black/90 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-2xl backdrop-blur-md transition-all group-hover:opacity-100 group-hover:translate-y-0 translate-y-1">
+                          根据《共生纪元》契约，这笔费用的 4% 将注入社区基金，用于回馈开源模型贡献者或支持原创艺术家。(沙盒模拟中)
+                          <span className="absolute left-1/2 top-full -translate-x-1/2 border-8 border-transparent border-t-black/90" />
+                        </span>
+                      </span>
+                    </div>
+                    <span className="font-mono font-semibold text-amber-400">{fmt(openSourceFund)}</span>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex items-baseline justify-between">
+                    <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">总价</span>
+                    <span className="text-2xl font-bold text-brand-action">¥{order.amount}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {showBuyerPay ? (

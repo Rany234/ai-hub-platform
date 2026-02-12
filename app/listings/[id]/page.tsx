@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 import { ReviewsSection } from "./ReviewsSection";
 import { ServiceConfigurator, type ServiceOption } from "./ServiceConfigurator";
 import { ContactSellerButton } from "@/components/ContactSellerButton";
-import { Star } from "lucide-react";
+import { Star, Bot, User, Sparkles } from "lucide-react";
 
 function assertString(v: unknown): string {
   if (typeof v !== "string" || v.length === 0) throw new Error("无效的服务 ID");
@@ -156,6 +156,44 @@ export default async function ListingDetailPage({
                   <div className="mt-2 text-sm text-slate-500 italic">暂无简介</div>
                 )}
               </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-[#151F32]/50 p-5 backdrop-blur-sm mt-6">
+            <h4 className="flex items-center gap-2 text-sm font-medium text-slate-400 mb-4">
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              共创信息 (Co-Creation)
+            </h4>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-slate-500" />
+                  <span className="text-sm text-slate-400">主创 (Architect)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-slate-200">
+                    {creatorProfile?.full_name || creatorProfile?.username || "Anonymous"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bot className="h-4 w-4 text-slate-500" />
+                  <span className="text-sm text-slate-400">协创 (Co-Pilot)</span>
+                </div>
+                <span className="text-sm font-medium text-brand-action">{(listing as any)?.base_model || "AI Model"}</span>
+              </div>
+
+              {(listing as any)?.credits ? (
+                <div className="mt-4 pt-4 border-t border-white/5">
+                  <p className="text-xs text-slate-500 mb-2">灵感致谢 (Credits)</p>
+                  <blockquote className="border-l-2 border-amber-500/50 pl-3 text-sm italic text-slate-300">
+                    “{(listing as any).credits}”
+                  </blockquote>
+                </div>
+              ) : null}
             </div>
           </div>
         </aside>
