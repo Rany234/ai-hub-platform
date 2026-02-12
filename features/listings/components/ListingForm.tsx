@@ -286,7 +286,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
     (listing as any).packages = packages;
     return listing;
-  }, [title, description, category, previewUrl, packages, previewTier]);
+  }, [title, description, mainCategory, previewUrl, packages, previewTier]);
 
   const state = mode === "edit" ? editState : createState;
 
