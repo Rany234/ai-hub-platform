@@ -147,31 +147,35 @@ export function ServiceMatrix() {
                   {item.level === "Level 3" ? (
                     <div className="pointer-events-none absolute inset-0">
                       {/* Code editor / tech delivery */}
-                      <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_30%_20%,rgba(14,165,233,0.16),transparent_55%),radial-gradient(700px_circle_at_70%_70%,rgba(99,102,241,0.14),transparent_60%)]" />
-                      <div className="absolute left-5 top-6 right-5 h-44 rounded-2xl border border-white/10 bg-black/35 backdrop-blur-sm">
-                        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10">
-                          <span className="h-2 w-2 rounded-full bg-red-400/70" />
-                          <span className="h-2 w-2 rounded-full bg-amber-400/70" />
-                          <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
-                          <span className="ml-2 text-[11px] text-slate-400">code_delivery.ts</span>
+                      <div className="absolute inset-0 bg-[radial-gradient(900px_circle_at_30%_20%,rgba(14,165,233,0.12),transparent_55%),radial-gradient(700px_circle_at_70%_70%,rgba(99,102,241,0.1),transparent_60%)]" />
+                      
+                      {/* Substantial darkening overlay to ensure text readability */}
+                      <div className="absolute inset-0 bg-slate-950/40" />
+
+                      <div className="absolute left-5 top-6 right-5 h-44 rounded-2xl border border-white/5 bg-black/60 backdrop-blur-md opacity-40">
+                        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-400/40" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-400/40" />
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/40" />
+                          <span className="ml-2 text-[10px] text-slate-500 font-mono">code_delivery.ts</span>
                         </div>
-                        <div className="p-4 font-mono text-[11px] leading-5 text-slate-300">
+                        <div className="p-4 font-mono text-[10px] leading-relaxed text-slate-600">
                           <div>
-                            <span className="text-sky-300">export</span> <span className="text-indigo-200">async</span> <span className="text-slate-100">function</span>{" "}
-                            <span className="text-amber-200">deliver</span>() {"{"}
+                            <span className="opacity-50">export</span> <span className="opacity-50">async</span> <span>function</span>{" "}
+                            <span>deliver</span>() {"{"}
                           </div>
-                          <div className="pl-4 text-slate-300">
-                            <span className="text-purple-200">return</span> <span className="text-slate-100">"Agent + 私有化部署"</span>;
+                          <div className="pl-4">
+                            <span className="opacity-50">return</span> <span>"Agent + Deployment"</span>;
                           </div>
-                          <div className="text-slate-300">{"}"}{"}"}</div>
+                          <div>{"}"}{"}"}</div>
                         </div>
                       </div>
-                      <div className="absolute -left-10 -bottom-10 h-56 w-56 rounded-full bg-sky-500/10 blur-[90px]" />
+                      <div className="absolute -left-10 -bottom-10 h-56 w-56 rounded-full bg-sky-500/5 blur-[100px]" />
                     </div>
                   ) : null}
 
                   {/* Content */}
-                  <div className="relative z-10">
+                  <div className="relative z-10 flex h-full flex-col">
                     <div className="flex items-center justify-between">
                       <div className={`inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-[11px] font-semibold ${a.pill}`}>
                         <Icon className={`h-4 w-4 ${a.icon}`} />
@@ -180,17 +184,17 @@ export function ServiceMatrix() {
                       <div className="text-[11px] font-medium text-slate-500">点击进入</div>
                     </div>
 
-                    <div className="mt-5 text-xl font-extrabold tracking-tight text-white">
+                    <div className="mt-5 text-xl font-extrabold tracking-tight text-white drop-shadow-sm">
                       {item.title}
                     </div>
-                    <div className="mt-2 text-sm font-medium text-slate-200">
+                    <div className="mt-2 text-sm font-bold text-white leading-snug">
                       {item.description}
                     </div>
-                    <div className="mt-4 text-sm leading-6 text-slate-400">
+                    <div className="mt-4 text-sm leading-relaxed text-slate-300 font-medium">
                       {item.examples}
                     </div>
 
-                    <div className="mt-7 inline-flex items-center text-sm font-semibold text-brand-action">
+                    <div className="mt-auto pt-7 inline-flex items-center text-sm font-bold text-amber-500 transition-colors group-hover:text-amber-400">
                       立即浏览
                       <svg
                         className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"

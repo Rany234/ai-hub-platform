@@ -28,30 +28,30 @@ export function FeaturedWorkCard({ listing, index }: FeaturedWorkCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
-      className={`group relative ${heightClass} overflow-hidden rounded-[2rem] border border-white/10 bg-[#151F32] shadow-2xl transition-all duration-500 hover:shadow-brand-action/10`}
+      className={`group relative ${heightClass} overflow-hidden rounded-[2rem] border border-[#334155] bg-[#151F32] shadow-2xl transition-all duration-500 hover:shadow-brand-action/10`}
     >
       {/* 作品图片 */}
-      <Image
-        src={
-          listing.preview_url ||
-          "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        }
-        alt={listing.title}
-        fill
-        className="object-cover transition-transform duration-700 group-hover:scale-110"
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        // 使用简单的透明占位图
-        placeholder="blur"
-        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-      />
+      {listing.preview_url ? (
+        <Image
+          src={listing.preview_url}
+          alt={listing.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          // 使用简单的透明占位图
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+        />
+      ) : (
+        <div className="h-full w-full bg-[#0B1121]" />
+      )}
 
       {/* 渐变遮罩 */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
       {/* 内容区域 */}
       <div className="absolute inset-0 flex flex-col justify-end p-6">
-        <div className="relative z-20 rounded-2xl border border-white/10 bg-[#151F32]/90 p-6 backdrop-blur-md">
-          <div className="translate-y-4 transition-transform duration-500 group-hover:translate-y-0">
+        <div className="translate-y-4 transition-transform duration-500 group-hover:translate-y-0">
           <h3 className="text-lg font-bold text-white line-clamp-1">{listing.title}</h3>
           
           <div className="mt-2 flex items-center gap-2">
@@ -76,7 +76,6 @@ export function FeaturedWorkCard({ listing, index }: FeaturedWorkCardProps) {
             <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
-      </div>
       </div>
 
       {/* 边框高光效果 */}
