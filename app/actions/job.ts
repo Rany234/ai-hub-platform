@@ -171,8 +171,8 @@ export async function deleteJob(id: string) {
     if (!job) throw new Error("任务不存在");
     if (job.creatorId !== userId) throw new Error("无权操作");
 
-    await prisma.job.delete({ 
-      where: { id } 
+    await prisma.job.delete({
+      where: { id },
     });
 
     revalidatePath("/dashboard/jobs");
@@ -184,7 +184,76 @@ export async function deleteJob(id: string) {
 }
 
 /**
- * 5. 获取任务的投标列表 (兼容原接口名)
+ * 5. 获取当前用户发布的任务
+ */
+export async function getMyPostedJobs() {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const jobs = await prisma.job.findMany({
+    where: { creatorId: userId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      creator: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+          username: true,
+          avatarUrl: true,
+        },
+      },
+      _count: { select: { bids: true } },
+    },
+  });
+
+  return jobs.map(adaptJobForFrontend);
+}
+
+/**
+ * 6. 获取当前用户的投标记录
+ */
+export async function getMyBids() {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const bids = await prisma.bid.findMany({
+    where: { bidderId: userId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      job: {
+        include: {
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              username: true,
+              avatarUrl: true,
+            },
+          },
+          _count: { select: { bids: true } },
+        },
+      },
+    },
+  });
+
+  return bids.map((b) => ({
+    ...b,
+    job: b.job ? adaptJobForFrontend(b.job) : null,
+  }));
+}
+
+/**
+ * 7. 获取任务的投标列表 (兼容原接口名)
  */
 export async function getBidsByJobId(jobId: string) {
   const job = await getJobById(jobId);
