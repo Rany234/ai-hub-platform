@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { DashboardPlaceholder } from "@/components/dashboard/DashboardPlaceholder";
+import { getJobById } from "@/app/actions/job";
+import { JobDetailClient } from "./JobDetailClient";
 
 export default async function JobDetailPage({
   params,
@@ -14,11 +15,10 @@ export default async function JobDetailPage({
 
   const { id } = await params;
 
-  return (
-    <DashboardPlaceholder
-      title="任务详情已下线"
-      description={`该功能模块已调整（原任务 ID: ${id}）。请前往【服务市场】或【我的订单】。`}
-      type="deprecated"
-    />
-  );
+  const job = await getJobById(id);
+  if (!job) {
+    notFound();
+  }
+
+  return <JobDetailClient job={job} viewerUserId={session.user.id} />;
 }
