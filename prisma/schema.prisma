@@ -52,6 +52,19 @@ enum ListingType {
   ASSET
 }
 
+enum JobStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 // 核心用户表 (NextAuth + 业务扩展)
 model User {
   id            String    @id @default(cuid())
@@ -83,6 +96,8 @@ model User {
   orders              Order[]             @relation("UserOrders")
   manifestoSignatures ManifestoSignature[]
   transactions         Transaction[]
+  jobs                Job[]               @relation("UserCreatedJobs")
+  bids                Bid[]               @relation("UserPlacedBids")
 
   @@index([referredBy])
   @@map("users")
@@ -234,4 +249,46 @@ model Transaction {
   @@index([orderId])
   @@index([beneficiaryId])
   @@map("transactions")
+}
+
+// 任务/悬赏模型
+model Job {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  budget      Float
+  status      JobStatus @default(OPEN)
+
+  creatorId   String    @map("creator_id")
+  creator     User      @relation("UserCreatedJobs", fields: [creatorId], references: [id])
+
+  bids        Bid[]
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([creatorId])
+  @@index([status])
+  @@map("jobs")
+}
+
+// 投标模型
+model Bid {
+  id        String    @id @default(cuid())
+  amount    Float
+  message   String
+  status    BidStatus @default(PENDING)
+
+  jobId     String    @map("job_id")
+  job       Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  bidderId  String    @map("bidder_id")
+  bidder    User      @relation("UserPlacedBids", fields: [bidderId], references: [id])
+
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([jobId])
+  @@index([bidderId])
+  @@index([status])
+  @@map("bids")
 }

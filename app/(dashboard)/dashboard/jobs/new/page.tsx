@@ -26,6 +26,10 @@ export default function NewJobPage() {
         </div>
       </div>
 
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+        💡 <strong>估值提示</strong>：建议勾选【允许作为资产上架】，通常可降低 50% 开发成本，并为您积累平台贡献值。
+      </div>
+
       <CreateJobForm />
     </div>
   );
