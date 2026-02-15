@@ -1,13 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-
-import { createSupabaseServerClient } from "./supabase/server";
+import { signIn, signOut } from "@/auth";
+import prisma from "@/lib/prisma";
+import type { ActionResult } from "@/types/actions";
+import bcrypt from "bcryptjs";
 import { loginSchema, signUpSchema } from "./schemas";
-
-type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
 
 type LoginResult = ActionResult<null> & { redirectTo?: string };
 
@@ -18,7 +17,7 @@ type SignUpInputs = {
 };
 
 type SignUpResult =
-  | { success: true; data: null; redirectTo?: string; inputs?: SignUpInputs; requireVerification?: boolean }
+  | { success: true; data: any; redirectTo?: string; inputs?: SignUpInputs }
   | { success: false; error: string; inputs?: SignUpInputs };
 
 function getString(formData: FormData, key: string): string | undefined {
@@ -34,25 +33,6 @@ function pickSignUpInputs(formData: FormData): SignUpInputs {
   };
 }
 
-function mapSupabaseErrorToChinese(message: string): string {
-  const m = message.toLowerCase();
-
-  if (m.includes("security purposes") || m.includes("rate limit")) {
-    return "操作太频繁，请稍后再试";
-  }
-
-  if (m.includes("already registered") || m.includes("unique constraint")) {
-    return "该邮箱/用户名已被注册";
-  }
-
-  if (m.includes("invalid login credentials")) {
-    return "账号或密码错误";
-  }
-
-  // Unknown errors: unmask raw message for debugging
-  return `注册失败: ${message}`;
-}
-
 export async function loginAction(
   _prevState: unknown,
   formData: FormData
@@ -63,15 +43,17 @@ export async function loginAction(
       password: formData.get("password"),
     });
 
-    const supabase = await createSupabaseServerClient();
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: input.email,
-      password: input.password,
-    });
-
-    if (error) {
-      return { success: false, error: "账号或密码错误" };
+    try {
+      await signIn("credentials", {
+        email: input.email,
+        password: input.password,
+        redirect: false,
+      });
+    } catch (error: any) {
+      if (error.type === "CredentialsSignin") {
+        return { success: false, error: "账号或密码错误" };
+      }
+      return { success: false, error: "登录发生异常，请稍后重试" };
     }
 
     revalidatePath("/", "layout");
@@ -86,10 +68,7 @@ export async function loginAction(
 
 export async function logoutAction(): Promise<ActionResult<null>> {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.signOut();
-    if (error) return { success: false, error: error.message };
-
+    await signOut({ redirect: false });
     revalidatePath("/", "layout");
     return { success: true, data: null };
   } catch (e) {
@@ -111,81 +90,41 @@ export async function signUpAction(
       fullName: formData.get("fullName"),
     });
 
-    const supabase = await createSupabaseServerClient();
+    const existingUser = await prisma.user.findUnique({
+      where: { email: input.email },
+    });
 
-    const callbackUrl = process.env.NODE_ENV === 'production'
-      ? 'https://ai-hub-platform.vercel.app/auth/callback'  // 生产环境：强制指向你的 Vercel 域名
-      : 'http://localhost:3000/auth/callback';              // 本地开发：指向 localhost
+    if (existingUser) {
+      return { success: false, error: "该邮箱已被注册", inputs };
+    }
 
-    console.log("正在注册，重定向地址为：", callbackUrl); // 加个日志，方便调试
+    const hashedPassword = await bcrypt.hash(input.password, 10);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: input.email,
-      password: input.password,
-      options: {
-        emailRedirectTo: callbackUrl,
+    const user = await prisma.user.create({
+      data: {
+        email: input.email,
+        password: hashedPassword,
+        name: input.fullName || input.username,
+        username: input.username,
+        fullName: input.fullName,
+        emailVerified: new Date(),
       },
     });
 
-    if (error) {
-      return { success: false, error: mapSupabaseErrorToChinese(error.message), inputs };
-    }
-
-    const userId = data.user?.id;
-    if (userId) {
-      const { error: profileErr } = await supabase.from("profiles").upsert({
-        id: userId,
-        username: input.username ?? null,
-        full_name: input.fullName ?? null,
-      });
-
-      if (profileErr) {
-        // Intentionally swallow to keep sign-up UX stable.
-      }
-    }
-
-    // If email verification is enabled, Supabase may return no session.
-    if (!data.session) {
-      return { success: true, data: null, requireVerification: true, inputs };
-    }
-
     revalidatePath("/", "layout");
-    return { success: true, data: null, redirectTo: "/dashboard", inputs };
+    return { success: true, data: { id: user.id }, redirectTo: "/dashboard", inputs };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : undefined;
-
-    if (msg) {
-      return { success: false, error: mapSupabaseErrorToChinese(msg), inputs };
-    }
-
-    return { success: false, error: "注册服务暂时不可用，请稍后重试", inputs };
+    console.error("SIGNUP_ERROR:", e);
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "注册服务暂时不可用，请稍后重试",
+      inputs,
+    };
   }
 }
 
-export async function resendVerificationAction(email: string): Promise<ActionResult<null>> {
-  try {
-    const supabase = await createSupabaseServerClient();
-
-    const callbackUrl = process.env.NODE_ENV === 'production'
-      ? 'https://ai-hub-platform.vercel.app/auth/callback'
-      : 'http://localhost:3000/auth/callback';
-
-    const { error } = await supabase.auth.resend({
-      email,
-      type: 'signup',
-      options: {
-        emailRedirectTo: callbackUrl,
-      },
-    });
-
-    if (error) {
-      return { success: false, error: "重发验证邮件失败，请稍后重试" };
-    }
-
-    return { success: true, data: null };
-  } catch (e) {
-    return { success: false, error: e instanceof Error ? e.message : "重发验证邮件失败" };
-  }
+export async function resendVerificationAction(_email: string): Promise<ActionResult<null>> {
+  return { success: false, error: "当前模式下已自动验证邮箱，无需重发" };
 }
 
 export async function loginAndRedirectAction(formData: FormData): Promise<never> {

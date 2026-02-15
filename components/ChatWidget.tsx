@@ -177,8 +177,8 @@ export function ChatWidget({ open: openProp, onOpenChange, initialConversationId
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages" },
-        (payload) => {
-          const m = payload.new as MessageRow;
+        (payload: { new: MessageRow }) => {
+          const m = payload.new;
 
           setConversations((prev) => {
             const idx = prev.findIndex((c) => c.id === m.conversation_id);

@@ -1,21 +1,17 @@
 import { Suspense } from "react";
-
 import Link from "next/link";
-
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { StatsSkeleton } from "@/components/dashboard/StatsSkeleton";
 import { DashboardJobList } from "@/components/dashboard/DashboardJobList";
 import { JobListSkeleton } from "@/components/dashboard/JobListSkeleton";
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
 export async function FreelancerView() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session?.user?.id;
 
-  if (!user) return null;
+  if (!userId) return null;
 
   return (
     <div className="p-6 space-y-6">
@@ -31,7 +27,7 @@ export async function FreelancerView() {
       </div>
 
       <Suspense fallback={<StatsSkeleton />}>
-        <DashboardStats userId={user.id} />
+        <DashboardStats userId={userId} />
       </Suspense>
 
       <div className="space-y-3">
@@ -43,7 +39,7 @@ export async function FreelancerView() {
         </div>
 
         <Suspense fallback={<JobListSkeleton rows={5} />}>
-          <DashboardJobList userId={user.id} role="freelancer" />
+          <DashboardJobList userId={userId} role="freelancer" />
         </Suspense>
       </div>
     </div>

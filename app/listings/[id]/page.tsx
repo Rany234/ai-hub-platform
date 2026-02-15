@@ -1,11 +1,16 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 
 import { ReviewsSection } from "./ReviewsSection";
 import { ServiceConfigurator, type ServiceOption } from "./ServiceConfigurator";
 import { ContactSellerButton } from "@/components/ContactSellerButton";
-import { Star, Bot, User, Sparkles } from "lucide-react";
+import { RemixButton } from "./RemixButton";
+import { RemixTree } from "@/features/listings/components/RemixTree";
+
+import { Star, Bot, User, Sparkles, Zap, GitFork } from "lucide-react";
 
 function assertString(v: unknown): string {
   if (typeof v !== "string" || v.length === 0) throw new Error("无效的服务 ID");
@@ -17,40 +22,48 @@ export default async function ListingDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
   const { id } = await params;
   const listingId = assertString(id);
 
-  const supabase = await createSupabaseServerClient();
+  const listing = (await prisma.listing.findUnique({
+    where: { id: listingId },
+    include: {
+      creator: {
+        select: {
+          id: true,
+          username: true,
+          fullName: true,
+          avatarUrl: true,
+          role: true,
+          createdAt: true,
+        },
+      },
+      parent: {
+        select: {
+          id: true,
+          title: true,
+          creatorId: true,
+        },
+      },
+    } as any,
+  })) as any;
 
-  const { data: listing, error: listingError } = await supabase
-    .from("listings")
-    .select("*")
-    .eq("id", listingId)
-    .maybeSingle();
-
-  if (listingError || !listing) {
+  if (!listing) {
     notFound();
   }
 
-  const { data: creatorProfile } = await supabase
-    .from("profiles")
-    .select("id, username, full_name, avatar_url, role, created_at, bio")
-    .eq("id", listing.creator_id)
-    .maybeSingle();
+  const creatorProfile = listing.creator;
 
-  const { data: reviews } = await supabase
-    .from("reviews")
-    .select("rating, content, created_at, reviewer_id, profiles(id, username, full_name, avatar_url)")
-    .eq("listing_id", listing.id)
-    .order("created_at", { ascending: false });
-
-  const avgRating =
-    reviews && reviews.length > 0
-      ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
-      : null;
-  const reviewCount = reviews?.length ?? 0;
+  // 暂时模拟评价数据，因为当前 schema 还没有 Review 模型
+  const reviews: any[] = [];
+  const avgRating = null as number | null;
+  const reviewCount = 0;
 
   const metadata = listing.metadata as unknown as { delivery_days?: number } | null;
+
+  const showRemixBanner = Boolean(listing.isRemix && listing.parentId && listing.parent);
+  const showRemixAction = listing.type === "ASSET" && Boolean(session?.user?.id);
 
   return (
     <div className="p-6 max-w-6xl mx-auto font-sans">
@@ -61,10 +74,7 @@ export default async function ListingDetailPage({
             <div className="flex items-center gap-2">
               <span className="text-slate-500">服务提供方：</span>
               <span className="text-slate-200 font-bold">
-                {creatorProfile?.full_name ||
-                  creatorProfile?.username ||
-                  creatorProfile?.id ||
-                  "未知"}
+                {creatorProfile?.fullName || creatorProfile?.username || creatorProfile?.id || "未知"}
               </span>
             </div>
             {avgRating !== null ? (
@@ -74,7 +84,9 @@ export default async function ListingDetailPage({
                 <span className="text-slate-500 text-xs">({reviewCount}条评价)</span>
               </div>
             ) : (
-              <div className="text-xs bg-brand-surface px-3 py-1 rounded-full border border-brand-border text-slate-400 italic">暂无评价</div>
+              <div className="text-xs bg-brand-surface px-3 py-1 rounded-full border border-brand-border text-slate-400 italic">
+                暂无评价
+              </div>
             )}
           </div>
         </div>
@@ -83,13 +95,9 @@ export default async function ListingDetailPage({
         </div>
       </div>
 
-      {listing.preview_url ? (
+      {listing.previewUrl ? (
         <div className="mt-8 relative aspect-video w-full max-h-[500px] overflow-hidden rounded-xl border border-brand-border shadow-2xl shadow-black/50">
-          <img
-            alt={listing.title}
-            src={listing.preview_url}
-            className="w-full h-full object-cover"
-          />
+          <img alt={listing.title} src={listing.previewUrl} className="w-full h-full object-cover" />
         </div>
       ) : null}
 
@@ -100,16 +108,30 @@ export default async function ListingDetailPage({
         </div>
         <div className="border border-brand-border bg-brand-surface rounded-xl p-5 transition-colors hover:bg-white/5">
           <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">预计交付</div>
-          <div className="mt-2 font-bold text-slate-200">
-            {metadata?.delivery_days ? `${metadata.delivery_days} 天` : "（未填写）"}
-          </div>
+          <div className="mt-2 font-bold text-slate-200">{metadata?.delivery_days ? `${metadata.delivery_days} 天` : "（未填写）"}</div>
         </div>
       </div>
 
       {listing.description ? (
         <div className="mt-10">
           <h2 className="text-2xl font-extrabold text-white tracking-tight">服务介绍</h2>
+
           <div className="mt-4 p-6 bg-brand-surface border border-brand-border rounded-xl leading-relaxed text-slate-300 whitespace-pre-wrap shadow-inner shadow-black/20">
+            {showRemixBanner ? (
+              <div className="mb-5 rounded-xl border border-purple-500/20 bg-purple-500/10 px-4 py-3">
+                <div className="flex items-center gap-2 text-sm font-bold text-purple-200">
+                  <Zap className="h-4 w-4" />
+                  <span>
+                    派生自{" "}
+                    <Link href={`/listings/${encodeURIComponent(listing.parent!.id)}`} className="underline underline-offset-2 hover:text-white">
+                      {listing.parent!.title}
+                    </Link>
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-purple-200/80">♻️ 每笔成交的 10% 将返还给原始创作者。</div>
+              </div>
+            ) : null}
+
             {listing.description}
           </div>
         </div>
@@ -126,35 +148,33 @@ export default async function ListingDetailPage({
               listingId={listing.id}
               basePrice={listing.price}
               options={((listing.options as unknown) as ServiceOption[] | null) ?? []}
-              packages={listing.packages}
+              packages={(listing as any).packages}
             />
           </div>
         </div>
+
         <aside className="space-y-6">
           <div className="bg-brand-surface border border-brand-border rounded-xl p-6 shadow-xl">
-            <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex items-center justify-between gap-3 mb-6">
               <h2 className="text-lg font-extrabold text-white">卖家信息</h2>
-              <ContactSellerButton sellerId={listing.creator_id} listingId={listing.id} />
+              <div className="flex items-center gap-2">
+                {showRemixAction ? (
+                  <RemixButton originalListingId={listing.id} currentUserId={session!.user!.id as string} />
+                ) : null}
+                <ContactSellerButton sellerId={listing.creatorId} listingId={listing.id} />
+              </div>
             </div>
             <div className="flex items-start gap-4">
               <div className="relative h-14 w-14 rounded-xl border border-brand-border overflow-hidden bg-black/20 flex-shrink-0">
-                {creatorProfile?.avatar_url ? (
-                  <img alt="avatar" src={creatorProfile.avatar_url} className="h-full w-full object-cover" />
+                {creatorProfile?.avatarUrl ? (
+                  <img alt="avatar" src={creatorProfile.avatarUrl} className="h-full w-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-600">无</div>
                 )}
               </div>
               <div className="min-w-0">
-                <div className="font-bold text-slate-100 truncate">
-                  {creatorProfile?.full_name || creatorProfile?.username || "未知卖家"}
-                </div>
-                {creatorProfile?.bio ? (
-                  <div className="mt-2 text-sm text-slate-400 line-clamp-3 italic">
-                    “{creatorProfile.bio}”
-                  </div>
-                ) : (
-                  <div className="mt-2 text-sm text-slate-500 italic">暂无简介</div>
-                )}
+                <div className="font-bold text-slate-100 truncate">{creatorProfile?.fullName || creatorProfile?.username || "未知卖家"}</div>
+                <div className="mt-2 text-sm text-slate-500 italic">暂无简介</div>
               </div>
             </div>
           </div>
@@ -172,9 +192,7 @@ export default async function ListingDetailPage({
                   <span className="text-sm text-slate-400">主创 (Architect)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-slate-200">
-                    {creatorProfile?.full_name || creatorProfile?.username || "Anonymous"}
-                  </span>
+                  <span className="text-sm font-medium text-slate-200">{creatorProfile?.fullName || creatorProfile?.username || "Anonymous"}</span>
                 </div>
               </div>
 
@@ -189,9 +207,7 @@ export default async function ListingDetailPage({
               {(listing as any)?.credits ? (
                 <div className="mt-4 pt-4 border-t border-white/5">
                   <p className="text-xs text-slate-500 mb-2">灵感致谢 (Credits)</p>
-                  <blockquote className="border-l-2 border-amber-500/50 pl-3 text-sm italic text-slate-300">
-                    “{(listing as any).credits}”
-                  </blockquote>
+                  <blockquote className="border-l-2 border-amber-500/50 pl-3 text-sm italic text-slate-300">“{(listing as any).credits}”</blockquote>
                 </div>
               ) : null}
             </div>
@@ -201,6 +217,14 @@ export default async function ListingDetailPage({
 
       <div className="mt-16">
         <ReviewsSection reviews={(reviews as any) ?? []} />
+      </div>
+
+      <div className="mt-16">
+        <div className="flex items-center gap-2 mb-4">
+          <GitFork className="h-5 w-5 text-slate-400" />
+          <h2 className="text-2xl font-extrabold text-white tracking-tight">🧬 演化谱系 (Evolution Tree)</h2>
+        </div>
+        <RemixTree listingId={listing.id} />
       </div>
     </div>
   );

@@ -1,80 +1,73 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
+import { PaymentMethod } from "@prisma/client";
+import { getPaymentAdapter } from "@/lib/payment";
 
-const stripe = process.env.STRIPE_SECRET_KEY 
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2023-10-16" as any }) 
-  : null;
+function isPaymentMethod(x: unknown): x is PaymentMethod {
+  return x === "STRIPE" || x === "WECHAT" || x === "ALIPAY" || x === "OFFLINE";
+}
 
 export async function POST(req: NextRequest) {
   try {
-    if (!stripe) {
-      return NextResponse.json({ error: "Stripe is not configured" }, { status: 500 });
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { orderId } = (await req.json()) as { orderId?: unknown };
+    const { orderId, method } = (await req.json()) as { orderId?: unknown; method?: unknown };
 
     if (typeof orderId !== "string" || orderId.length === 0) {
       return NextResponse.json({ error: "Invalid orderId" }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
+    const paymentMethod: PaymentMethod = isPaymentMethod(method) ? method : "OFFLINE";
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .select("id, listing_id, amount, status")
-      .eq("id", orderId)
-      .single();
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { listing: { select: { title: true } } },
+    });
 
-    if (orderError || !order) {
+    if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    if (order.buyerId !== userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     if (order.status !== "pending") {
       return NextResponse.json({ error: "Order is not payable" }, { status: 400 });
     }
 
-    const { data: listing } = await supabase
-      .from("listings")
-      .select("title")
-      .eq("id", order.listing_id)
-      .single();
+    const adapter = getPaymentAdapter(paymentMethod);
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const result = await adapter.createPayment({
+      orderId: order.id,
+      amount: order.amount,
+      currency: "cny",
+      description: order.listing?.title ?? "服务订单",
+      buyerEmail: session?.user?.email ?? undefined,
+      metadata: { orderId: order.id },
+    });
 
-    const unitAmount = Math.round(Number(order.amount) * 100);
-    if (!Number.isFinite(unitAmount) || unitAmount <= 0) {
-      return NextResponse.json({ error: "Invalid order amount" }, { status: 400 });
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "payment",
-      line_items: [
-        {
-          price_data: {
-            currency: "cny",
-            product_data: {
-              name: listing?.title ?? "服务订单",
-            },
-            unit_amount: unitAmount,
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: `${baseUrl}/dashboard/orders/${orderId}?success=true`,
-      cancel_url: `${baseUrl}/dashboard/orders/${orderId}?canceled=true`,
-      metadata: {
-        orderId,
+    // Persist selected method + channel id for later verification / reconciliation
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        paymentMethod,
+        paymentChannelId: result.paymentChannelId,
       },
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: result.url, paymentChannelId: result.paymentChannelId, method: paymentMethod });
   } catch (e) {
     console.error("[POST /api/checkout]", e);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: e instanceof Error ? e.message : "Internal server error" }, { status: 500 });
   }
 }

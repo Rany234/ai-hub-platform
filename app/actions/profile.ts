@@ -91,8 +91,8 @@ export async function getUserProfile(userId: string): Promise<{
     throw new Error(ratingError.message);
   }
 
-  const ratings = (ratingRows ?? []).map((r: any) => Number(r.rating)).filter((n) => Number.isFinite(n));
-  const averageRating = ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null;
+  const ratings = (ratingRows ?? []).map((r: any) => Number(r.rating)).filter((n: number) => Number.isFinite(n));
+  const averageRating = ratings.length ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length : null;
 
   const { data: recentReviews, error: reviewsError } = await supabase
     .from("reviews")

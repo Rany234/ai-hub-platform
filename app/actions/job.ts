@@ -121,15 +121,15 @@ export async function getBidsByJobId(jobId: string) {
 
     // Aggregate ratings for each bidder
     const bidsWithRatings = await Promise.all(
-      (bids || []).map(async (bid) => {
+      (bids || []).map(async (bid: any) => {
         const { data: reviews } = await supabase
           .from("reviews")
           .select("rating")
           .eq("reviewee_id", bid.bidder_id);
 
-        const ratings = reviews?.map((r) => r.rating) || [];
+        const ratings = (reviews || []).map((r: any) => r.rating);
         const avgRating = ratings.length > 0 
-          ? Number((ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1))
+          ? Number((ratings.reduce((sum: number, r: number) => sum + r, 0) / ratings.length).toFixed(1))
           : null;
         const reviewCount = ratings.length;
 

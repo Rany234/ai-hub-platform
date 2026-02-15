@@ -114,7 +114,7 @@ export function ServiceConfigurator({
     }
 
     setOpen(false);
-    router.push(`/dashboard/orders/${encodeURIComponent(result.orderId)}`);
+    router.push(`/dashboard/orders/${encodeURIComponent(result.data.id)}`);
     router.refresh();
   };
 

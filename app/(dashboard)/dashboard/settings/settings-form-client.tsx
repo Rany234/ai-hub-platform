@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-import { updateProfile } from "@/app/actions/profile";
+import { updateUserSettings } from "@/app/actions/settings";
 
 type Profile = {
   id: string;
@@ -23,6 +22,8 @@ type Profile = {
   bio: string | null;
   website: string | null;
   avatar_url: string | null;
+  email?: string | null;
+  wechat_id?: string | null;
 };
 
 export function SettingsFormClient({
@@ -32,14 +33,13 @@ export function SettingsFormClient({
   userId: string;
   initialProfile: Profile | null;
 }) {
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
 
   const [fullName, setFullName] = useState(initialProfile?.full_name ?? "");
   const [bio, setBio] = useState(initialProfile?.bio ?? "");
   const [avatarUrl, setAvatarUrl] = useState(initialProfile?.avatar_url ?? "");
-  const [email, setEmail] = useState((initialProfile as any)?.email ?? "");
-  const [wechatId, setWechatId] = useState((initialProfile as any)?.wechat_id ?? "");
+  const [email, setEmail] = useState(initialProfile?.email ?? "");
+  const [wechatId, setWechatId] = useState(initialProfile?.wechat_id ?? "");
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,11 +49,14 @@ export function SettingsFormClient({
     setError(null);
 
     try {
-      const result = await updateProfile({
-        title: fullName.trim() || null,
+      const result = await updateUserSettings({
+        name: fullName.trim() || null,
         bio: bio.trim() || null,
-        skills: null,
+        image: avatarUrl.trim() || null,
+        email: email.trim() || null,
+        wechatId: wechatId.trim() || null,
       });
+
       if (!result?.success) {
         throw new Error(result?.error ?? "保存失败");
       }

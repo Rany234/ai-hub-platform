@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { logoutAction } from "@/features/auth/actions";
 
 type Props = {
@@ -13,7 +12,6 @@ type Props = {
 };
 
 export function UserDropdown({ avatarUrl, fullName, username }: Props) {
-  const supabase = createSupabaseBrowserClient();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 

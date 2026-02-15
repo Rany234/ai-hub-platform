@@ -1,7 +1,6 @@
 import { CreditCard, Clock, FileText } from "lucide-react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import prisma from "@/lib/prisma";
 
 type ClientStatsProps = {
   userId: string;
@@ -14,36 +13,34 @@ function formatMoney(value: unknown) {
 }
 
 export async function ClientStats({ userId }: ClientStatsProps) {
-  const supabase = await createSupabaseServerClient();
+  // 1. 累计支出：所有状态非 cancelled 的订单总额
+  const stats = await prisma.order.aggregate({
+    where: {
+      buyerId: userId,
+      status: { not: "disputed" }, // 适配现有 OrderStatus 枚举
+    },
+    _sum: {
+      amount: true,
+    },
+  });
 
-  // 并行查询 Client 端数据
-  const [
-    { data: ordersData },
-    { count: activeOrdersCount },
-    { count: jobsCount },
-  ] = await Promise.all([
-    // 累计支出：orders 表中所有状态为已支付的订单总金额
-    supabase
-      .from("orders")
-      .select("amount")
-      .eq("buyer_id", userId)
-      .not("status", "eq", "cancelled"), // 排除已取消的
-    // 活跃订单：in_progress 状态
-    supabase
-      .from("orders")
-      .select("*", { count: "exact", head: true })
-      .eq("buyer_id", userId)
-      .eq("status", "in_progress"),
-    // 发布任务：jobs 表中创建的所有任务数
-    supabase
-      .from("jobs")
-      .select("*", { count: "exact", head: true })
-      .eq("creator_id", userId),
-  ]);
+  // 2. 活跃订单：进行中状态的订单
+  const activeOrdersCount = await prisma.order.count({
+    where: {
+      buyerId: userId,
+      status: { in: ["pending", "paid", "delivered"] },
+    },
+  });
 
-  const totalSpent = ordersData?.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0) ?? 0;
-  const activeOrders = activeOrdersCount ?? 0;
-  const publishedJobs = jobsCount ?? 0;
+  // 3. 已完成订单数
+  const completedOrdersCount = await prisma.order.count({
+    where: {
+      buyerId: userId,
+      status: "completed",
+    },
+  });
+
+  const totalSpent = stats._sum.amount ?? 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -64,19 +61,19 @@ export async function ClientStats({ userId }: ClientStatsProps) {
           <Clock className="h-4 w-4 text-orange-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-mono">{activeOrders}</div>
+          <div className="text-2xl font-bold font-mono">{activeOrdersCount}</div>
           <p className="text-xs text-muted-foreground mt-1">正在进行中的订单</p>
         </CardContent>
       </Card>
 
       <Card className="rounded-2xl shadow-sm border-brand-border bg-brand-surface">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">发布任务</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">已完成</CardTitle>
           <FileText className="h-4 w-4 text-purple-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold font-mono">{publishedJobs}</div>
-          <p className="text-xs text-muted-foreground mt-1">已发布的定制化需求</p>
+          <div className="text-2xl font-bold font-mono">{completedOrdersCount}</div>
+          <p className="text-xs text-muted-foreground mt-1">已成功结项的服务</p>
         </CardContent>
       </Card>
     </div>

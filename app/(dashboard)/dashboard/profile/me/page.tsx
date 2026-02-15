@@ -1,16 +1,13 @@
 import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
 
 export default async function MyProfileRedirectPage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
 
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login?redirectedFrom=/dashboard/profile/me");
   }
 
-  redirect(`/dashboard/profile/${user.id}`);
+  redirect(`/dashboard/profile/${session.user.id}`);
 }

@@ -1,24 +1,19 @@
 import { Suspense } from "react";
-
 import Link from "next/link";
-
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { ClientStats } from "@/components/dashboard/ClientStats";
 import { StatsSkeleton } from "@/components/dashboard/StatsSkeleton";
 import { DashboardJobList } from "@/components/dashboard/DashboardJobList";
 import { JobListSkeleton } from "@/components/dashboard/JobListSkeleton";
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
 type ClientViewProps = {
   userId: string;
 };
 
 export async function ClientView({ userId }: ClientViewProps) {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const user = session?.user;
 
   if (!user) return null;
 

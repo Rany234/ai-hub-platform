@@ -183,7 +183,6 @@ export function JobCard({ job, isOwner, userId }: JobCardProps) {
                 <div onClick={(e) => e.stopPropagation()}>
                   <BidDrawer 
                     jobId={j.id} 
-                    jobTitle={displayTitle}
                     trigger={
                       <Button 
                         size="sm" 

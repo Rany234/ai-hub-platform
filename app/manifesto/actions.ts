@@ -1,56 +1,53 @@
-"use client";
+"use server";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
+import { serializePrisma } from "@/lib/utils";
+import { Prisma } from "@prisma/client";
+import type { ActionResult } from "@/types/actions";
 
-export async function signManifesto(signatureHash: string) {
-  const supabase = createSupabaseBrowserClient();
-  
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+export type ManifestoSignaturePayload = Prisma.ManifestoSignatureGetPayload<{}>;
+
+export async function signManifesto(signatureHash: string): Promise<ActionResult<ManifestoSignaturePayload>> {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
     throw new Error("请先登录再签署宣言");
   }
 
-  const { data, error } = await supabase
-    .from("manifesto_signatures")
-    .insert({
-      user_id: user.id,
-      signature_hash: signatureHash,
-      signed_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
+  try {
+    const created = await prisma.manifestoSignature.create({
+      data: {
+        userId,
+        signatureHash,
+        signedAt: new Date(),
+      },
+    });
 
-  if (error) {
-    if (error.code === "23505") { // Unique constraint violation
+    return { success: true, data: serializePrisma(created) };
+  } catch (e) {
+    // 唯一约束：@@unique([userId])
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
       throw new Error("您已经签署过该宣言了");
     }
-    throw new Error(error.message);
+    throw e;
   }
-
-  return data;
 }
 
 export async function getSignatureStatus() {
-  const supabase = createSupabaseBrowserClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { signed: false };
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) return { signed: false };
 
-  const { data, error } = await supabase
-    .from("manifesto_signatures")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const data = await prisma.manifestoSignature.findUnique({
+    where: { userId },
+    select: { id: true },
+  });
 
-  if (error) return { signed: false };
   return { signed: !!data };
 }
 
 export async function getSignatureCount() {
-  const supabase = createSupabaseBrowserClient();
-  const { count, error } = await supabase
-    .from("manifesto_signatures")
-    .select("*", { count: "exact", head: true });
-
-  if (error) return 0;
-  return count ?? 0;
+  const count = await prisma.manifestoSignature.count();
+  return count;
 }

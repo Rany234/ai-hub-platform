@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { ListingForm } from "@/features/listings/components/ListingForm";
 
 function assertString(v: unknown): string {
@@ -13,32 +14,41 @@ export default async function EditListingPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
+
   const { id } = await params;
   const listingId = assertString(id);
 
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!session?.user?.id) {
     redirect(`/login?redirectedFrom=/dashboard/listings/${listingId}/edit`);
   }
 
-  const { data: listing, error } = await supabase
-    .from("listings")
-    .select("*")
-    .eq("id", listingId)
-    .eq("creator_id", user.id)
-    .maybeSingle();
+  const listing = await prisma.listing.findFirst({
+    where: { id: listingId, creatorId: session.user.id },
+  });
 
-  if (error || !listing) {
+  if (!listing) {
     notFound();
   }
 
+  const initialData = {
+    id: listing.id,
+    created_at: listing.createdAt.toISOString(),
+    creator_id: listing.creatorId,
+    title: listing.title,
+    description: listing.description,
+    price: listing.price,
+    category: listing.category,
+    metadata: listing.metadata as any,
+    preview_url: listing.previewUrl,
+    options: (listing.options as any) ?? [],
+    status: listing.status,
+    packages: (listing.metadata as any)?.packages,
+  } as any;
+
   return (
     <div className="p-6 max-w-6xl">
-      <ListingForm mode="edit" initialData={(listing as any) ?? null} />
+      <ListingForm mode="edit" initialData={initialData} />
     </div>
   );
 }

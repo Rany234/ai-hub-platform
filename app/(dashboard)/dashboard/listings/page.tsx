@@ -1,26 +1,24 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { ListingsClient } from "./ListingsClient";
 
 export default async function ListingsPage() {
-  const supabase = await createSupabaseServerClient();
+  const session = await auth();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!session?.user?.id) {
     redirect("/login?redirectedFrom=/dashboard/listings");
   }
 
-  const { data: listings, error } = await supabase
-    .from("listings")
-    .select("*")
-    .eq("creator_id", user.id)
-    .neq("status", "archived")
-    .order("created_at", { ascending: false });
+  const listings = await prisma.listing.findMany({
+    where: {
+      creatorId: session.user.id,
+      NOT: { status: "archived" },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <div className="p-6 max-w-4xl">
@@ -31,11 +29,7 @@ export default async function ListingsPage() {
         </Link>
       </div>
 
-      {error ? (
-        <p className="mt-4 text-sm text-red-600">{error.message}</p>
-      ) : null}
-
-      {!listings || listings.length === 0 ? (
+      {listings.length === 0 ? (
         <div className="mt-10 border rounded-lg p-8 text-center">
           <h2 className="text-lg font-semibold">暂无内容</h2>
           <p className="mt-2 text-sm text-muted-foreground">你还没有发布任何服务。</p>

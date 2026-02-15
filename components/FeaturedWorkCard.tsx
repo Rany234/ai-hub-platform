@@ -4,9 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, User } from "lucide-react";
-import type { Database } from "@/database.types";
-
-type Listing = Database["public"]["Tables"]["listings"]["Row"];
+import type { Listing } from "@prisma/client";
 
 interface FeaturedWorkCardProps {
   listing: Listing;
@@ -31,9 +29,9 @@ export function FeaturedWorkCard({ listing, index }: FeaturedWorkCardProps) {
       className={`group relative ${heightClass} overflow-hidden rounded-[2rem] border border-[#334155] bg-[#151F32] shadow-2xl transition-all duration-500 hover:shadow-brand-action/10`}
     >
       {/* 作品图片 */}
-      {listing.preview_url ? (
+      {listing.previewUrl ? (
         <Image
-          src={listing.preview_url}
+          src={listing.previewUrl}
           alt={listing.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110"

@@ -12,7 +12,7 @@ export type ListingMetadata = z.infer<typeof listingMetadataSchema>;
 export const listingPackageSchema = z
   .object({
     enabled: z.coerce.boolean().default(true),
-    price: z.coerce.number({ invalid_type_error: "价格必须是数字" }),
+    price: z.coerce.number().min(0, { message: "价格必须是数字且大于等于 0" }),
     delivery_days: z.coerce
       .number()
       .int({ message: "预计交付天数必须为整数" })
@@ -102,7 +102,12 @@ export const createListingSchema = z.object({
       message: "请选择有效的分类",
     })
     .optional(),
-  previewUrl: z.string().url({ message: "请输入有效的链接" }).optional(),
+  previewUrl: z
+    .string()
+    .optional()
+    .refine((v) => !v || v.startsWith("/") || /^https?:\/\//.test(v), {
+      message: "请输入有效的链接",
+    }),
   packages: listingPackagesSchema,
 });
 

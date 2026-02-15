@@ -1,66 +1,32 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
 
-export async function getNotifications() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export type NotificationItem = {
+  id: string;
+  title?: string | null;
+  content?: string | null;
+  created_at?: string | null;
+  is_read?: boolean | null;
+};
 
-  if (!user) throw new Error("Unauthorized");
+export async function getNotifications(): Promise<NotificationItem[]> {
+  const session = await auth();
+  if (!session?.user?.id) return [];
 
-  const { data, error } = await supabase
-    .from("notifications")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching notifications:", error);
-    return [];
-  }
-
-  return data || [];
+  // 通知模块原先基于 Supabase Realtime/表结构实现。
+  // 当前项目已全面移除 Supabase，通知功能暂时降级为空实现，后续将用 Prisma 重做。
+  return [];
 }
 
-export async function markAsRead(id: string) {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("Unauthorized");
-
-  const { error } = await supabase
-    .from("notifications")
-    .update({ is_read: true })
-    .eq("id", id)
-    .eq("user_id", user.id);
-
-  if (error) {
-    console.error("Error marking notification as read:", error);
-    return { success: false };
-  }
-
-  revalidatePath("/");
+export async function markAsRead(_id: string): Promise<{ success: true }> {
+  const session = await auth();
+  if (!session?.user?.id) return { success: true };
   return { success: true };
 }
 
-export async function markAllAsRead() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("Unauthorized");
-
-  const { error } = await supabase
-    .from("notifications")
-    .update({ is_read: true })
-    .eq("user_id", user.id)
-    .eq("is_read", false);
-
-  if (error) {
-    console.error("Error marking all notifications as read:", error);
-    return { success: false };
-  }
-
-  revalidatePath("/");
+export async function markAllAsRead(): Promise<{ success: true }> {
+  const session = await auth();
+  if (!session?.user?.id) return { success: true };
   return { success: true };
 }

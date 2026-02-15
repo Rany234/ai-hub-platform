@@ -1,10 +1,8 @@
 import Link from "next/link";
-
 import { Star } from "lucide-react";
+import { Listing as PrismaListing } from "@prisma/client";
 
-import type { Database } from "@/database.types";
-
-export type Listing = Database["public"]["Tables"]["listings"]["Row"];
+export type Listing = PrismaListing;
 
 export function ListingCard({ listing }: { listing: Listing }) {
   const metadata = listing.metadata as unknown as {
@@ -88,12 +86,12 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </div>
         )}
 
-        {listing.preview_url ? (
+        {listing.previewUrl ? (
           <div className="mt-2 w-full h-40 rounded-md border overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               alt={listing.title}
-              src={listing.preview_url}
+              src={listing.previewUrl}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>

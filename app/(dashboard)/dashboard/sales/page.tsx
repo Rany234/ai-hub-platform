@@ -1,54 +1,28 @@
 import { redirect } from "next/navigation";
 
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { StatusBadge } from "@/components/StatusBadge";
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
 
 export default async function SalesPage() {
-  const supabase = await createSupabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const session = await auth();
+  if (!session?.user?.id) {
     redirect("/login?redirectedFrom=/dashboard/sales");
   }
 
-  const { data: listings, error: listingsError } = await supabase
-    .from("listings")
-    .select("id")
-    .eq("creator_id", user.id);
+  const orders = await prisma.order.findMany({
+    where: {
+      listing: {
+        creatorId: session.user.id,
+      },
+    },
+    include: {
+      listing: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
-  if (listingsError) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold">销售看板</h1>
-        <p className="mt-4 text-sm text-red-600">{listingsError.message}</p>
-      </div>
-    );
-  }
-
-  const listingIds = (listings ?? []).map((l) => l.id);
-
-  const { data: orders, error: ordersError } = await supabase
-    .from("orders")
-    .select("id, buyer_id, listing_id, amount, status, escrow_status, created_at")
-    .in(
-      "listing_id",
-      listingIds.length ? listingIds : ["00000000-0000-0000-0000-000000000000"]
-    )
-    .order("created_at", { ascending: false });
-
-  if (ordersError) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold">销售看板</h1>
-        <p className="mt-4 text-sm text-red-600">{ordersError.message}</p>
-      </div>
-    );
-  }
-
-  const pendingDeliveryCount = orders?.filter((o) => o.status === "paid").length ?? 0;
+  const pendingDeliveryCount = orders.filter((o) => o.status === "paid").length;
 
   return (
     <div className="p-6">
@@ -60,7 +34,7 @@ export default async function SalesPage() {
         </div>
       ) : null}
 
-      {(orders ?? []).length === 0 ? (
+      {orders.length === 0 ? (
         <div className="mt-6 border rounded-lg p-6">
           <p className="text-sm text-muted-foreground">暂无销售订单</p>
         </div>
@@ -76,9 +50,9 @@ export default async function SalesPage() {
               </tr>
             </thead>
             <tbody>
-              {(orders ?? []).map((order) => (
+              {orders.map((order) => (
                 <tr key={order.id} className="border-b last:border-b-0">
-                  <td className="p-3 font-mono">{order.listing_id}</td>
+                  <td className="p-3 font-mono">{order.listing?.title ?? order.listingId}</td>
                   <td className="p-3">¥{order.amount}</td>
                   <td className="p-3">
                     <StatusBadge status={order.status} />

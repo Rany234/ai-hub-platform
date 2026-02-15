@@ -25,9 +25,7 @@ export default function RootLayout({
           🚀 技术预览版 (Technical Preview)：为验证《共生纪元》价值分配逻辑，当前交易处于沙盒模拟模式。不涉及真实资金流转。
         </div>
         <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
         <footer className="border-t border-white/5 bg-[#0B1121] py-8">
           <div className="mx-auto max-w-6xl px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
             <div className="font-medium text-slate-400">

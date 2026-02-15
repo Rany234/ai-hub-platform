@@ -81,7 +81,7 @@ export function TrustProcess() {
       show: {
         scaleX: 1,
         opacity: 1,
-        transition: { duration: 1.2, ease: "easeOut", delay: 0.2 },
+        transition: { duration: 1.2, ease: "easeOut" as const, delay: 0.2 },
       },
     }),
     []
@@ -98,7 +98,7 @@ export function TrustProcess() {
   const itemVariants = useMemo(
     () => ({
       hidden: { opacity: 0, y: 10 },
-      show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
+      show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" as const } },
     }),
     []
   );

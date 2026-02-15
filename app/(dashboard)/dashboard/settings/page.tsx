@@ -1,24 +1,35 @@
 import { redirect } from "next/navigation";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { SettingsFormClient } from "./settings-form-client";
 
 export default async function SettingsPage() {
-  const supabase = await createSupabaseServerClient();
+  const session = await auth();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (!session?.user?.id) {
+    redirect("/login?redirectedFrom=/dashboard/settings");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, name: true, email: true, image: true },
+  });
 
   if (!user) {
     redirect("/login?redirectedFrom=/dashboard/settings");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, username, full_name, bio, website, avatar_url, email, wechat_id")
-    .eq("id", user.id)
-    .maybeSingle();
+  const initialProfile = {
+    id: user.id,
+    username: null,
+    full_name: user.name ?? null,
+    bio: null,
+    website: null,
+    avatar_url: user.image ?? null,
+    email: user.email ?? null,
+    wechat_id: null,
+  };
 
   return (
     <div className="p-6 max-w-2xl">
@@ -26,10 +37,7 @@ export default async function SettingsPage() {
       <p className="mt-2 text-sm text-muted-foreground">更新你的个人资料与头像。</p>
 
       <div className="mt-6">
-        <SettingsFormClient
-          userId={user.id}
-          initialProfile={profile ?? null}
-        />
+        <SettingsFormClient userId={user.id} initialProfile={initialProfile as any} />
       </div>
     </div>
   );

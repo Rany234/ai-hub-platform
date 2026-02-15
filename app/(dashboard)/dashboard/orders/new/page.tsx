@@ -25,5 +25,5 @@ export default async function NewOrderPage({
     redirect(`/listings/${encodeURIComponent(listingId)}?error=${encodeURIComponent(result.error)}`);
   }
 
-  redirect(`/dashboard/orders/${encodeURIComponent(result.orderId)}`);
+  redirect(`/dashboard/orders/${encodeURIComponent(result.data.id)}`);
 }

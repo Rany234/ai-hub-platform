@@ -1,17 +1,20 @@
 import { redirect } from "next/navigation";
-
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
-import ChatClient from "./ui/ChatClient";
+import { auth } from "@/auth";
+import { DashboardPlaceholder } from "@/components/dashboard/DashboardPlaceholder";
+import { MessageCircle } from "lucide-react";
 
 export default async function ChatPage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const session = await auth();
+  if (!session?.user?.id) {
     redirect("/login?redirectedFrom=/dashboard/chat");
   }
 
-  return <ChatClient currentUserId={user.id} />;
+  return (
+    <DashboardPlaceholder
+      title="聊天功能即将上线"
+      description="我们正在将系统全面升级为服务市场模式。聊天功能正在重构中，敬请期待。"
+      type="coming-soon"
+      icon={MessageCircle}
+    />
+  );
 }

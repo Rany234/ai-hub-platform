@@ -18,9 +18,9 @@ export async function getUserConversations() {
     .eq("user_id", user.id);
 
   if (pError) throw pError;
-  if (!participations || participations.length === 0) return [];
+  if (!participations || (participations as any[]).length === 0) return [];
 
-  const conversationIds = participations.map(p => p.conversation_id);
+  const conversationIds = (participations as any[]).map(p => p.conversation_id);
 
   // Fetch conversations with participants (excluding current user) and the latest message
   const { data: conversations, error: cError } = await supabase
@@ -46,8 +46,8 @@ export async function getUserConversations() {
 
   if (cError) throw cError;
 
-  return (conversations || []).map(conv => {
-    const otherParticipant = conv.conversation_participants.find(p => p.user_id !== user.id);
+  return (conversations as any[] || []).map(conv => {
+    const otherParticipant = (conv.conversation_participants as any[]).find(p => p.user_id !== user.id);
     const lastMessage = conv.messages?.[0] || null;
     return {
       id: conv.id,

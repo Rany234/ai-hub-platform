@@ -1,8 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
-
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useCallback, useRef, useState } from "react";
 
 type Props = {
   userId: string;
@@ -15,12 +13,9 @@ function isImageFile(file: File) {
   return file.type.startsWith("image/");
 }
 
-export function AvatarUpload({ userId, currentUrl, onUploaded, size = 96 }: Props) {
+export function AvatarUpload({ currentUrl, size = 96 }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const openPicker = useCallback(() => {
     setError(null);
@@ -37,34 +32,13 @@ export function AvatarUpload({ userId, currentUrl, onUploaded, size = 96 }: Prop
         return;
       }
 
-      try {
-        setUploading(true);
-        setError(null);
-
-        const ext = file.name.split(".").pop() || "png";
-        const path = `${userId}/${Date.now()}.${ext}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("avatars")
-          .upload(path, file, { upsert: true, contentType: file.type });
-
-        if (uploadError) throw uploadError;
-
-        const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-        const publicUrl = data.publicUrl;
-
-        if (!publicUrl) throw new Error("无法获取头像公开地址");
-
-        onUploaded(publicUrl);
-
-        if (inputRef.current) inputRef.current.value = "";
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "上传失败");
-      } finally {
-        setUploading(false);
-      }
+      // 暂时仅做预览提示，后续对接服务器上传逻辑
+      console.log("已选择文件:", file.name);
+      setError("文件上传功能正在重构中...");
+      
+      if (inputRef.current) inputRef.current.value = "";
     },
-    [onUploaded, supabase, userId]
+    []
   );
 
   const boxStyle: React.CSSProperties = {
@@ -79,7 +53,6 @@ export function AvatarUpload({ userId, currentUrl, onUploaded, size = 96 }: Prop
         onClick={openPicker}
         className="relative overflow-hidden rounded-full border border-[#334155] bg-slate-800 hover:border-brand-action/50 transition-colors"
         style={boxStyle}
-        disabled={uploading}
         aria-label="更换头像"
       >
         {currentUrl ? (
@@ -90,11 +63,6 @@ export function AvatarUpload({ userId, currentUrl, onUploaded, size = 96 }: Prop
             无头像
           </div>
         )}
-        {uploading ? (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center text-xs text-white font-medium">
-            上传中...
-          </div>
-        ) : null}
       </button>
 
       <div className="flex flex-col gap-1">
@@ -102,8 +70,7 @@ export function AvatarUpload({ userId, currentUrl, onUploaded, size = 96 }: Prop
         <button
           type="button"
           onClick={openPicker}
-          className="text-sm text-brand-action underline hover:text-amber-400 transition-colors disabled:opacity-50"
-          disabled={uploading}
+          className="text-sm text-brand-action underline hover:text-amber-400 transition-colors"
         >
           点击更换
         </button>

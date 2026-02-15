@@ -2,39 +2,45 @@
 
 import { revalidatePath } from "next/cache";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { Prisma } from "@prisma/client";
 
-type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
+import { serializePrisma } from "@/lib/utils";
+import type { ActionResult } from "@/types/actions";
 
-type CreateOrderResult =
-  | { success: true; orderId: string }
+export type OrderWithBuyerListing = Prisma.OrderGetPayload<{
+  include: { buyer: true; listing: true };
+}>;
+
+export type OrderWithBuyerListingDeliveries = Prisma.OrderGetPayload<{
+  include: { buyer: true; listing: true; deliveries: true };
+}>;
+
+export type CreateOrderResult =
+  | { success: true; data: OrderWithBuyerListing }
   | { success: false; error: string; code?: "UNAUTHORIZED" | "NOT_FOUND" | "UNKNOWN" };
 
 export async function createOrderAction(
   listingId: string,
   requirements: string,
   selectedOptions: Array<{ label: string; price: number }> = [],
-  selectedPackage?: { tier: "basic" | "standard" | "premium"; packageDetails?: unknown }
+  selectedPackage?: { tier: "basic" | "standard" | "premium"; packageDetails?: Record<string, unknown> }
 ): Promise<CreateOrderResult> {
   try {
-    const supabase = await createSupabaseServerClient();
+    const session = await auth();
+    const userId = session?.user?.id;
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
+    if (!userId) {
       return { success: false, error: "请先登录后再下单", code: "UNAUTHORIZED" };
     }
 
-    const { data: listing, error: listingError } = await supabase
-      .from("listings")
-      .select("id, price, options")
-      .eq("id", listingId)
-      .single();
+    const listing = await prisma.listing.findUnique({
+      where: { id: listingId },
+      select: { id: true, price: true, options: true },
+    });
 
-    if (listingError || !listing) {
+    if (!listing) {
       return { success: false, error: "服务不存在或已下架", code: "NOT_FOUND" };
     }
 
@@ -48,63 +54,59 @@ export async function createOrderAction(
     const addOnTotal = validated.reduce((acc, o) => acc + o.price, 0);
     const total = listing.price + addOnTotal;
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        buyer_id: user.id,
-        listing_id: listing.id,
+    const metadata = {
+      requirements,
+      selected_options: validated,
+      selected_package: selectedPackage ? JSON.parse(JSON.stringify(selectedPackage)) : null,
+    } as any;
+
+    const order = await prisma.order.create({
+      data: {
+        buyerId: userId,
+        listingId: listing.id,
         amount: total,
         status: "pending",
-        escrow_status: "held",
-        metadata: {
-          requirements,
-          selected_options: validated,
-          selected_package: selectedPackage ?? null,
-        },
-      })
-      .select("id")
-      .single();
-
-    if (orderError || !order) {
-      return { success: false, error: "下单失败，请稍后重试", code: "UNKNOWN" };
-    }
+        escrowStatus: "held",
+        metadata,
+      },
+      include: {
+        buyer: true,
+        listing: true,
+      },
+    });
 
     revalidatePath("/dashboard");
     revalidatePath("/");
 
-    return { success: true, orderId: order.id };
-  } catch {
+    return { success: true, data: serializePrisma(order) };
+  } catch (e) {
+    console.error("CREATE_ORDER_ERROR:", e);
     return { success: false, error: "下单失败，请稍后重试", code: "UNKNOWN" };
   }
 }
 
-export async function payOrderAction(orderId: string): Promise<ActionResult<null>> {
+export async function payOrderAction(orderId: string): Promise<ActionResult<OrderWithBuyerListing>> {
   try {
-    const supabase = await createSupabaseServerClient();
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("未登录");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError) return { success: false, error: userError.message };
-    if (!user) return { success: false, error: "未登录" };
-
-    const { error } = await supabase
-      .from("orders")
-      .update({
+    const updated = await prisma.order.update({
+      where: { id: orderId },
+      data: {
         status: "paid",
-        escrow_status: "held",
-      })
-      .eq("id", orderId)
-      .eq("buyer_id", user.id);
-
-    if (error) return { success: false, error: error.message };
+        escrowStatus: "held",
+      },
+      include: {
+        buyer: true,
+        listing: true,
+      },
+    });
 
     revalidatePath(`/dashboard/orders/${orderId}`);
     revalidatePath("/dashboard");
 
-    return { success: true, data: null };
+    return { success: true, data: serializePrisma(updated) };
   } catch (e) {
     return {
       success: false,
@@ -116,66 +118,61 @@ export async function payOrderAction(orderId: string): Promise<ActionResult<null
 export async function createDeliveryAction(
   orderId: string,
   content: string,
-  fileUrl?: string
-): Promise<ActionResult<null>> {
+  input?: {
+    fileKey: string;
+    fileName: string;
+    fileSize: number;
+    fileType: string;
+  } | null
+): Promise<ActionResult<OrderWithBuyerListingDeliveries>> {
   try {
-    const supabase = await createSupabaseServerClient();
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("未登录");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { listing: { select: { creatorId: true } } },
+    });
 
-    if (userError) return { success: false, error: userError.message };
-    if (!user) return { success: false, error: "未登录" };
+    if (!order) return { success: false, error: "订单不存在" };
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .select("id, buyer_id, listing_id, status")
-      .eq("id", orderId)
-      .single();
-
-    if (orderError) return { success: false, error: orderError.message };
-
-    const { data: listing, error: listingError } = await supabase
-      .from("listings")
-      .select("id, creator_id")
-      .eq("id", order.listing_id)
-      .single();
-
-    if (listingError) return { success: false, error: listingError.message };
-
-    if (listing.creator_id !== user.id) {
+    if (order.listing.creatorId !== userId) {
       return { success: false, error: "无权限" };
     }
 
-    if (!["paid", "delivered"].includes(order.status)) {
+    if (!['paid', 'delivered'].includes(order.status)) {
       return { success: false, error: "订单状态不正确，无法交付" };
     }
 
-    const { error: insertError } = await supabase
-      .from("deliveries")
-      .insert({
-        order_id: orderId,
-        content,
-        file_url: fileUrl ?? null,
-      });
+    const deliveryCreate = {
+          orderId,
+          content,
+      fileUrl: null,
+          fileKey: input?.fileKey ?? null,
+          fileName: input?.fileName ?? null,
+          fileSize: input?.fileSize ?? null,
+          fileType: input?.fileType ?? null,
+          status: "pending",
+    } as any;
 
-    if (insertError) return { success: false, error: insertError.message };
-
-    const { error: updateError } = await supabase
-      .from("orders")
-      .update({
-        status: "delivered",
-      })
-      .eq("id", orderId);
-
-    if (updateError) return { success: false, error: updateError.message };
+    const [_, updatedOrder] = await prisma.$transaction([
+      prisma.delivery.create({ data: deliveryCreate as any }),
+      prisma.order.update({
+        where: { id: orderId },
+        data: { status: "delivered" },
+        include: {
+          buyer: true,
+          listing: true,
+          deliveries: true,
+        },
+      }),
+    ]);
 
     revalidatePath(`/dashboard/orders/${orderId}`);
     revalidatePath("/dashboard");
 
-    return { success: true, data: null };
+    return { success: true, data: serializePrisma(updatedOrder) };
   } catch (e) {
     return {
       success: false,
@@ -184,27 +181,56 @@ export async function createDeliveryAction(
   }
 }
 
-export async function approveDeliveryAction(orderId: string): Promise<ActionResult<null>> {
+export async function updateOrderRequirements(orderId: string, requirements: string): Promise<ActionResult<OrderWithBuyerListing>> {
   try {
-    const supabase = await createSupabaseServerClient();
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("未登录");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true, buyerId: true },
+    });
 
-    if (userError) return { success: false, error: userError.message };
-    if (!user) return { success: false, error: "未登录" };
+    if (!order) return { success: false, error: "订单不存在" };
+    if (order.buyerId !== userId) return { success: false, error: "无权限" };
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .select("id, buyer_id, status")
-      .eq("id", orderId)
-      .single();
+    const updated = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        metadata: {
+          ...(await prisma.order.findUnique({ where: { id: orderId } }).then(o => o?.metadata as any || {})),
+          requirements,
+          requirements_updated_at: new Date().toISOString(),
+        }
+      },
+      include: {
+        buyer: true,
+        listing: true,
+      }
+    });
 
-    if (orderError) return { success: false, error: orderError.message };
+    revalidatePath(`/dashboard/orders/${orderId}`);
+    return { success: true, data: serializePrisma(updated) };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "更新需求失败" };
+  }
+}
 
-    if (order.buyer_id !== user.id) {
+export async function approveDeliveryAction(orderId: string): Promise<ActionResult<OrderWithBuyerListing>> {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("未登录");
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true, buyerId: true, status: true },
+    });
+
+    if (!order) return { success: false, error: "订单不存在" };
+
+    if (order.buyerId !== userId) {
       return { success: false, error: "无权限" };
     }
 
@@ -212,21 +238,22 @@ export async function approveDeliveryAction(orderId: string): Promise<ActionResu
       return { success: false, error: "订单状态不正确，无法确认收货" };
     }
 
-    const { error: updateError } = await supabase
-      .from("orders")
-      .update({
+    const updated = await prisma.order.update({
+      where: { id: orderId },
+      data: {
         status: "completed",
-        escrow_status: "released",
-      })
-      .eq("id", orderId)
-      .eq("buyer_id", user.id);
-
-    if (updateError) return { success: false, error: updateError.message };
+        escrowStatus: "released",
+      },
+      include: {
+        buyer: true,
+        listing: true,
+      },
+    });
 
     revalidatePath(`/dashboard/orders/${orderId}`);
     revalidatePath("/dashboard");
 
-    return { success: true, data: null };
+    return { success: true, data: serializePrisma(updated) };
   } catch (e) {
     return {
       success: false,
@@ -235,27 +262,68 @@ export async function approveDeliveryAction(orderId: string): Promise<ActionResu
   }
 }
 
-export async function requestChangesAction(orderId: string, feedback: string): Promise<ActionResult<null>> {
+export async function completeOrderAction(orderId: string): Promise<ActionResult<OrderWithBuyerListing>> {
   try {
-    const supabase = await createSupabaseServerClient();
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("未登录");
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true, buyerId: true, status: true, paymentMethod: true, amount: true },
+    });
 
-    if (userError) return { success: false, error: userError.message };
-    if (!user) return { success: false, error: "未登录" };
+    if (!order) return { success: false, error: "订单不存在" };
+    if (order.buyerId !== userId) return { success: false, error: "无权限" };
+    if (order.status !== "delivered") {
+      return { success: false, error: "订单状态不正确，当前无法验收" };
+    }
 
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .select("id, buyer_id, status, metadata")
-      .eq("id", orderId)
-      .single();
+    // 模拟资金划转逻辑
+    if (order.paymentMethod === "OFFLINE") {
+      console.log(`[Fund Release] Order ${orderId}: Mock payment detected. Releasing ¥${order.amount} to seller.`);
+    } else {
+      console.log(`[Fund Release] Order ${orderId}: Releasing ¥${order.amount} via ${order.paymentMethod}.`);
+    }
 
-    if (orderError) return { success: false, error: orderError.message };
+    const updated = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: "completed",
+        escrowStatus: "released",
+      },
+      include: {
+        buyer: true,
+        listing: true,
+      },
+    });
 
-    if (order.buyer_id !== user.id) {
+    revalidatePath(`/dashboard/orders/${orderId}`);
+    revalidatePath("/dashboard");
+
+    return { success: true, data: serializePrisma(updated) };
+  } catch (e) {
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "验收失败",
+    };
+  }
+}
+
+export async function requestChangesAction(orderId: string, feedback: string): Promise<ActionResult<OrderWithBuyerListing>> {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) throw new Error("未登录");
+
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: { id: true, buyerId: true, status: true, metadata: true },
+    });
+
+    if (!order) return { success: false, error: "订单不存在" };
+
+    if (order.buyerId !== userId) {
       return { success: false, error: "无权限" };
     }
 
@@ -263,25 +331,28 @@ export async function requestChangesAction(orderId: string, feedback: string): P
       return { success: false, error: "订单状态不正确，无法申请修改" };
     }
 
-    const { error: updateError } = await supabase
-      .from("orders")
-      .update({
+    const currentMetadata = (order.metadata as Record<string, any>) || {};
+
+    const updated = await prisma.order.update({
+      where: { id: orderId },
+      data: {
         status: "paid",
         metadata: {
-          ...(order.metadata ?? {}),
+          ...currentMetadata,
           last_feedback: feedback,
           requested_changes_at: new Date().toISOString(),
         },
-      })
-      .eq("id", orderId)
-      .eq("buyer_id", user.id);
-
-    if (updateError) return { success: false, error: updateError.message };
+      },
+      include: {
+        buyer: true,
+        listing: true,
+      },
+    });
 
     revalidatePath(`/dashboard/orders/${orderId}`);
     revalidatePath("/dashboard");
 
-    return { success: true, data: null };
+    return { success: true, data: serializePrisma(updated) };
   } catch (e) {
     return {
       success: false,

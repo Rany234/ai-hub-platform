@@ -10,9 +10,9 @@ import { toast } from "sonner";
 import { getSignatureStatus } from "@/app/manifesto/actions";
 
 import { Button } from "@/components/ui/button";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { createListing, updateListing } from "@/features/listings/actions";
-import { ListingCard, type Listing } from "@/features/listings/components/ListingCard";
+import { ListingCard } from "@/features/listings/components/ListingCard";
+import type { Listing } from "@prisma/client";
 import type { ListingPackages, PackageTierKey as NormalizedTierKey } from "@/types/supabase";
 
 type CreateState =
@@ -113,7 +113,6 @@ function parseExistingPackages(initialData: Listing | null | undefined): Listing
 
 export function ListingForm({ mode = "create", initialData }: Props) {
   const router = useRouter();
-  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [createState, setCreateState] = useState<CreateState>({});
@@ -143,6 +142,10 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [description, setDescription] = useState(initialData?.description ?? "");
+  const [listingType, setListingType] = useState<"SERVICE" | "ASSET">(
+    (initialData as any)?.type ?? "SERVICE"
+  );
+  const [attachmentUrl, setAttachmentUrl] = useState((initialData as any)?.attachmentUrl ?? "");
   const [mainCategory, setMainCategory] = useState<"assets" | "services" | "solutions">(
     ((initialData?.category as any) as "assets" | "services" | "solutions") ?? "assets"
   );
@@ -151,7 +154,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     const fromMeta = (initialData?.metadata as any)?.sub_category;
     return typeof fromMeta === "string" && fromMeta.length > 0 ? fromMeta : "prompt";
   });
-  const [previewUrl, setPreviewUrl] = useState(initialData?.preview_url ?? "");
+  const [previewUrl, setPreviewUrl] = useState((initialData as any)?.previewUrl ?? "");
 
   const [packages, setPackages] = useState<ListingPackagesDraft>(() => parseExistingPackages(initialData));
   const [previewTier, setPreviewTier] = useState<PackageTierKey>("basic");
@@ -187,6 +190,13 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     }, {} as ListingPackages);
 
     formData.set("packages", JSON.stringify(normalizedPackages));
+    formData.set("type", listingType);
+    if (listingType === "ASSET") {
+      formData.set("attachmentUrl", attachmentUrl);
+      formData.set("instantDelivery", "true");
+    } else {
+      formData.set("instantDelivery", "false");
+    }
 
     try {
       let result;
@@ -226,22 +236,44 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     setEditState({});
 
     try {
-      const ext = file.name.split(".").pop() || "png";
-      const path = `public/${Date.now()}-${randomString()}.${ext}`;
+      const fd = new FormData();
+      fd.set("file", file);
 
-      const { data, error } = await supabase.storage.from("listings").upload(path, file, {
-        upsert: false,
-        contentType: file.type || undefined,
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: fd,
       });
 
-      if (error) {
-        setCreateState({ success: false, error: "上传失败，请稍后重试" });
-        setEditState({ success: false, error: "上传失败，请稍后重试" });
+      if (!res.ok) {
+        let message = "上传失败，请稍后重试";
+        try {
+          const errJson = (await res.json()) as { error?: string };
+          if (errJson?.error) message = errJson.error;
+        } catch {
+          // ignore
+        }
+        setCreateState({ success: false, error: message });
+        setEditState({ success: false, error: message });
+        toast.error(message);
         return;
       }
 
-      const publicUrl = supabase.storage.from("listings").getPublicUrl(data.path).data.publicUrl;
-      setPreviewUrl(publicUrl);
+      const json = (await res.json()) as { url?: string };
+      if (!json.url) {
+        const message = "上传失败：服务端未返回图片地址";
+        setCreateState({ success: false, error: message });
+        setEditState({ success: false, error: message });
+        toast.error(message);
+        return;
+      }
+
+      setPreviewUrl(json.url);
+      toast.success("上传成功");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "上传失败，请稍后重试";
+      setCreateState({ success: false, error: message });
+      setEditState({ success: false, error: message });
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -279,7 +311,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
       price: Number.isFinite(Number(tier.price)) ? Number(tier.price) : 0,
       category: categoryValue,
       metadata: { delivery_days: tier.delivery_days } as unknown as Listing["metadata"],
-      preview_url: previewUrl || null,
+      previewUrl: previewUrl || null,
       options: [],
       status: "active",
     } as any;
@@ -295,7 +327,7 @@ export function ListingForm({ mode = "create", initialData }: Props) {
     const meta = TIER_META.find((x) => x.key === key)!;
 
     return (
-      <div className={`border border-[#334155] rounded-xl p-4 bg-[#151F32] ${!t.enabled ? "opacity-60" : ""}`}>
+      <div key={key} className={`border border-[#334155] rounded-xl p-4 bg-[#151F32] ${!t.enabled ? "opacity-60" : ""}`}>
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="font-semibold">{meta.title}</div>
@@ -462,6 +494,57 @@ export function ListingForm({ mode = "create", initialData }: Props) {
 
             <form action={onSubmit} className="mt-6 space-y-8">
               <section className="space-y-4">
+                <h2 className="text-sm font-semibold text-muted-foreground">交付类型</h2>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => setListingType("SERVICE")}
+                    className={`text-left rounded-2xl border p-4 transition-all backdrop-blur ${
+                      listingType === "SERVICE"
+                        ? "border-amber-500/30 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.12)]"
+                        : "border-white/10 bg-white/5 hover:border-white/20"
+                    }`}
+                  >
+                    <div className="text-sm font-extrabold text-white">专业服务 (Service)</div>
+                    <div className="mt-1 text-xs text-slate-400">人工介入交付，支持定制开发、咨询等。</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setListingType("ASSET")}
+                    className={`text-left rounded-2xl border p-4 transition-all backdrop-blur ${
+                      listingType === "ASSET"
+                        ? "border-amber-500/30 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.12)]"
+                        : "border-white/10 bg-white/5 hover:border-white/20"
+                    }`}
+                  >
+                    <div className="text-sm font-extrabold text-white">数字资产 (Asset)</div>
+                    <div className="mt-1 text-xs text-slate-400">支付后自动发货，如 Prompt、电子书。</div>
+                  </button>
+                </div>
+              </section>
+
+              {listingType === "ASSET" && (
+                <section className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                  <h2 className="text-sm font-semibold text-muted-foreground">资产配置</h2>
+                  <div className="space-y-1">
+                    <label className="text-sm" htmlFor="attachmentUrl">
+                      资产链接 (Asset URL)
+                    </label>
+                    <input
+                      id="attachmentUrl"
+                      required
+                      placeholder="Google Drive, Dropbox 或 Notion 链接"
+                      className="w-full bg-[#0B1121] border border-[#334155] rounded-xl px-4 py-2.5 text-slate-100 placeholder:text-slate-600 outline-none focus:ring-2 focus:ring-brand-action/20 focus:border-brand-action/50 transition-all"
+                      value={attachmentUrl}
+                      onChange={(e) => setAttachmentUrl(e.target.value)}
+                    />
+                    <p className="text-xs text-slate-500">买家付款后将立即获得此链接。</p>
+                  </div>
+                </section>
+              )}
+
+              <section className="space-y-4">
                 <h2 className="text-sm font-semibold text-muted-foreground">基本信息</h2>
 
                 <div className="space-y-1">
@@ -497,14 +580,27 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
 
                   <div
-                    className="border-2 border-dashed border-slate-600 bg-transparent rounded-xl p-8 text-center cursor-pointer select-none hover:border-brand-action/50 hover:bg-white/5 transition-all"
+                    className="relative border-2 border-dashed border-slate-600 bg-transparent rounded-xl p-8 text-center cursor-pointer select-none hover:border-brand-action/50 hover:bg-white/5 transition-all min-h-[160px] flex items-center justify-center overflow-hidden"
                     onClick={onPickFile}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onDrop}
                     role="button"
                     tabIndex={0}
                   >
-                    <p className="text-sm text-slate-400">{isUploading ? "上传中..." : "点击或拖拽上传服务封面"}</p>
+                    {previewUrl ? (
+                      <>
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <p className="text-sm font-medium text-white">点击更换封面</p>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-slate-400">{isUploading ? "上传中..." : "点击或拖拽上传服务封面"}</p>
+                    )}
                   </div>
 
                   <input type="hidden" name="previewUrl" value={previewUrl} />
@@ -731,7 +827,9 @@ export function ListingForm({ mode = "create", initialData }: Props) {
                 })}
               </div>
             </div>
-            <ListingCard key={previewTier} listing={previewListing} />
+            <div onClick={(e) => e.preventDefault()} className="pointer-events-none">
+              <ListingCard key={previewTier} listing={previewListing} />
+            </div>
           </div>
         </div>
       </div>

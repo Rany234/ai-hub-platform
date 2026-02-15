@@ -1,7 +1,7 @@
 import Link from "next/link";
-
 import { cn } from "@/lib/utils";
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { BentoCard } from "@/components/BentoCard";
 import { HeroExploreButton } from "@/components/HeroExploreButton";
 import { AIDemoComponent } from "@/components/AIDemoComponent";
@@ -12,28 +12,16 @@ import { ServiceMatrix } from "@/components/home/ServiceMatrix";
 import { TrustProcess } from "@/components/home/TrustProcess";
 
 export default async function HomePage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const user = session?.user;
 
-  const { data: listings, error } = await supabase
-    .from("listings")
-    .select("*")
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(6);
+  const listings = await prisma.listing.findMany({
+    where: { status: "active" },
+    orderBy: { createdAt: "desc" },
+    take: 6,
+  });
 
-  if (error) {
-    return (
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold">市场</h1>
-        <p className="mt-4 text-sm text-red-600">{error.message}</p>
-      </div>
-    );
-  }
-
-  const featuredListings = (listings ?? []).filter((l) => typeof l.id === "string" && l.id.length > 0);
+  const featuredListings = listings.filter((l) => typeof l.id === "string" && l.id.length > 0);
   const hasListings = featuredListings.length > 0;
 
   return (

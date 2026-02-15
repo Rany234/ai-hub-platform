@@ -11,7 +11,7 @@ export default async function AdminPage() {
     .select("id", { count: "exact", head: true });
 
   const { data: gmvRows } = await supabase.from("orders").select("amount");
-  const totalGmv = (gmvRows ?? []).reduce((acc, row: any) => acc + Number(row.amount ?? 0), 0);
+  const totalGmv = (gmvRows ?? []).reduce((acc: number, row: any) => acc + Number(row.amount ?? 0), 0);
 
   const { data: pendingListings } = await supabase
     .from("listings")
@@ -50,7 +50,7 @@ export default async function AdminPage() {
           <div className="text-xs text-muted-foreground">待审核服务（最新 5 条 active）</div>
           <div className="mt-2 grid gap-1">
             {pendingListings && pendingListings.length > 0 ? (
-              pendingListings.map((l) => (
+              pendingListings.map((l: any) => (
                 <div key={l.id} className="text-sm truncate">
                   {l.title}
                 </div>

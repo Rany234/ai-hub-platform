@@ -1,22 +1,23 @@
 import Link from "next/link";
 
-import { createSupabaseServerClient } from "@/features/auth/supabase/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 import { UserDropdown } from "./UserDropdown";
 import { NavLinks } from "./NavLinks";
 
 export async function Navbar() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const user = session?.user;
 
-  const profile = user
-    ? await supabase
-        .from("profiles")
-        .select("id, username, full_name, avatar_url")
-        .eq("id", user.id)
-        .maybeSingle()
-        .then(({ data }) => data)
+  const profile = user?.id
+    ? await prisma.user.findUnique({
+        where: { id: user.id },
+        select: {
+          username: true,
+          fullName: true,
+          avatarUrl: true,
+        },
+      })
     : null;
 
   return (
@@ -48,8 +49,8 @@ export async function Navbar() {
                 成为卖家 / 发布服务
               </Link>
               <UserDropdown
-                avatarUrl={profile?.avatar_url}
-                fullName={profile?.full_name}
+                avatarUrl={profile?.avatarUrl}
+                fullName={profile?.fullName}
                 username={profile?.username}
               />
             </>
