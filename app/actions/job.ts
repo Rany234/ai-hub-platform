@@ -21,8 +21,8 @@ export type CreateJobInput = z.infer<typeof createJobSchema>;
  */
 function adaptJobForFrontend(job: any) {
   if (!job) return null;
-  
-  return {
+
+        return {
     ...job,
     // 基础字段对齐
     created_at: job.createdAt,
@@ -223,7 +223,7 @@ export async function getMyBids() {
 
   if (!userId) {
     throw new Error("Unauthorized");
-  }
+    }
 
   const bids = await prisma.bid.findMany({
     where: { bidderId: userId },
@@ -250,7 +250,7 @@ export async function getMyBids() {
     ...b,
     job: b.job ? adaptJobForFrontend(b.job) : null,
   }));
-}
+    }
 
 /**
  * 7. 获取任务的投标列表 (兼容原接口名)
