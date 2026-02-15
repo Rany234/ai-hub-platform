@@ -27,22 +27,57 @@ type WorkbenchClientProps = {
 export function WorkbenchClient({ postedJobs, myBids }: WorkbenchClientProps) {
   const [activeTab, setActiveTab] = useState<"posted" | "bids">("posted");
 
-  const getJobStatusStyles = (status: string) => {
-    switch (status.toUpperCase()) {
-      case "OPEN": return "bg-blue-500/10 text-blue-400 border-blue-500/20";
-      case "IN_PROGRESS": return "bg-amber-500/10 text-amber-400 border-amber-500/20";
-      case "COMPLETED": return "bg-green-500/10 text-green-400 border-green-500/20";
-      case "CANCELLED": return "bg-slate-500/10 text-slate-400 border-slate-500/20";
-      default: return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+  const normalizeStatus = (status: unknown) => (typeof status === "string" ? status.toUpperCase() : "");
+
+  const getJobStatusStyles = (status: unknown) => {
+    switch (normalizeStatus(status)) {
+      case "OPEN":
+        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+      case "IN_PROGRESS":
+        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+      case "COMPLETED":
+        return "bg-slate-500/10 text-slate-300 border-slate-500/20";
+      default:
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
 
-  const getBidStatusStyles = (status: string) => {
-    switch (status.toUpperCase()) {
-      case "PENDING": return "bg-amber-500/10 text-amber-400 border-amber-500/20";
-      case "ACCEPTED": return "bg-green-500/10 text-green-400 border-green-500/20";
-      case "REJECTED": return "bg-red-500/10 text-red-400 border-red-500/20";
-      default: return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+  const getJobStatusLabel = (status: unknown) => {
+    switch (normalizeStatus(status)) {
+      case "OPEN":
+        return "招标中 (Open)";
+      case "IN_PROGRESS":
+        return "进行中 (In Progress)";
+      case "COMPLETED":
+        return "已完成 (Completed)";
+      default:
+        return "未知状态";
+    }
+  };
+
+  const getBidStatusStyles = (status: unknown) => {
+    switch (normalizeStatus(status)) {
+      case "PENDING":
+        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+      case "ACCEPTED":
+        return "bg-green-500/10 text-green-400 border-green-500/20";
+      case "REJECTED":
+        return "bg-red-500/10 text-red-400 border-red-500/20";
+      default:
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+    }
+  };
+
+  const getBidStatusLabel = (status: unknown) => {
+    switch (normalizeStatus(status)) {
+      case "PENDING":
+        return "审核中 (Pending)";
+      case "ACCEPTED":
+        return "已中标 (Accepted)";
+      case "REJECTED":
+        return "未中标 (Rejected)";
+      default:
+        return "未知状态";
     }
   };
 
@@ -104,7 +139,7 @@ export function WorkbenchClient({ postedJobs, myBids }: WorkbenchClientProps) {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start mb-2">
                       <Badge variant="outline" className={cn("px-2 py-0", getJobStatusStyles(job.status))}>
-                        {job.status === "OPEN" ? "招募中" : job.status === "IN_PROGRESS" ? "进行中" : "已完成"}
+                        {getJobStatusLabel(job.status)}
                       </Badge>
                       <span className="text-sm font-extrabold text-brand-action">¥{job.budget}</span>
                     </div>
@@ -163,7 +198,7 @@ export function WorkbenchClient({ postedJobs, myBids }: WorkbenchClientProps) {
                     </div>
                     <div className="flex items-center gap-4">
                       <Badge variant="outline" className={cn("px-3 py-1", getBidStatusStyles(bid.status))}>
-                        {bid.status === "PENDING" ? "等待中" : bid.status === "ACCEPTED" ? "已中标" : "未选中"}
+                        {getBidStatusLabel(bid.status)}
                       </Badge>
                       <Button asChild size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-white/5">
                         <Link href={`/dashboard/jobs/${bid.job.id}`}>

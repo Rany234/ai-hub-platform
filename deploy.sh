@@ -1,22 +1,34 @@
 #!/bin/bash
-# AI-Hub 一键部署脚本
+# AI-Hub 极速部署脚本
+set -e
 
-echo "🚀 开始部署更新..."
+cd /var/www/ai-hub
 
-# 1. 进入项目目录
-cd /var/www/ai-hub || exit
+echo "Step 1: 检查环境..."
+# 确保使用的是国内镜像
+npm config set registry https://registry.npmmirror.com
 
-# 2. 清理旧缓存 (解决 Server Action 冲突的关键)
-echo "清理旧缓存..."
+# 检查 .env.local 是否完整
+if [ ! -f .env.local ]; then
+    echo "❌ 错误: 缺少 .env.local 文件"
+    exit 1
+fi
+
+echo "Step 2: 增量安装依赖..."
+# 使用 install 而不是 ci，在 node_modules 存在时会非常快
+npm install
+
+echo "Step 3: 同步数据库结构..."
+npx prisma migrate deploy
+npx prisma generate
+
+echo "Step 4: 构建项目..."
+# 清理缓存并构建
 rm -rf .next
-
-# 3. 重新构建
-echo "正在重新构建项目..."
 npm run build
 
-# 4. 重启 PM2 服务
-echo "重启服务..."
-pm2 restart ai-hub
+echo "Step 5: 重启 PM2 服务..."
+pm2 restart ai-hub --update-env
 
-echo "✅ 部署完成！"
+echo "✅ 部署成功！"
 pm2 list
