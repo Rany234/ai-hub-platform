@@ -62,13 +62,13 @@ function InnerLoginForm() {
 
     if (state.success) {
       toast.success("欢迎回来！");
-      router.push(state.redirectTo ?? "/dashboard");
-      router.refresh();
+      // 使用 window.location.href 强制刷新页面状态并跳转，解决 auth 状态同步延迟问题
+      window.location.href = state.redirectTo ?? "/dashboard";
       return;
     }
 
     toastError(state.error);
-  }, [state, router]);
+  }, [state]);
 
   useEffect(() => {
     if (authError === "not_found") {
