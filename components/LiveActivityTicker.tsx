@@ -1,93 +1,43 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import { Zap } from "lucide-react";
 
-type Activity = {
-  id: string;
-  text: string;
-};
-
-function pick<T>(arr: T[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function makeActivity(i: number): Activity {
-  const sellers = ["卖家 A", "卖家 Luna", "卖家 Neo", "卖家 小北", "卖家 Aurora"];
-  const buyers = ["买家 B", "买家 Kai", "买家 玖玖", "买家 Mira", "买家 Atlas"];
-  const services = ["MJ 提示词服务", "智能体开发服务", "数据分析服务", "RAG 知识库搭建", "模型微调咨询"];
-  const verbs = [
-    () => `${pick(sellers)} 刚刚发布了 ${pick(services)}`,
-    () => `${pick(buyers)} 接受了一个投标`,
-    () => `${pick(buyers)} 刚刚下单了 ${pick(services)}`,
-    () => `${pick(sellers)} 更新了服务套餐定价`,
-    () => `${pick(sellers)} 收到了一条新消息`,
-  ];
-
-  return {
-    id: `activity-${Date.now()}-${i}`,
-    text: pick(verbs)(),
-  };
-}
+const activities = [
+  { id: 1, text: "🔥 [悬赏] RAG 知识库搭建 (¥2000) - 招标中", time: "刚刚" },
+  { id: 2, text: "⚡️ [Remix] '智能翻译助手' 被派生，原始创作者获得版税 ¥50", time: "3分钟前" },
+  { id: 3, text: "💎 [新资产] 'DeepSeek 优化 Prompt 集' 已确权上架", time: "12分钟前" },
+  { id: 4, text: "🔥 [悬赏] 企业级多代理协作方案 (¥8000) - 已达成", time: "25分钟前" },
+];
 
 export function LiveActivityTicker() {
-  const [mounted, setMounted] = useState(false);
-  const [items, setItems] = useState<Activity[]>([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-    setItems(Array.from({ length: 8 }).map((_, i) => makeActivity(i)));
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || items.length === 0) return;
-
-    const id = window.setInterval(() => {
-      setActiveIndex((prev) => {
-        const next = prev + 1;
-        if (next >= items.length) {
-          setItems((old) => [...old, makeActivity(old.length)]);
-        }
-        return next;
-      });
-    }, 2600);
-
-    return () => window.clearInterval(id);
-  }, [items.length, mounted]);
-
-  if (!mounted || items.length === 0) {
-    return (
-      <div className="w-full border-t border-white/5 bg-slate-950/60 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-6 py-3">
-          <div className="h-4 w-72 rounded bg-white/10" />
-        </div>
-      </div>
-    );
-  }
-
-  const current = items[Math.min(activeIndex, items.length - 1)];
-
   return (
-    <div className="w-full border-t border-white/5 bg-slate-950/60 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-6 py-3">
-        <div className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-slate-950/90 to-transparent" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-slate-950/90 to-transparent" />
-
-          <AnimatePresence mode="wait">
+    <div className="border-y border-white/5 bg-slate-950/50 py-3 backdrop-blur-sm">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="flex items-center gap-4 overflow-hidden">
+          <div className="flex items-center gap-2 whitespace-nowrap text-xs font-bold text-brand-action">
+            <Zap className="h-3.5 w-3.5 fill-brand-action" />
+            实时动态
+          </div>
+          <div className="h-4 w-px bg-white/10" />
+          <div className="flex-1 overflow-hidden">
             <motion.div
-              key={current.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              className="whitespace-nowrap text-xs text-slate-400"
+              animate={{ x: [0, -1000] }}
+              transition={{
+                duration: 30,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="flex gap-12 whitespace-nowrap"
             >
-              <span className="mr-2 text-slate-500">Live</span>
-              <span className="text-slate-300">{current.text}</span>
+              {[...activities, ...activities].map((item, idx) => (
+                <div key={idx} className="flex items-center gap-3 text-sm">
+                  <span className="text-slate-300 font-medium">{item.text}</span>
+                  <span className="text-[10px] text-slate-500 uppercase tracking-tighter">{item.time}</span>
+                </div>
+              ))}
             </motion.div>
-          </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
