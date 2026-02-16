@@ -1,24 +1,23 @@
 import Link from "next/link";
-import { 
-  Users, 
-  Code2, 
-  Flame, 
-  ArrowRight, 
-  Database, 
-  GitFork, 
-  PieChart, 
-  Unlock,
-  Wallet,
-  ShoppingBag,
-  HelpCircle,
-  PlusCircle,
-  Zap,
-  CheckCircle2,
-  Search,
-  MessageSquare,
+import {
+  ArrowRight,
   Boxes,
+  CheckCircle2,
+  Code2,
   Cpu,
-  LayoutGrid
+  Database,
+  Flame,
+  GitFork,
+  LayoutGrid,
+  MessageSquare,
+  PieChart,
+  PlusCircle,
+  Search,
+  ShoppingBag,
+  Unlock,
+  Users,
+  Wallet,
+  Zap,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,18 +33,94 @@ export default async function HomePage() {
 
   // Seed Data Fallback for Bounty Hall
   const jobs = jobsData.length > 0 ? jobsData : [
-    { id: "seed-1", title: "企业级知识库 RAG 架构优化 (DeepSeek-V3)", budget: 3500, status: "open", profiles: { username: "AI_Architect" } },
-    { id: "seed-2", title: "定制化 ComfyUI 电商海报自动生成流", budget: 1200, status: "open", profiles: { username: "Workflow_Master" } },
-    { id: "seed-3", title: "多模态法律合同审查 Agent 开发", budget: 5000, status: "in_progress", profiles: { username: "LegalTech_Lab" } },
-    { id: "seed-4", title: "微信小程序 AI 客服插件对接 (含流式响应)", budget: 800, status: "open", profiles: { username: "FastDev" } },
+    {
+      id: "seed-1",
+      title: "企业级知识库 RAG 架构优化 (DeepSeek-V3)",
+      budget: 3500,
+      status: "open",
+      profiles: { username: "AI_Architect" },
+      isHot: true,
+    },
+    {
+      id: "seed-2",
+      title: "定制化 ComfyUI 电商海报自动生成工作流",
+      budget: 1200,
+      status: "open",
+      profiles: { username: "Workflow_Master" },
+      isNew: true,
+    },
+    {
+      id: "seed-3",
+      title: "多模态法律合同审查 Agent 开发",
+      budget: 5000,
+      status: "in_progress",
+      profiles: { username: "LegalTech_Lab" },
+    },
+    {
+      id: "seed-4",
+      title: "微信小程序 AI 客服插件对接 (含流式响应)",
+      budget: 800,
+      status: "open",
+      profiles: { username: "FastDev" },
+      isNew: true,
+    },
+    {
+      id: "seed-5",
+      title: "企业 Agent 权限管理模块 + 审计日志",
+      budget: 4200,
+      status: "open",
+      profiles: { username: "EnterpriseOps" },
+      isHot: true,
+    },
+    {
+      id: "seed-6",
+      title: "Prompt 版本管理 + A/B 测试控制台",
+      budget: 1600,
+      status: "open",
+      profiles: { username: "PromptLab" },
+    },
+    {
+      id: "seed-7",
+      title: "私有化部署：向量库 + 监控告警 (Prometheus)",
+      budget: 6800,
+      status: "in_progress",
+      profiles: { username: "InfraTeam" },
+    },
+    {
+      id: "seed-8",
+      title: "代码脚本：批量清洗 Excel + 字段映射生成器",
+      budget: 900,
+      status: "open",
+      profiles: { username: "DataTools" },
+    },
   ];
 
   // Featured Creators Data
   const featuredCreators = [
-    { name: "张小刚", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix", badge: "Top 1% 开发者", sales: "1.2k+" },
-    { name: "Li Wei", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka", badge: "Prompt 专家", sales: "800+" },
-    { name: "Sarah J.", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah", badge: "工作流大师", sales: "2.5k+" },
-    { name: "陈老师", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Brian", badge: "企业方案专家", sales: "500+" },
+    {
+      name: "张小刚",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+      badge: "Top 1% 开发者",
+      sales: "1.2k+",
+    },
+    {
+      name: "Li Wei",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
+      badge: "Prompt 专家",
+      sales: "800+",
+    },
+    {
+      name: "Sarah J.",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+      badge: "工作流大师",
+      sales: "2.5k+",
+    },
+    {
+      name: "陈老师",
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Brian",
+      badge: "企业方案专家",
+      sales: "500+",
+    },
   ];
 
   // Mock counts for dashboard
@@ -55,233 +130,408 @@ export default async function HomePage() {
     unreadMessages: 5,
   };
 
-  const categories = [
-    { name: "提示词", icon: <Zap className="h-5 w-5" />, slug: "prompt" },
-    { name: "智能体", icon: <Cpu className="h-5 w-5" />, slug: "agent" },
-    { name: "代码脚本", icon: <Code2 className="h-5 w-5" />, slug: "code" },
-    { name: "工作流", icon: <GitFork className="h-5 w-5" />, slug: "workflow" },
-    { name: "行业方案", icon: <Boxes className="h-5 w-5" />, slug: "solution" },
-    { name: "全部", icon: <LayoutGrid className="h-5 w-5" />, slug: "all" },
+  const portalCategories = [
+    {
+      name: "AI Agents",
+      href: "/listings?category=agent",
+      badge: "Hot",
+    },
+    {
+      name: "Prompt Engineering",
+      href: "/listings?category=prompt",
+      badge: "New",
+    },
+    {
+      name: "Code Scripts",
+      href: "/listings?category=code",
+    },
+    {
+      name: "Workflow",
+      href: "/listings?category=workflow",
+    },
+    {
+      name: "Industry Solutions",
+      href: "/listings?category=solution",
+    },
+  ];
+
+  const iconGridCategories = [
+    { name: "提示词", icon: <Zap className="h-4 w-4" />, slug: "prompt" },
+    { name: "智能体", icon: <Cpu className="h-4 w-4" />, slug: "agent" },
+    { name: "代码脚本", icon: <Code2 className="h-4 w-4" />, slug: "code" },
+    { name: "工作流", icon: <GitFork className="h-4 w-4" />, slug: "workflow" },
+    { name: "行业方案", icon: <Boxes className="h-4 w-4" />, slug: "solution" },
+    { name: "全部", icon: <LayoutGrid className="h-4 w-4" />, slug: "all" },
+  ];
+
+  const recentlyTraded = [
+    { name: "RAG 架构模板", price: "¥199" },
+    { name: "ComfyUI 海报流", price: "¥49" },
+    { name: "企业 Agent 权限模块", price: "¥899" },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-blue-500/30">
-      
-      {/* --- 第 0 层: Hero Section --- */}
-      <section className="relative border-b border-white/5 overflow-hidden py-8 md:py-10">
-        {isLoggedIn ? (
-          /* 已登录: 快捷仪表盘 */
-          <div className="mx-auto max-w-7xl px-6 py-12">
-            <div className="flex flex-col gap-8">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl font-black tracking-tight text-white mb-2">
-                    欢迎回来，{session.user?.name || "开发者"}
-                  </h1>
-                  <p className="text-slate-400 font-medium">今天想开启什么新任务？</p>
+    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-blue-500/30 text-[85%]">
+      {/* --- 第 0 层: 三栏门户 Hero (2:6:2) --- */}
+      <section className="border-b border-white/10 bg-slate-900/60">
+        <div className="mx-auto max-w-7xl px-6 py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-10 gap-4">
+            {/* 左侧分类栏 */}
+            <aside className="lg:col-span-2 rounded-2xl border border-white/10 bg-slate-950/40 overflow-hidden">
+              <div className="px-4 py-3 border-b border-white/10 text-xs font-black tracking-widest text-slate-400">
+                分类导航
+              </div>
+              <div className="p-2">
+                {portalCategories.map((c) => (
+                  <Link
+                    key={c.name}
+                    href={c.href}
+                    className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors"
+                  >
+                    <span className="text-sm font-bold text-slate-200">
+                      {c.name}
+                    </span>
+                    {c.badge ? (
+                      <span
+                        className={
+                          c.badge === "Hot"
+                            ? "text-[10px] font-black text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full"
+                            : "text-[10px] font-black text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full"
+                        }
+                      >
+                        {c.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                ))}
+              </div>
+            </aside>
+
+            {/* 中间主区 */}
+            <div className="lg:col-span-6">
+              {/* 搜索 */}
+              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-2 shadow-2xl">
+                <div className="flex items-center gap-2">
+                  <div className="pl-2 text-slate-500">
+                    <Search className="h-4 w-4" />
+                  </div>
+                  <Input
+                    className="bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-slate-600 h-10 text-sm"
+                    placeholder="搜索 AI 资产、任务或服务..."
+                  />
+                  <Button className="bg-blue-600 hover:bg-blue-500 text-white font-black h-9 px-6 rounded-xl">
+                    搜索
+                  </Button>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Button asChild className="bg-blue-600 hover:bg-blue-500 rounded-xl font-bold">
-                    <Link href="/dashboard/jobs/new"><PlusCircle className="mr-2 h-4 w-4" /> 发布新需求</Link>
+                <div className="mt-2 flex items-center gap-2 px-2 text-xs font-bold">
+                  <span className="text-slate-500">热搜：</span>
+                  {["DeepSeek 提示词", "企业 Agent", "私人助理脚本"].map((tag) => (
+                    <Link
+                      key={tag}
+                      href={`/listings?q=${tag}`}
+                      className="text-slate-400 hover:text-blue-400 transition-colors"
+                    >
+                      {tag}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* 紧凑横幅 */}
+              <div className="mt-4 rounded-2xl border border-white/10 bg-gradient-to-r from-blue-600/15 via-slate-950/40 to-purple-600/15 p-4 overflow-hidden relative">
+                <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.35),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.35),transparent_40%)]" />
+                <div className="relative flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-sm font-black text-white">
+                      高密度门户模式 · Marketplace Portal
+                    </div>
+                    <div className="text-xs text-slate-400 font-medium mt-1">
+                      搜索优先，分类直达，像“猪八戒”一样快找人/找方案。
+                    </div>
+                  </div>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="bg-brand-action/90 hover:bg-brand-action text-slate-950 font-black rounded-xl"
+                  >
+                    <Link href="/dashboard/jobs/new">
+                      <PlusCircle className="mr-2 h-4 w-4" /> 立即发布任务
+                    </Link>
                   </Button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link href="/dashboard/wallet" className="group p-6 rounded-[2rem] border border-white/10 bg-slate-950/40 hover:bg-slate-950 transition-all">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400">
-                      <Wallet className="h-6 w-6" />
+              {/* 小图标网格 */}
+              <div className="mt-4 grid grid-cols-3 md:grid-cols-6 gap-3">
+                {iconGridCategories.map((cat) => (
+                  <Link
+                    key={cat.name}
+                    href={cat.slug === "all" ? "/listings" : `/listings?category=${cat.slug}`}
+                    className="flex items-center gap-2 px-3 py-2 rounded-2xl border border-white/10 bg-slate-950/30 hover:bg-white/5 transition-colors"
+                  >
+                    <span className="text-slate-300">{cat.icon}</span>
+                    <span className="text-xs font-black text-slate-200">
+                      {cat.name}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* 右侧用户欢迎卡 */}
+            <aside className="lg:col-span-2 rounded-2xl border border-white/10 bg-slate-950/40 overflow-hidden">
+              <div className="px-4 py-3 border-b border-white/10 text-xs font-black tracking-widest text-slate-400">
+                用户中心
+              </div>
+              <div className="p-4">
+                {isLoggedIn ? (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-white/5 border border-white/10 overflow-hidden" />
+                      <div className="min-w-0">
+                        <div className="text-sm font-black text-white truncate">
+                          {session.user?.name || "开发者"}
+                        </div>
+                        <div className="text-xs text-slate-500 font-bold">
+                          欢迎回来
+                        </div>
+                      </div>
                     </div>
-                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                      钱包余额
-                    </Badge>
-                  </div>
-                  <div className="text-3xl font-black text-white group-hover:text-emerald-400 transition-colors">{dashboardStats.balance}</div>
-                </Link>
 
-                <Link href="/dashboard/orders" className="group p-6 rounded-[2rem] border border-white/10 bg-slate-950/40 hover:bg-slate-950 transition-all">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-blue-500/10 text-blue-400">
-                      <ShoppingBag className="h-6 w-6" />
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <Link
+                        href="/dashboard/wallet"
+                        className="rounded-xl border border-white/10 bg-white/5 p-2 hover:bg-white/10 transition-colors"
+                      >
+                        <div className="text-[10px] text-slate-500 font-black">
+                          余额
+                        </div>
+                        <div className="text-sm font-black text-white">
+                          {dashboardStats.balance}
+                        </div>
+                      </Link>
+                      <Link
+                        href="/dashboard/jobs"
+                        className="rounded-xl border border-white/10 bg-white/5 p-2 hover:bg-white/10 transition-colors"
+                      >
+                        <div className="text-[10px] text-slate-500 font-black">
+                          进行中
+                        </div>
+                        <div className="text-sm font-black text-white">
+                          {dashboardStats.activeOrders} 单
+                        </div>
+                      </Link>
                     </div>
-                    <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30">
-                      活跃订单
-                    </Badge>
-                  </div>
-                  <div className="text-3xl font-black text-white group-hover:text-blue-400 transition-colors">{dashboardStats.activeOrders} <span className="text-sm font-medium text-slate-500 italic ml-1">个进行中</span></div>
-                </Link>
 
-                <Link href="/dashboard/chat" className="group p-6 rounded-[2rem] border border-white/10 bg-slate-950/40 hover:bg-slate-950 transition-all">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400">
-                      <MessageSquare className="h-6 w-6" />
+                    <div className="mt-4 rounded-xl border border-white/10 bg-slate-950/40 overflow-hidden">
+                      <div className="px-3 py-2 border-b border-white/10 text-[10px] font-black text-slate-500 tracking-widest">
+                        最近成交
+                      </div>
+                      <div className="px-3 py-2 space-y-2">
+                        {recentlyTraded.map((t) => (
+                          <div
+                            key={t.name}
+                            className="flex items-center justify-between text-xs"
+                          >
+                            <span className="text-slate-300 font-bold truncate">
+                              {t.name}
+                            </span>
+                            <span className="text-brand-action font-black">
+                              {t.price}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <Badge variant="outline" className="bg-purple-500/10 text-purple-400 border-purple-500/30">
-                      未读消息
-                    </Badge>
-                  </div>
-                  <div className="text-3xl font-black text-white group-hover:text-purple-400 transition-colors">{dashboardStats.unreadMessages} <span className="text-sm font-medium text-slate-500 italic ml-1">条新通知</span></div>
-                </Link>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* 未登录: 营销分屏 - 紧凑排列 */
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="flex flex-col md:flex-row gap-4 mb-8">
-              {/* 左侧: 需求方 (雇主) */}
-              <div className="flex-1 p-6 lg:p-8 rounded-[2rem] border border-white/5 bg-blue-600/[0.02] hover:bg-blue-600/[0.05] transition-all group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10 flex items-start gap-5">
-                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20">
-                    <Users className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black mb-2 tracking-tight">我有需求</h2>
-                    <p className="text-slate-400 text-sm mb-4 max-w-xs leading-relaxed font-medium">
-                      发布“半开源”悬赏，以传统开发 <span className="text-blue-400 font-bold">50% 的成本</span> 获取方案。
-                    </p>
-                    <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-10 px-6 rounded-xl active:scale-95 transition-all">
-                      <Link href="/dashboard/jobs/new">发布悬赏</Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
 
-              {/* 右侧: 供给方 (创作者) */}
-              <div className="flex-1 p-6 lg:p-8 rounded-[2rem] border border-white/5 bg-purple-600/[0.02] hover:bg-purple-600/[0.05] transition-all group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10 flex items-start gap-5">
-                  <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-400 ring-1 ring-purple-500/20">
-                    <Code2 className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black mb-2 tracking-tight">我有能力</h2>
-                    <p className="text-slate-400 text-sm mb-4 max-w-xs leading-relaxed font-medium">
-                      一次开发，终身受益。您的代码被他人引用即自动触发协议，<span className="text-purple-400 font-bold">永久赚取版税</span>。
-                    </p>
-                    <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-500 text-white font-bold h-10 px-6 rounded-xl active:scale-95 transition-all">
-                      <Link href="/dashboard/workbench">上架资产</Link>
-                    </Button>
-                  </div>
-                </div>
+                    <div className="mt-4 flex items-center gap-2">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl h-9 px-4"
+                      >
+                        <Link href="/dashboard">控制台</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        size="sm"
+                        variant="secondary"
+                        className="rounded-xl h-9 px-4 font-black"
+                      >
+                        <Link href="/dashboard/chat">
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          消息
+                        </Link>
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-sm font-black text-white">
+                      你好，欢迎来到 AI-Hub
+                    </div>
+                    <div className="text-xs text-slate-500 font-medium mt-1">
+                      登录后可查看余额、订单和消息。
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <Link
+                        className="rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-center font-black hover:bg-white/10 transition-colors"
+                        href="/login"
+                      >
+                        登录
+                      </Link>
+                      <Link
+                        className="rounded-xl bg-brand-action/90 hover:bg-brand-action text-slate-950 px-3 py-2 text-center font-black transition-colors"
+                        href="/signup"
+                      >
+                        注册
+                      </Link>
+                    </div>
+
+                    <div className="mt-3">
+                      <Link
+                        href="/dashboard/jobs/new"
+                        className="text-xs font-black text-brand-action hover:text-brand-action/80 transition-colors"
+                      >
+                        快速入口：发布任务 →
+                      </Link>
+                    </div>
+
+                    <div className="mt-4 rounded-xl border border-white/10 bg-slate-950/40 overflow-hidden">
+                      <div className="px-3 py-2 border-b border-white/10 text-[10px] font-black text-slate-500 tracking-widest">
+                        最近成交
+                      </div>
+                      <div className="px-3 py-2 space-y-2">
+                        {recentlyTraded.map((t) => (
+                          <div
+                            key={t.name}
+                            className="flex items-center justify-between text-xs"
+                          >
+                            <span className="text-slate-300 font-bold truncate">
+                              {t.name}
+                            </span>
+                            <span className="text-brand-action font-black">
+                              {t.price}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* 全局搜索条 - 全宽度且更宽 */}
-        <div className="relative z-20 pb-6">
-          <div className="mx-auto max-w-5xl px-6">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-blue-600/15 blur-3xl group-hover:bg-blue-600/25 transition-all opacity-50" />
-              <div className="relative flex items-center bg-slate-950/80 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-2xl focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
-                <div className="pl-4 text-slate-500">
-                  <Search className="h-5 w-5" />
-                </div>
-                <Input 
-                  className="bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-slate-600 h-10 md:h-12 text-base" 
-                  placeholder="搜索 AI 资产、任务或服务..." 
-                />
-                <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-8 md:h-10 px-6 rounded-xl mr-1">
-                  搜索
-                </Button>
-              </div>
-            </div>
-
-            {/* 热搜关键词 */}
-            <div className="mt-3 flex items-center gap-3 px-2 text-xs font-bold">
-              <span className="text-slate-500">热搜：</span>
-              {["DeepSeek 提示词", "企业 Agent", "私人助理脚本"].map((tag) => (
-                <Link key={tag} href={`/listings?q=${tag}`} className="text-slate-400 hover:text-blue-400 transition-colors">
-                  {tag}
-                </Link>
-              ))}
-            </div>
-
-            {/* 类别导航 Icon Grid - 移到搜索下方 */}
-            <div className="mt-8 grid grid-cols-3 md:grid-cols-6 gap-4">
-              {categories.map((cat, i) => (
-                <Link 
-                  key={i} 
-                  href={cat.slug === 'all' ? '/listings' : `/listings?category=${cat.slug}`}
-                  className="flex flex-col items-center gap-2 p-3 rounded-2xl hover:bg-white/5 transition-colors group"
-                >
-                  <div className="p-3 rounded-xl bg-slate-800 text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                    {cat.icon}
-                  </div>
-                  <span className="text-xs font-bold text-slate-500 group-hover:text-white transition-colors tracking-widest">{cat.name}</span>
-                </Link>
-              ))}
-            </div>
+            </aside>
           </div>
         </div>
       </section>
 
       {/* --- 第 1 层: 任务大厅 (Bounty Hall) --- */}
-      <section className="py-24 border-b border-white/5 bg-slate-900/50">
+      <section className="py-16 border-b border-white/10 bg-slate-900/40">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 text-brand-action font-bold text-sm uppercase tracking-widest mb-3">
-                <Flame className="h-4 w-4 fill-brand-action" /> 实时需求广场
+              <div className="inline-flex items-center gap-2 text-brand-action font-black text-xs uppercase tracking-widest mb-2">
+                <Flame className="h-3 w-3 fill-brand-action" /> 实时需求广场
               </div>
-              <h3 className="text-3xl font-black tracking-tight text-white">任务大厅</h3>
-              <p className="text-slate-500 mt-3 text-lg font-medium">参与企业级 AI 项目，每一次交付都是一个新资产的起点。</p>
+              <h3 className="text-2xl font-black tracking-tight text-white">
+                任务大厅
+              </h3>
+              <p className="text-slate-500 mt-2 text-sm font-medium">
+                高密度列表：更快浏览，更快接单。
+              </p>
             </div>
-            <Button asChild variant="link" className="text-slate-400 hover:text-white p-0 h-auto font-bold">
+            <Button
+              asChild
+              variant="link"
+              className="text-slate-400 hover:text-white p-0 h-auto font-black"
+            >
               <Link href="/dashboard/jobs" className="flex items-center gap-1">
                 查看全部活跃任务 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           </div>
 
-          <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/40 backdrop-blur-xl shadow-2xl">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40 backdrop-blur-xl shadow-2xl">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+              <table className="w-full text-left border-collapse min-w-[760px]">
                 <thead>
-                  <tr className="border-b border-white/5 bg-white/[0.02] text-[11px] uppercase font-black tracking-widest text-slate-500">
-                    <th className="px-8 py-5">项目描述</th>
-                    <th className="px-8 py-5">悬赏预算</th>
-                    <th className="px-8 py-5">当前进度</th>
-                    <th className="px-8 py-5 text-right">操作</th>
+                  <tr className="border-b border-white/10 bg-white/[0.02] text-[10px] uppercase font-black tracking-widest text-slate-500">
+                    <th className="px-5 py-3">项目描述</th>
+                    <th className="px-5 py-3">预算</th>
+                    <th className="px-5 py-3">进度</th>
+                    <th className="px-5 py-3 text-right">操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
-                  {jobs.length > 0 ? (
-                    jobs.slice(0, 5).map((job: any, i: number) => (
-                      <tr key={i} className="hover:bg-white/[0.03] transition-colors group">
-                        <td className="px-8 py-6">
-                          <div className="font-extrabold text-slate-200 text-lg group-hover:text-brand-action transition-colors truncate max-w-md">{job.title}</div>
-                          {job.profiles && (
-                            <div className="text-xs text-slate-500 mt-1 font-bold">发布人: {job.profiles.username}</div>
-                          )}
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="text-brand-action font-black text-xl tracking-tighter">¥{job.budget || job.price}</div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <Badge variant="outline" className={job.status === 'open' || job.status === '竞标中' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-3 py-1 font-bold" : "bg-blue-500/10 text-blue-400 border-blue-500/30 px-3 py-1 font-bold"}>
-                            {job.status === 'open' ? '竞标中' : (job.status === 'in_progress' ? '进行中' : job.status)}
-                          </Badge>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          <Button asChild size="sm" variant={job.status === 'open' || job.status === '竞标中' ? "default" : "secondary"} className="h-10 px-6 rounded-xl font-black">
-                            <Link href={`/dashboard/jobs/${job.id}`}>
-                              {job.status === 'open' || job.status === '竞标中' ? "我要接单" : "详情围观"}
-                            </Link>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="px-8 py-12 text-center text-slate-500 font-bold">
-                        当前暂无公开悬赏任务
+                <tbody className="divide-y divide-white/10">
+                  {jobs.slice(0, 8).map((job: any) => (
+                    <tr
+                      key={job.id}
+                      className="hover:bg-white/[0.03] transition-colors group"
+                    >
+                      <td className="px-5 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="font-extrabold text-slate-200 text-sm group-hover:text-brand-action transition-colors truncate max-w-[520px]">
+                            {job.title}
+                          </div>
+                          {job.isHot ? (
+                            <span className="text-[10px] font-black text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full">
+                              Hot
+                            </span>
+                          ) : null}
+                          {job.isNew ? (
+                            <span className="text-[10px] font-black text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                              New
+                            </span>
+                          ) : null}
+                        </div>
+                        {job.profiles ? (
+                          <div className="text-[10px] text-slate-500 mt-1 font-bold">
+                            发布人: {job.profiles.username}
+                          </div>
+                        ) : null}
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="text-brand-action font-black text-sm tracking-tight">
+                          ¥{job.budget ?? job.price}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3">
+                        <Badge
+                          variant="outline"
+                          className={
+                            job.status === "open" || job.status === "竞标中"
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-2 py-0.5 font-black text-[10px]"
+                              : "bg-blue-500/10 text-blue-400 border-blue-500/30 px-2 py-0.5 font-black text-[10px]"
+                          }
+                        >
+                          {job.status === "open"
+                            ? "竞标中"
+                            : job.status === "in_progress"
+                              ? "进行中"
+                              : job.status}
+                        </Badge>
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <Button
+                          asChild
+                          size="sm"
+                          variant={
+                            job.status === "open" || job.status === "竞标中"
+                              ? "default"
+                              : "secondary"
+                          }
+                          className="h-8 px-4 rounded-xl font-black text-xs"
+                        >
+                          <Link href={`/dashboard/jobs/${job.id}`}>
+                            {job.status === "open" || job.status === "竞标中"
+                              ? "我要接单"
+                              : "详情"}
+                          </Link>
+                        </Button>
                       </td>
                     </tr>
-                  )}
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -289,29 +539,40 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* --- 第 3 层: 核心机制教学 --- */}
-      <section className="py-24 bg-slate-900/30">
+      {/* --- 第 2 层: 资产库 --- */}
+      <section className="py-16 border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-14">
-            <h3 className="text-3xl font-black tracking-tight text-white">资产库</h3>
-            <p className="text-slate-500 mt-3 text-lg font-medium">不要重复造轮子。直接购买基础单元，基于它们进行“派生” (Remix)。</p>
+          <div className="mb-8">
+            <h3 className="text-2xl font-black tracking-tight text-white">
+              资产库
+            </h3>
+            <p className="text-slate-500 mt-2 text-sm font-medium">
+              更密集的 6 列网格，快速扫货。
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { name: "DeepSeek 优化提示词", type: "Prompt", icon: <Zap className="h-5 w-5" /> },
-              { name: "Next.js 高级认证组件", type: "代码/脚本", icon: <Unlock className="h-5 w-5" /> },
-              { name: "RAG 向量知识库架构", type: "系统架构", icon: <Database className="h-5 w-5" /> },
-              { name: "垂直行业微调模型", type: "模型文件", icon: <Code2 className="h-5 w-5" /> },
+              { name: "DeepSeek 优化提示词", type: "Prompt", icon: <Zap className="h-4 w-4" /> },
+              { name: "Next.js 高级认证组件", type: "代码/脚本", icon: <Unlock className="h-4 w-4" /> },
+              { name: "RAG 向量知识库架构", type: "系统架构", icon: <Database className="h-4 w-4" /> },
+              { name: "垂直行业微调模型", type: "模型文件", icon: <Code2 className="h-4 w-4" /> },
+              { name: "企业 Agent 权限模块", type: "组件", icon: <Users className="h-4 w-4" /> },
+              { name: "ComfyUI 海报工作流", type: "工作流", icon: <GitFork className="h-4 w-4" /> },
             ].map((asset, i) => (
-              <Link key={i} href="/listings" className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/40 p-8 hover:border-brand-action/50 transition-all hover:-translate-y-2 shadow-xl">
-                <div className="mb-6 p-4 rounded-2xl bg-white/5 w-fit text-slate-400 group-hover:text-brand-action group-hover:scale-110 transition-all">
+              <Link
+                key={i}
+                href="/listings"
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-950/40 p-4 hover:border-brand-action/50 transition-all hover:-translate-y-1"
+              >
+                <div className="mb-3 p-2 rounded-xl bg-white/5 w-fit text-slate-400 group-hover:text-brand-action transition-all">
                   {asset.icon}
                 </div>
-                <h4 className="font-black text-slate-100 text-lg mb-2">{asset.name}</h4>
-                <div className="text-xs font-bold text-slate-500 mb-6 uppercase tracking-widest">{asset.type}</div>
-                <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3 py-1.5 text-[11px] font-black text-emerald-400 ring-1 ring-emerald-500/20 uppercase tracking-tight">
-                  <GitFork className="h-3 w-3" /> 引用分红: 10%
+                <h4 className="font-black text-slate-100 text-sm mb-1 truncate">
+                  {asset.name}
+                </h4>
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                  {asset.type}
                 </div>
               </Link>
             ))}
@@ -320,30 +581,53 @@ export default async function HomePage() {
       </section>
 
       {/* --- 推荐创作者 --- */}
-      <section className="py-16 border-b border-white/5 bg-slate-900/30">
+      <section className="py-12 border-b border-white/10 bg-slate-900/30">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-end justify-between gap-6 mb-10">
+          <div className="flex items-end justify-between gap-6 mb-8">
             <div>
-              <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white">推荐创作者</h3>
-              <p className="text-slate-500 mt-2 text-sm md:text-base font-medium">真实交付与口碑沉淀，让选择更有把握。</p>
+              <h3 className="text-xl md:text-2xl font-black tracking-tight text-white">
+                推荐创作者
+              </h3>
+              <p className="text-slate-500 mt-2 text-xs md:text-sm font-medium">
+                口碑与交付证明，降低选择成本。
+              </p>
             </div>
-            <Link href="/dashboard" className="text-slate-400 hover:text-white font-black text-sm">进入控制台 →</Link>
+            <Link
+              href="/dashboard"
+              className="text-slate-400 hover:text-white font-black text-xs"
+            >
+              进入控制台 →
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {featuredCreators.map((c) => (
-              <div key={c.name} className="flex items-center gap-4 rounded-[2rem] border border-white/10 bg-slate-950/40 p-5 hover:bg-slate-950 transition-colors">
-                <div className="h-14 w-14 rounded-full overflow-hidden ring-2 ring-white/10 bg-white/5">
+              <div
+                key={c.name}
+                className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/40 p-4 hover:bg-slate-950 transition-colors"
+              >
+                <div className="h-12 w-12 rounded-full overflow-hidden ring-2 ring-white/10 bg-white/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={c.avatar} alt={c.name} className="h-full w-full object-cover" />
+                  <img
+                    src={c.avatar}
+                    alt={c.name}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
                 <div className="min-w-0">
-                  <div className="font-black text-white truncate">{c.name}</div>
+                  <div className="font-black text-white truncate text-sm">
+                    {c.name}
+                  </div>
                   <div className="mt-1 inline-flex items-center gap-2">
-                    <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30 px-2 py-0.5 text-[10px] font-black">
+                    <Badge
+                      variant="outline"
+                      className="bg-blue-500/10 text-blue-400 border-blue-500/30 px-2 py-0.5 text-[10px] font-black"
+                    >
                       {c.badge}
                     </Badge>
-                    <span className="text-[10px] font-black text-slate-500">成交 {c.sales}</span>
+                    <span className="text-[10px] font-black text-slate-500">
+                      成交 {c.sales}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -352,72 +636,46 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* --- 第 2 层: 资产库 --- */}
-      <section className="py-24 border-b border-white/5">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-14">
-            <h3 className="text-3xl font-black tracking-tight text-white">资产库</h3>
-            <p className="text-slate-500 mt-3 text-lg font-medium">不要重复造轮子。直接购买基础单元，基于它们进行“派生” (Remix)。</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: "DeepSeek 优化提示词", type: "Prompt", icon: <Zap className="h-5 w-5" /> },
-              { name: "Next.js 高级认证组件", type: "代码/脚本", icon: <Unlock className="h-5 w-5" /> },
-              { name: "RAG 向量知识库架构", type: "系统架构", icon: <Database className="h-5 w-5" /> },
-              { name: "垂直行业微调模型", type: "模型文件", icon: <Code2 className="h-5 w-5" /> },
-            ].map((asset, i) => (
-              <Link key={i} href="/listings" className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/40 p-8 hover:border-brand-action/50 transition-all hover:-translate-y-2 shadow-xl">
-                <div className="mb-6 p-4 rounded-2xl bg-white/5 w-fit text-slate-400 group-hover:text-brand-action group-hover:scale-110 transition-all">
-                  {asset.icon}
-                </div>
-                <h4 className="font-black text-slate-100 text-lg mb-2">{asset.name}</h4>
-                <div className="text-xs font-bold text-slate-500 mb-6 uppercase tracking-widest">{asset.type}</div>
-                <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3 py-1.5 text-[11px] font-black text-emerald-400 ring-1 ring-emerald-500/20 uppercase tracking-tight">
-                  <GitFork className="h-3 w-3" /> 引用分红: 10%
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* --- 第 3 层: 核心机制教学 --- */}
-      <section className="py-24 bg-slate-900/30">
+      <section className="py-16 bg-slate-900/30 border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center mb-20">
-            <h3 className="text-4xl font-black tracking-tight text-white mb-4">为什么选择 AI-Hub？</h3>
-            <p className="text-slate-500 text-xl font-medium max-w-2xl mx-auto">不仅仅是交易，更是重新定义了代码资产的商业价值。</p>
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-black tracking-tight text-white mb-3">
+              为什么选择 AI-Hub？
+            </h3>
+            <p className="text-slate-500 text-base font-medium max-w-2xl mx-auto">
+              不仅仅是交易，更是重新定义了代码资产的商业价值。
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="p-10 rounded-[2.5rem] border border-white/5 bg-slate-950/40 text-center hover:bg-slate-950 transition-colors shadow-2xl">
-              <div className="mx-auto mb-8 p-5 rounded-2xl bg-emerald-500/10 text-emerald-400 w-fit ring-1 ring-emerald-500/20">
-                <GitFork className="h-10 w-10" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-8 rounded-2xl border border-white/10 bg-slate-950/40 text-center hover:bg-slate-950 transition-colors">
+              <div className="mx-auto mb-6 p-4 rounded-2xl bg-emerald-500/10 text-emerald-400 w-fit ring-1 ring-emerald-500/20">
+                <GitFork className="h-8 w-8" />
               </div>
-              <h4 className="text-2xl font-black mb-4">族谱</h4>
-              <p className="text-slate-400 text-base leading-relaxed font-medium">
-                代码不再是孤岛。通过族谱追踪每一次引用，当有人基于您的成果赚钱时，系统会自动为您分配版税。
+              <h4 className="text-xl font-black mb-3">族谱</h4>
+              <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                通过族谱追踪每一次引用，当有人基于您的成果赚钱时，系统会自动为您分配版税。
               </p>
             </div>
 
-            <div className="p-10 rounded-[2.5rem] border border-white/5 bg-slate-950/40 text-center hover:bg-slate-950 transition-colors shadow-2xl">
-              <div className="mx-auto mb-8 p-5 rounded-2xl bg-blue-500/10 text-blue-400 w-fit ring-1 ring-blue-500/20">
-                <PieChart className="h-10 w-10" />
+            <div className="p-8 rounded-2xl border border-white/10 bg-slate-950/40 text-center hover:bg-slate-950 transition-colors">
+              <div className="mx-auto mb-6 p-4 rounded-2xl bg-blue-500/10 text-blue-400 w-fit ring-1 ring-blue-500/20">
+                <PieChart className="h-8 w-8" />
               </div>
-              <h4 className="text-2xl font-black mb-4">自动分账</h4>
-              <p className="text-slate-400 text-base leading-relaxed font-medium">
-                抛弃传统账期。每一笔交易完成后，系统将根据分账协议瞬间完成资金清算，钱直接进您的个人钱包。
+              <h4 className="text-xl font-black mb-3">自动分账</h4>
+              <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                每一笔交易完成后系统瞬间完成资金清算，钱直接进您的个人钱包。
               </p>
             </div>
 
-            <div className="p-10 rounded-[2.5rem] border border-white/5 bg-slate-950/40 text-center hover:bg-slate-950 transition-colors shadow-2xl">
-              <div className="mx-auto mb-8 p-5 rounded-2xl bg-amber-500/10 text-amber-400 w-fit ring-1 ring-amber-500/20">
-                <Unlock className="h-10 w-10" />
+            <div className="p-8 rounded-2xl border border-white/10 bg-slate-950/40 text-center hover:bg-slate-950 transition-colors">
+              <div className="mx-auto mb-6 p-4 rounded-2xl bg-amber-500/10 text-amber-400 w-fit ring-1 ring-amber-500/20">
+                <Unlock className="h-8 w-8" />
               </div>
-              <h4 className="text-2xl font-black mb-4">半开源模式</h4>
-              <p className="text-slate-400 text-base leading-relaxed font-medium">
-                甲方以极致低价租用方案解决痛点，乙方保留核心版权通过规模化授权获利。这是属于 AI 时代的双赢。
+              <h4 className="text-xl font-black mb-3">半开源模式</h4>
+              <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                甲方低价租用方案解决痛点，乙方保留核心版权通过规模化授权获利。
               </p>
             </div>
           </div>
@@ -425,52 +683,93 @@ export default async function HomePage() {
       </section>
 
       {/* --- 第 4 层: 实时动态 --- */}
-      <div className="py-8 bg-slate-950">
+      <div className="py-6 bg-slate-950 border-b border-white/10">
         <LiveActivityTicker />
       </div>
 
       {/* --- 页脚 --- */}
-      <footer className="border-t border-white/5 bg-slate-950 pt-24 pb-12">
+      <footer className="border-t border-white/10 bg-slate-950 pt-16 pb-10">
         <div className="mx-auto max-w-7xl px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
             <div className="col-span-1 md:col-span-2">
-              <div className="text-2xl font-black tracking-tighter text-white uppercase mb-6 flex items-center gap-2">
+              <div className="text-xl font-black tracking-tighter text-white uppercase mb-5 flex items-center gap-2">
                 <div className="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
                   <Zap className="h-5 w-5 fill-white" />
                 </div>
                 AI-Hub
               </div>
-              <p className="text-base text-slate-500 leading-relaxed max-w-sm font-medium">
-                让代码资产化，让创造可持续。全球首个基于“半开源”协议的 AI 资产演化网络。
+              <p className="text-sm text-slate-500 leading-relaxed max-w-sm font-medium">
+                让代码资产化，让创造可持续。基于“半开源”协议的 AI 资产演化网络。
               </p>
             </div>
             <div>
-              <h5 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8">我的中心</h5>
-              <ul className="space-y-5 text-sm font-bold text-slate-500">
-                <li><Link href="/dashboard/wallet" className="hover:text-white flex items-center gap-3 transition-all group"><Wallet className="h-4 w-4 group-hover:text-brand-action" /> 我的钱包</Link></li>
-                <li><Link href="/dashboard/orders" className="hover:text-white flex items-center gap-3 transition-all group"><ShoppingBag className="h-4 w-4 group-hover:text-brand-action" /> 我的订单</Link></li>
-                <li><Link href="/help" className="hover:text-white flex items-center gap-3 transition-all group"><HelpCircle className="h-4 w-4 group-hover:text-brand-action" /> 帮助中心</Link></li>
+              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">
+                我的中心
+              </h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-500">
+                <li>
+                  <Link
+                    href="/dashboard/wallet"
+                    className="hover:text-white flex items-center gap-3 transition-all group"
+                  >
+                    <Wallet className="h-4 w-4 group-hover:text-brand-action" />
+                    我的钱包
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/orders"
+                    className="hover:text-white flex items-center gap-3 transition-all group"
+                  >
+                    <ShoppingBag className="h-4 w-4 group-hover:text-brand-action" />
+                    我的订单
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/help"
+                    className="hover:text-white flex items-center gap-3 transition-all group"
+                  >
+                    <MessageSquare className="h-4 w-4 group-hover:text-brand-action" />
+                    帮助中心
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
-              <h5 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8">协议规则</h5>
-              <ul className="space-y-5 text-sm font-bold text-slate-500">
-                <li><Link href="/manifesto" className="hover:text-white transition-colors">共生宣言</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">服务协议</Link></li>
-                <li><Link href="/privacy" className="hover:text-white transition-colors">隐私条款</Link></li>
+              <h5 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">
+                协议规则
+              </h5>
+              <ul className="space-y-4 text-xs font-bold text-slate-500">
+                <li>
+                  <Link href="/manifesto" className="hover:text-white transition-colors">
+                    共生宣言
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-white transition-colors">
+                    服务协议
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-white transition-colors">
+                    隐私条款
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="pt-10 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] font-black uppercase tracking-widest text-slate-600">
+          <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-600">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-3 w-3 text-emerald-500" />
               © {new Date().getFullYear()} AI-Hub. 沪ICP备 XXXXXXXX号
             </div>
-            <div className="text-slate-500">让每一行代码都在资产网络中持续进化</div>
+            <div className="text-slate-500">
+              让每一行代码都在资产网络中持续进化
+            </div>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-
