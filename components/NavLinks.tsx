@@ -9,8 +9,8 @@ export function NavLinks() {
 
   const links = [
     { href: "/listings", label: "服务市场" },
-    { href: "/dashboard/jobs", label: "任务大厅" },
-    { href: "/dashboard", label: "控制台" },
+    { href: "/dashboard/jobs", label: "悬赏大厅" },
+    { href: "/manifesto", label: "创作者宣言" },
   ];
 
   return (

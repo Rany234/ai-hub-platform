@@ -46,7 +46,7 @@ export async function Navbar() {
                 className="rounded-md bg-black text-white px-3 py-1.5"
                 href="/dashboard/listings/new"
               >
-                成为卖家 / 发布服务
+                发布服务 / 资产
               </Link>
               <UserDropdown
                 avatarUrl={profile?.avatarUrl}

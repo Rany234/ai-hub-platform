@@ -54,10 +54,18 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
 
             <Link
               className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
-              href="/dashboard/settings"
+              href="/dashboard/workbench"
               onClick={() => setOpen(false)}
             >
-              👤 个人资料
+              🖥️ 我的工作台
+            </Link>
+
+            <Link
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
+              href="/dashboard/profile/me"
+              onClick={() => setOpen(false)}
+            >
+              👤 个人主页
             </Link>
 
             <Link
@@ -72,7 +80,6 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
               className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/wallet"
               onClick={() => setOpen(false)}
-              title="⌘B"
             >
               💰 我的钱包
             </Link>
@@ -82,23 +89,25 @@ export function UserDropdown({ avatarUrl, fullName, username }: Props) {
               href="/dashboard/orders"
               onClick={() => setOpen(false)}
             >
-              📦 我买到的
+              📦 我的订单
             </Link>
 
-            <Link
-              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
-              href="/dashboard/sales"
-              onClick={() => setOpen(false)}
-            >
-              💰 我卖出的
-            </Link>
+            <div className="border-t border-brand-border my-1" />
 
             <Link
               className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
               href="/dashboard/listings"
               onClick={() => setOpen(false)}
             >
-              📂 管理我的服务
+              📂 我的服务
+            </Link>
+
+            <Link
+              className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-md transition-colors"
+              href="/dashboard/settings"
+              onClick={() => setOpen(false)}
+            >
+              ⚙️ 设置
             </Link>
 
             <div className="border-t my-1" />

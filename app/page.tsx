@@ -29,7 +29,7 @@ export default function HomePage() {
             <div className="max-w-xl text-center lg:text-left">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-400 backdrop-blur-md">
                 <span className="flex h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
-                AI-Hub Protocol v2.0
+                智汇协议 v2.0
               </div>
 
               <h1 className="mt-6 text-5xl font-extrabold tracking-tight sm:text-6xl text-slate-100">
@@ -78,7 +78,7 @@ export default function HomePage() {
                   <div className="flex gap-3 mt-1">
                     <span className="text-slate-600 select-none">2</span>
                     <p className="text-slate-300">
-                      <span className="text-slate-500">// Value +10.00%</span>
+                      <span className="text-slate-500">// 价值增长 +10.00%</span>
                     </p>
                   </div>
                   <div className="flex gap-3 mt-1">
@@ -115,7 +115,7 @@ export default function HomePage() {
                   <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
                     <PlusCircle className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold">悬赏大厅 (Bounty Hall)</h3>
+                  <h3 className="text-xl font-bold">悬赏大厅</h3>
                 </div>
                 <ArrowRight className="h-5 w-5 text-slate-600 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -146,8 +146,8 @@ export default function HomePage() {
               <div className="p-2 w-fit rounded-lg bg-blue-500/10 text-blue-400 mb-6">
                 <TrendingUp className="h-5 w-5" />
               </div>
-              <h3 className="text-xl font-bold mb-2">智能合约</h3>
-              <p className="text-sm text-slate-500 mb-8 font-medium">Smart Split Protocol</p>
+              <h3 className="text-xl font-bold mb-2">自动分账协议</h3>
+              <p className="text-sm text-slate-500 mb-8 font-medium">无需人工介入，系统自动按比例分配收益。</p>
               
               <div className="space-y-6">
                 <div className="relative h-2 w-full bg-white/5 rounded-full overflow-hidden">
@@ -156,11 +156,11 @@ export default function HomePage() {
                 <div className="flex justify-between items-end">
                   <div>
                     <div className="text-3xl font-black text-slate-100 tracking-tighter">90%</div>
-                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Creator Share</div>
+                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">创作者分成</div>
                   </div>
                   <div className="text-right">
                     <div className="text-xl font-bold text-slate-400">10%</div>
-                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Protocol</div>
+                    <div className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">平台激励</div>
                   </div>
                 </div>
               </div>
@@ -173,8 +173,8 @@ export default function HomePage() {
               <div className="p-2 w-fit rounded-lg bg-emerald-500/10 text-emerald-400 mb-6">
                 <GitFork className="h-5 w-5" />
               </div>
-              <h3 className="text-xl font-bold mb-2">资产谱系</h3>
-              <p className="text-sm text-slate-500 mb-8 font-medium">Genealogy Tree</p>
+              <h3 className="text-xl font-bold mb-2">资产族谱</h3>
+              <p className="text-sm text-slate-500 mb-8 font-medium">追踪每一次改编与引用。</p>
               
               <div className="flex justify-center py-4">
                 <div className="relative">
@@ -188,7 +188,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="mt-8 text-center">
-                <span className="text-[10px] text-emerald-400/80 font-bold uppercase tracking-widest">追踪每一份衍生价值</span>
+                <span className="text-[10px] text-emerald-400/80 font-bold uppercase tracking-widest">可视化价值链条</span>
               </div>
             </div>
           </Link>
@@ -201,24 +201,24 @@ export default function HomePage() {
                   <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
                     <Database className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold">原子资产库 (Atomic Assets)</h3>
+                  <h3 className="text-xl font-bold">原子资产库</h3>
                 </div>
-                <div className="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded-md uppercase tracking-tighter">120+ Assets Online</div>
+                <div className="text-[10px] font-bold text-slate-500 bg-white/5 px-2 py-1 rounded-md uppercase tracking-tighter">如 Prompt、脚本、模型等基础单元</div>
               </div>
               
               <div className="flex gap-4 overflow-hidden mask-fade-right">
                 {[
-                  { name: "DeepSeek Prompts", icon: <Zap className="h-4 w-4" /> },
-                  { name: "Auth Kit v1.2", icon: <Cpu className="h-4 w-4" /> },
-                  { name: "RAG Schema", icon: <Search className="h-4 w-4" /> },
-                  { name: "Agent Blueprint", icon: <Terminal className="h-4 w-4" /> },
+                  { name: "DeepSeek 提示词", icon: <Zap className="h-4 w-4" /> },
+                  { name: "鉴权组件 v1.2", icon: <Cpu className="h-4 w-4" /> },
+                  { name: "RAG 知识库架构", icon: <Search className="h-4 w-4" /> },
+                  { name: "智能体蓝图", icon: <Terminal className="h-4 w-4" /> },
                 ].map((asset, i) => (
                   <div key={i} className="min-w-[160px] p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col gap-3">
                     <div className="p-2 rounded-lg bg-white/5 w-fit text-slate-400">
                       {asset.icon}
                     </div>
                     <span className="text-xs font-bold text-slate-300">{asset.name}</span>
-                    <span className="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Remixable</span>
+                    <span className="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">可二创</span>
                   </div>
                 ))}
               </div>

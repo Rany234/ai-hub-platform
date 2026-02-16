@@ -4,7 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  PieChart,
   Globe,
   MessageCircle,
   LayoutDashboard,
@@ -12,6 +11,10 @@ import {
   User,
   ArrowLeftCircle,
   Package,
+  Store,
+  ShoppingBag,
+  Wallet,
+  Settings,
 } from "lucide-react"
 
 import {
@@ -39,16 +42,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">AI Hub</span>
-            <span className="truncate text-xs text-muted-foreground">Platform</span>
+            <span className="truncate text-xs text-muted-foreground">控制台</span>
           </div>
         </Link>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel>管理菜单</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Hardcoded items to ensure visibility */}
+              {/* 概览 */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard"}>
                   <Link href="/dashboard">
@@ -58,15 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/dashboard/jobs"}>
-                  <Link href="/dashboard/jobs">
-                    <Globe className="size-4" />
-                    <span>任务广场</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
+              {/* 我的工作台 */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/workbench"}>
                   <Link href="/dashboard/workbench">
@@ -76,6 +71,47 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
+              {/* 服务市场 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/listings"}>
+                  <Link href="/listings">
+                    <Store className="size-4" />
+                    <span>服务市场</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* 悬赏大厅 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/jobs"}>
+                  <Link href="/dashboard/jobs">
+                    <Globe className="size-4" />
+                    <span>悬赏大厅</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* 我的订单 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/orders"}>
+                  <Link href="/dashboard/orders">
+                    <ShoppingBag className="size-4" />
+                    <span>我的订单</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* 资金管理 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/wallet"}>
+                  <Link href="/dashboard/wallet">
+                    <Wallet className="size-4" />
+                    <span>资金管理</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* 个人主页 */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/profile/me" || pathname.startsWith("/dashboard/profile/")}>
                   <Link href="/dashboard/profile/me">
@@ -85,6 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
+              {/* 我的服务 */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/services"}>
                   <Link href="/dashboard/services">
@@ -94,20 +131,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
+              {/* 消息沟通 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/chat"}>
+                  <Link href="/dashboard/chat">
+                    <MessageCircle className="size-4" />
+                    <span>消息沟通</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* 设置 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/settings"}>
+                  <Link href="/dashboard/settings">
+                    <Settings className="size-4" />
+                    <span>设置</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* 返回官网 */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link href="/" target="_self">
                     <ArrowLeftCircle className="size-4" />
                     <span>返回官网</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/dashboard/chat"}>
-                  <Link href="/dashboard/chat">
-                    <MessageCircle className="size-4" />
-                    <span>消息中心</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
