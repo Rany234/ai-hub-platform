@@ -14,16 +14,18 @@ export function NavLinks() {
   ];
 
   return (
-    <nav className="flex items-center gap-6 text-sm">
+    <nav className="flex items-center gap-6 text-sm font-semibold">
       {links.map((link) => {
-        const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+        const isActive =
+          pathname === link.href ||
+          (link.href !== "/" && pathname.startsWith(link.href));
         return (
           <Link
             key={link.href}
             href={link.href}
             className={cn(
               "transition-colors hover:text-white underline-offset-4 hover:underline",
-              isActive ? "text-brand-action font-medium" : "text-slate-400"
+              isActive ? "text-brand-action font-extrabold" : "text-slate-400"
             )}
           >
             {link.label}

@@ -30,13 +30,29 @@ import { getJobs } from "@/app/actions/job";
 export default async function HomePage() {
   const session = await auth();
   const isLoggedIn = !!session?.user;
-  const jobs = await getJobs();
+  const jobsData = await getJobs();
 
-  // Mock counts for dashboard (replace with real logic if available)
+  // Seed Data Fallback for Bounty Hall
+  const jobs = jobsData.length > 0 ? jobsData : [
+    { id: "seed-1", title: "企业级知识库 RAG 架构优化 (DeepSeek-V3)", budget: 3500, status: "open", profiles: { username: "AI_Architect" } },
+    { id: "seed-2", title: "定制化 ComfyUI 电商海报自动生成流", budget: 1200, status: "open", profiles: { username: "Workflow_Master" } },
+    { id: "seed-3", title: "多模态法律合同审查 Agent 开发", budget: 5000, status: "in_progress", profiles: { username: "LegalTech_Lab" } },
+    { id: "seed-4", title: "微信小程序 AI 客服插件对接 (含流式响应)", budget: 800, status: "open", profiles: { username: "FastDev" } },
+  ];
+
+  // Featured Creators Data
+  const featuredCreators = [
+    { name: "张小刚", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix", badge: "Top 1% 开发者", sales: "1.2k+" },
+    { name: "Li Wei", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka", badge: "Prompt 专家", sales: "800+" },
+    { name: "Sarah J.", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah", badge: "工作流大师", sales: "2.5k+" },
+    { name: "陈老师", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Brian", badge: "企业方案专家", sales: "500+" },
+  ];
+
+  // Mock counts for dashboard
   const dashboardStats = {
     balance: "¥1,200.00",
     activeOrders: 3,
-    unreadMessages: 5
+    unreadMessages: 5,
   };
 
   const categories = [
@@ -52,7 +68,7 @@ export default async function HomePage() {
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans selection:bg-blue-500/30">
       
       {/* --- 第 0 层: Hero Section --- */}
-      <section className="relative border-b border-white/5 overflow-hidden">
+      <section className="relative border-b border-white/5 overflow-hidden py-8 md:py-10">
         {isLoggedIn ? (
           /* 已登录: 快捷仪表盘 */
           <div className="mx-auto max-w-7xl px-6 py-12">
@@ -111,72 +127,80 @@ export default async function HomePage() {
             </div>
           </div>
         ) : (
-          /* 未登录: 营销分屏 */
-          <div className="flex flex-col md:flex-row min-h-[420px]">
-            {/* 左侧: 需求方 (雇主) */}
-            <div className="flex-1 p-8 lg:p-10 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5 hover:bg-blue-600/[0.03] transition-all group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative z-10">
-                <div className="mb-4 w-fit p-3 rounded-2xl bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20">
-                  <Users className="h-6 w-6" />
-                </div>
-                <h2 className="text-3xl font-black mb-3 tracking-tight">我有需求</h2>
-                <p className="text-slate-400 text-lg mb-8 max-w-md leading-relaxed font-medium">
-                  发布“半开源”悬赏，以传统开发 <span className="text-blue-400 font-bold">50% 的成本</span> 快速获取 AI 解决方案。
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 px-8 rounded-xl shadow-2xl shadow-blue-600/20 active:scale-95 transition-all">
-                    <Link href="/dashboard/jobs/new">
-                      <PlusCircle className="mr-2 h-5 w-5" /> 发布悬赏
-                    </Link>
-                  </Button>
+          /* 未登录: 营销分屏 - 紧凑排列 */
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="flex flex-col md:flex-row gap-4 mb-8">
+              {/* 左侧: 需求方 (雇主) */}
+              <div className="flex-1 p-6 lg:p-8 rounded-[2rem] border border-white/5 bg-blue-600/[0.02] hover:bg-blue-600/[0.05] transition-all group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10 flex items-start gap-5">
+                  <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20">
+                    <Users className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black mb-2 tracking-tight">我有需求</h2>
+                    <p className="text-slate-400 text-sm mb-4 max-w-xs leading-relaxed font-medium">
+                      发布“半开源”悬赏，以传统开发 <span className="text-blue-400 font-bold">50% 的成本</span> 获取方案。
+                    </p>
+                    <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-10 px-6 rounded-xl active:scale-95 transition-all">
+                      <Link href="/dashboard/jobs/new">发布悬赏</Link>
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 右侧: 供给方 (创作者) */}
-            <div className="flex-1 p-8 lg:p-10 flex flex-col justify-center hover:bg-purple-600/[0.03] transition-all group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative z-10">
-                <div className="mb-4 w-fit p-3 rounded-2xl bg-purple-500/10 text-purple-400 ring-1 ring-purple-500/20">
-                  <Code2 className="h-6 w-6" />
-                </div>
-                <h2 className="text-3xl font-black mb-3 tracking-tight">我有能力</h2>
-                <p className="text-slate-400 text-lg mb-8 max-w-md leading-relaxed font-medium">
-                  一次开发，终身受益。您的代码被他人引用即可自动触发协议，<span className="text-purple-400 font-bold">永久赚取版税</span>。
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-500 text-white font-bold h-12 px-8 rounded-xl shadow-2xl shadow-purple-600/20 active:scale-95 transition-all">
-                    <Link href="/dashboard/workbench">
-                      <Database className="mr-2 h-5 w-5" /> 上架资产
-                    </Link>
-                  </Button>
+              {/* 右侧: 供给方 (创作者) */}
+              <div className="flex-1 p-6 lg:p-8 rounded-[2rem] border border-white/5 bg-purple-600/[0.02] hover:bg-purple-600/[0.05] transition-all group relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10 flex items-start gap-5">
+                  <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-400 ring-1 ring-purple-500/20">
+                    <Code2 className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-black mb-2 tracking-tight">我有能力</h2>
+                    <p className="text-slate-400 text-sm mb-4 max-w-xs leading-relaxed font-medium">
+                      一次开发，终身受益。您的代码被他人引用即自动触发协议，<span className="text-purple-400 font-bold">永久赚取版税</span>。
+                    </p>
+                    <Button asChild size="sm" className="bg-purple-600 hover:bg-purple-500 text-white font-bold h-10 px-6 rounded-xl active:scale-95 transition-all">
+                      <Link href="/dashboard/workbench">上架资产</Link>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* 全局搜索条 - 位于 Hero 下方或中间 */}
-        <div className="relative z-20 -mt-8 pb-12">
-          <div className="mx-auto max-w-3xl px-6">
+        {/* 全局搜索条 - 全宽度且更宽 */}
+        <div className="relative z-20 pb-6">
+          <div className="mx-auto max-w-5xl px-6">
             <div className="relative group">
-              <div className="absolute inset-0 bg-blue-600/20 blur-2xl group-hover:bg-blue-600/30 transition-all opacity-50" />
-              <div className="relative flex items-center bg-slate-950 border border-white/10 rounded-2xl p-1 shadow-2xl focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
+              <div className="absolute inset-0 bg-blue-600/15 blur-3xl group-hover:bg-blue-600/25 transition-all opacity-50" />
+              <div className="relative flex items-center bg-slate-950/80 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-2xl focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
                 <div className="pl-4 text-slate-500">
                   <Search className="h-5 w-5" />
                 </div>
                 <Input 
-                  className="bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-slate-600 h-14 text-lg" 
-                  placeholder="搜索 AI 模型、提示词、工作流或任务..." 
+                  className="bg-transparent border-0 focus-visible:ring-0 text-white placeholder:text-slate-600 h-10 md:h-12 text-base" 
+                  placeholder="搜索 AI 资产、任务或服务..." 
                 />
-                <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-12 px-8 rounded-xl mr-1">
+                <Button className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-8 md:h-10 px-6 rounded-xl mr-1">
                   搜索
                 </Button>
               </div>
             </div>
 
-            {/* 类别导航 Icon Grid */}
+            {/* 热搜关键词 */}
+            <div className="mt-3 flex items-center gap-3 px-2 text-xs font-bold">
+              <span className="text-slate-500">热搜：</span>
+              {["DeepSeek 提示词", "企业 Agent", "私人助理脚本"].map((tag) => (
+                <Link key={tag} href={`/listings?q=${tag}`} className="text-slate-400 hover:text-blue-400 transition-colors">
+                  {tag}
+                </Link>
+              ))}
+            </div>
+
+            {/* 类别导航 Icon Grid - 移到搜索下方 */}
             <div className="mt-8 grid grid-cols-3 md:grid-cols-6 gap-4">
               {categories.map((cat, i) => (
                 <Link 
@@ -261,6 +285,69 @@ export default async function HomePage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- 第 3 层: 核心机制教学 --- */}
+      <section className="py-24 bg-slate-900/30">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-14">
+            <h3 className="text-3xl font-black tracking-tight text-white">资产库</h3>
+            <p className="text-slate-500 mt-3 text-lg font-medium">不要重复造轮子。直接购买基础单元，基于它们进行“派生” (Remix)。</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: "DeepSeek 优化提示词", type: "Prompt", icon: <Zap className="h-5 w-5" /> },
+              { name: "Next.js 高级认证组件", type: "代码/脚本", icon: <Unlock className="h-5 w-5" /> },
+              { name: "RAG 向量知识库架构", type: "系统架构", icon: <Database className="h-5 w-5" /> },
+              { name: "垂直行业微调模型", type: "模型文件", icon: <Code2 className="h-5 w-5" /> },
+            ].map((asset, i) => (
+              <Link key={i} href="/listings" className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/40 p-8 hover:border-brand-action/50 transition-all hover:-translate-y-2 shadow-xl">
+                <div className="mb-6 p-4 rounded-2xl bg-white/5 w-fit text-slate-400 group-hover:text-brand-action group-hover:scale-110 transition-all">
+                  {asset.icon}
+                </div>
+                <h4 className="font-black text-slate-100 text-lg mb-2">{asset.name}</h4>
+                <div className="text-xs font-bold text-slate-500 mb-6 uppercase tracking-widest">{asset.type}</div>
+                <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3 py-1.5 text-[11px] font-black text-emerald-400 ring-1 ring-emerald-500/20 uppercase tracking-tight">
+                  <GitFork className="h-3 w-3" /> 引用分红: 10%
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- 推荐创作者 --- */}
+      <section className="py-16 border-b border-white/5 bg-slate-900/30">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex items-end justify-between gap-6 mb-10">
+            <div>
+              <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white">推荐创作者</h3>
+              <p className="text-slate-500 mt-2 text-sm md:text-base font-medium">真实交付与口碑沉淀，让选择更有把握。</p>
+            </div>
+            <Link href="/dashboard" className="text-slate-400 hover:text-white font-black text-sm">进入控制台 →</Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {featuredCreators.map((c) => (
+              <div key={c.name} className="flex items-center gap-4 rounded-[2rem] border border-white/10 bg-slate-950/40 p-5 hover:bg-slate-950 transition-colors">
+                <div className="h-14 w-14 rounded-full overflow-hidden ring-2 ring-white/10 bg-white/5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={c.avatar} alt={c.name} className="h-full w-full object-cover" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-black text-white truncate">{c.name}</div>
+                  <div className="mt-1 inline-flex items-center gap-2">
+                    <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/30 px-2 py-0.5 text-[10px] font-black">
+                      {c.badge}
+                    </Badge>
+                    <span className="text-[10px] font-black text-slate-500">成交 {c.sales}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
