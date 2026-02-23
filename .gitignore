@@ -33,6 +33,13 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local artifacts / binaries
+stripe.exe
+deploy.zip
+
+# local uploads (runtime-generated)
+/public/uploads/
+
 # vercel
 .vercel
 
