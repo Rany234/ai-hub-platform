@@ -1,12 +1,9 @@
-import dotenv from "dotenv";
-import path from "path";
+// IMPORTANT: scripts must load env via setupEnv() ONLY
+const { setupEnv, printDbInfo } = require("./utils");
+setupEnv();
+printDbInfo();
+
 import crypto from "crypto";
-
-import { WXBizMsgCrypt } from "../lib/wechat/crypt";
-
-// Load env like Next.js
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 function mustGetEnv(key: string) {
   const v = process.env[key];

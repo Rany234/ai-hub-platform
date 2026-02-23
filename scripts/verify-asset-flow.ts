@@ -1,10 +1,7 @@
-import dotenv from "dotenv";
-import path from "path";
-
-// 优先加载 .env.local (Next.js 默认)，其次加载 .env
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
-dotenv.config({ path: path.resolve(process.cwd(), ".env") });
-
+// IMPORTANT: scripts must load env via setupEnv() ONLY
+const { setupEnv, printDbInfo } = require("./utils");
+setupEnv();
+printDbInfo();
 
 
 async function main() {
@@ -45,14 +42,17 @@ async function main() {
       data: {
         creatorId: alice.id,
         type: "ASSET",
-        price: 100.0,
+        priceCents: 10000,
         title: "STM32 HAL库终极指南",
         attachmentUrl: "https://drive.google.com/file/d/Bz...",
         instantDelivery: true,
         status: "active",
       },
     });
-    console.log(`✅ Alice 已发布资产: ${listing.id}, 价格: ${listing.price}`);
+    const listingPriceYuan = (listing as any).priceCents
+      ? (listing as any).priceCents / 100
+      : (listing as any).price;
+    console.log(`✅ Alice 已发布资产: ${listing.id}, 价格: ${listingPriceYuan}`);
 
     // 4. 模拟购买 (Order)
     console.log("--- 步骤 4: 模拟下单 ---");
@@ -60,7 +60,8 @@ async function main() {
       data: {
         buyerId: bob.id,
         listingId: listing.id,
-        amount: 100.0,
+        // amount 仍以“元”为口径（与当前订单/分润逻辑保持一致）
+        amount: listingPriceYuan,
         status: "pending",
       },
     });
